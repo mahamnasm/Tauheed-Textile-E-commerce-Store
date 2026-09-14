@@ -69,12 +69,26 @@ export default async function HomePage() {
     }),
   ]);
 
+  // Parse hero stats (e.g. "100%|Pure Swiss Fabrics")
+  const parseStat = (statStr: string, defaultVal: string, defaultLabel: string) => {
+    if (!statStr) return { value: defaultVal, label: defaultLabel };
+    const parts = statStr.split("|");
+    return {
+      value: parts[0]?.trim() || defaultVal,
+      label: parts[1]?.trim() || defaultLabel,
+    };
+  };
+
+  const stat1 = parseStat(settings.heroStats1, "100%", "Pure Swiss & Egyptian Fabrics");
+  const stat2 = parseStat(settings.heroStats2, "COD", "Available across Pakistan");
+  const stat3 = parseStat(settings.heroStats3, "2-4 Days", "Express Courier Delivery");
+
   return (
     <div className="space-y-16 sm:space-y-24 pb-20 bg-ink-black text-sand-100">
       {/* 1. HERO SHOWCASE (ADMIN CONTROLLED) */}
       {settings.showHero && (
         <section className="relative min-h-[85vh] lg:min-h-[92vh] flex items-center bg-black overflow-hidden border-b border-sand-900/60">
-          {/* Background AI Model Image or Ambient Video */}
+          {/* Background Media */}
           <div className="absolute inset-0 z-0">
             {settings.heroMediaType === "VIDEO" ? (
               <video
@@ -130,24 +144,35 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {/* Quick Hero Highlights */}
+              {/* Dynamic Hero Highlights */}
               <div className="pt-6 grid grid-cols-3 gap-4 border-t border-sand-800/80 text-sand-300 text-xs">
                 <div>
-                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">100%</p>
-                  <p className="text-[11px] text-sand-400">Pure Swiss & Egyptian Fabrics</p>
+                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">{stat1.value}</p>
+                  <p className="text-[11px] text-sand-400">{stat1.label}</p>
                 </div>
                 <div>
-                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">COD</p>
-                  <p className="text-[11px] text-sand-400">Available across Pakistan</p>
+                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">{stat2.value}</p>
+                  <p className="text-[11px] text-sand-400">{stat2.label}</p>
                 </div>
                 <div>
-                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">2-4 Days</p>
-                  <p className="text-[11px] text-sand-400">Express Courier Delivery</p>
+                  <p className="font-serif font-bold text-gold-400 text-lg sm:text-xl">{stat3.value}</p>
+                  <p className="text-[11px] text-sand-400">{stat3.label}</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
+      )}
+
+      {/* FESTIVE SLIDING MARQUEE TICKER (ADMIN CONTROLLED) */}
+      {settings.marqueeEnabled && (
+        <div className="w-full bg-gold-500 text-ink-black py-3 overflow-hidden whitespace-nowrap border-y border-gold-400 font-bold text-xs uppercase tracking-widest shadow-lg">
+          <Link href={settings.marqueeLink || "/shop"} className="hover:opacity-90 transition-opacity flex items-center gap-6 px-4">
+            <span className="shrink-0">{settings.marqueeText}</span>
+            <span className="text-brand-950 font-black">•</span>
+            <span className="shrink-0 hidden md:inline">{settings.marqueeText}</span>
+          </Link>
+        </div>
       )}
 
       {/* 2. CURATED CATEGORIES SHOWCASE (ADMIN CONTROLLED) */}
@@ -157,8 +182,13 @@ export default async function HomePage() {
             <div>
               <span className="text-xs font-bold tracking-widest uppercase text-gold-400">Explore by Category</span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sand-50 mt-1">
-                Curated Collections
+                {settings.categoriesTitle || "Curated Collections"}
               </h2>
+              {settings.categoriesSubtitle && (
+                <p className="text-xs text-sand-400 mt-1 max-w-xl">
+                  {settings.categoriesSubtitle}
+                </p>
+              )}
             </div>
             <Link 
               href="/shop" 
@@ -213,7 +243,7 @@ export default async function HomePage() {
                 <Film className="w-3.5 h-3.5" /> Models in Motion
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sand-50 mt-1">
-                Shoppable Runway Reels
+                {settings.videosTitle || "Shoppable Runway Reels"}
               </h2>
             </div>
             <p className="text-xs text-sand-400">
@@ -272,7 +302,7 @@ export default async function HomePage() {
             <div className="text-center max-w-xl mx-auto mb-10">
               <span className="text-xs font-bold tracking-widest uppercase text-gold-400">Haute Couture Looks</span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sand-50 mt-1">
-                Campaign Lookbook & Spotlight
+                {settings.lookbookTitle || "Campaign Lookbook & Spotlight"}
               </h2>
               <p className="text-xs sm:text-sm text-sand-400 mt-2">
                 Experience the grace, drape, and needlework precision of our collections styled on our high-fashion muse.
@@ -280,7 +310,7 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {/* Editorial Model Look 1 */}
+              {/* Editorial Look 1 */}
               <div className="bg-brand-900 rounded-3xl overflow-hidden shadow-2xl border border-sand-900 hover:border-gold-500/40 flex flex-col group transition-all">
                 <div className="relative aspect-[9/14] sm:aspect-[9/13] w-full bg-brand-950 overflow-hidden">
                   <Image
@@ -309,7 +339,7 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Editorial Model Look 2 */}
+              {/* Editorial Look 2 */}
               <div className="bg-brand-900 rounded-3xl overflow-hidden shadow-2xl border border-sand-900 hover:border-gold-500/40 flex flex-col group transition-all">
                 <div className="relative aspect-[9/14] sm:aspect-[9/13] w-full bg-brand-950 overflow-hidden">
                   <Image
@@ -348,7 +378,7 @@ export default async function HomePage() {
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs font-bold tracking-widest uppercase text-gold-400">Trusted by Women Nationwide</span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sand-50 mt-1">
-              Words of Grace & Appreciation
+              {settings.reviewsTitle || "Words of Grace & Appreciation"}
             </h2>
           </div>
 
@@ -385,16 +415,47 @@ export default async function HomePage() {
       {/* 7. BRAND HERITAGE & CRAFTSMANSHIP BANNER (ADMIN CONTROLLED) */}
       {settings.showHeritage && (
         <section className="bg-brand-950 text-sand-100 py-16 px-4 text-center border-t border-sand-900">
-          <div className="max-w-3xl mx-auto space-y-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-gold-400">
-              Timeless Pakistani Couture
+          <div className="max-w-4xl mx-auto space-y-6">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-gold-500/20 text-gold-300 text-xs font-bold uppercase tracking-widest border border-gold-500/30">
+              {settings.heritageBadge || "Crafting Luxury Since 1994"}
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-sand-50">
               {settings.heritageTitle || "Tauheed Textile — Where Heritage Meets Modern Grace"}
             </h3>
-            <p className="text-sand-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-sans">
+            <p className="text-sand-300 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto font-sans">
               {settings.heritageSubtitle || "Every thread is an ode to centuries of subcontinental needlecraft, woven into breathable Swiss lawns and regal chiffons. Exquisite quality, verified nationwide delivery, and dedicated customer care."}
             </p>
+
+            {/* 3 Heritage Pillars */}
+            <div className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              <div className="p-5 rounded-2xl bg-brand-900/60 border border-sand-900 space-y-2">
+                <h4 className="font-serif font-bold text-sand-50 text-sm">
+                  {settings.heritageHighlight1Title || "100% Pure Natural Fibers"}
+                </h4>
+                <p className="text-xs text-sand-400 leading-relaxed">
+                  {settings.heritageHighlight1Text || "Finest combed cotton lawn, mulberry silks, and ethereal organzas tested for extreme durability in summer heat."}
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-brand-900/60 border border-sand-900 space-y-2">
+                <h4 className="font-serif font-bold text-sand-50 text-sm">
+                  {settings.heritageHighlight2Title || "Artisanal Needlework"}
+                </h4>
+                <p className="text-xs text-sand-400 leading-relaxed">
+                  {settings.heritageHighlight2Text || "Hand-rendered tilla, sequins, marori, and fine resham embroidery created by master craftsmen in Punjab."}
+                </p>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-brand-900/60 border border-sand-900 space-y-2">
+                <h4 className="font-serif font-bold text-sand-50 text-sm">
+                  {settings.heritageHighlight3Title || "Impeccable Tailoring"}
+                </h4>
+                <p className="text-xs text-sand-400 leading-relaxed">
+                  {settings.heritageHighlight3Text || "Ready-to-wear perfection featuring structured silhouettes, luxury inner linings, and handcrafted tassels."}
+                </p>
+              </div>
+            </div>
+
             <div className="pt-4 flex justify-center gap-4">
               <Link
                 href="/shop"

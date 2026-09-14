@@ -19,9 +19,23 @@ import {
   Phone, 
   Mail, 
   MapPin,
-  Play
+  Play,
+  Megaphone,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  CreditCard,
+  Globe,
+  Share2,
+  HelpCircle,
+  Palette,
+  Layout,
+  RefreshCw,
+  Smartphone,
+  Monitor
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { SiteLayoutSettings } from "@/lib/settings";
 
 interface AdminLayoutCustomizerProps {
@@ -46,35 +60,28 @@ export default function AdminLayoutCustomizer({
   products,
 }: AdminLayoutCustomizerProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"layout" | "hero" | "videos" | "contact">("layout");
+  const [activeTab, setActiveTab] = useState<
+    "announcement" | "marquee" | "hero" | "sections" | "heritage" | "perks" | "contact" | "social" | "footer" | "videos" | "preview"
+  >("announcement");
+
   const [settings, setSettings] = useState<SiteLayoutSettings>(initialSettings);
   const [videos, setVideos] = useState<any[]>(initialVideos);
   const [isSaving, setIsSaving] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
 
-  // New Video State
+  // New Video Reel State
   const [newVideoTitle, setNewVideoTitle] = useState("");
   const [newVideoUrl, setNewVideoUrl] = useState("");
   const [newVideoProductId, setNewVideoProductId] = useState(products[0]?.id || "");
   const [isAddingVideo, setIsAddingVideo] = useState(false);
 
-  // Direct Product Video Update State
-  const [selectedProductId, setSelectedProductId] = useState(products[0]?.id || "");
-  const [productVideoUrl, setProductVideoUrl] = useState(products[0]?.videoUrl || "");
-  const [isUpdatingProdVideo, setIsUpdatingProdVideo] = useState(false);
-
-  const handleProductSelectChange = (prodId: string) => {
-    setSelectedProductId(prodId);
-    const prod = products.find((p) => p.id === prodId);
-    setProductVideoUrl(prod?.videoUrl || "");
+  // Field change helper
+  const updateField = <K extends keyof SiteLayoutSettings>(key: K, value: SiteLayoutSettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
-    setErrorMsg("");
-    setSuccessMsg("");
-
     try {
       const res = await fetch("/api/admin/layout", {
         method: "POST",
@@ -85,11 +92,10 @@ export default function AdminLayoutCustomizer({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save settings");
 
-      setSuccessMsg("Website layout settings successfully saved and applied live!");
-      setTimeout(() => setSuccessMsg(""), 4000);
+      toast.success("Website customizations applied live to storefront!", { icon: "✨" });
       router.refresh();
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to update layout");
+      toast.error(err.message || "Failed to update layout settings");
     } finally {
       setIsSaving(false);
     }
@@ -97,11 +103,12 @@ export default function AdminLayoutCustomizer({
 
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newVideoTitle || !newVideoUrl || !newVideoProductId) return;
+    if (!newVideoTitle || !newVideoUrl || !newVideoProductId) {
+      toast.error("Please fill in video title, video URL, and select a product.");
+      return;
+    }
 
     setIsAddingVideo(true);
-    setErrorMsg("");
-
     try {
       const res = await fetch("/api/admin/layout", {
         method: "POST",
@@ -111,7 +118,7 @@ export default function AdminLayoutCustomizer({
             title: newVideoTitle,
             videoUrl: newVideoUrl,
             productId: newVideoProductId,
-            displayOrder: videos.length,
+            displayOrder: videos.length.toString(),
           },
         }),
       });
@@ -122,79 +129,66 @@ export default function AdminLayoutCustomizer({
       setVideos(data.videos || []);
       setNewVideoTitle("");
       setNewVideoUrl("");
-      setSuccessMsg("New shoppable video reel attached to product!");
-      setTimeout(() => setSuccessMsg(""), 3000);
+      toast.success("Shoppable runway video added to storefront!");
       router.refresh();
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to add video");
+      toast.error(err.message || "Failed to add video reel");
     } finally {
       setIsAddingVideo(false);
     }
   };
 
-  const handleDeleteVideo = async (videoId: string) => {
-    if (!confirm("Are you sure you want to remove this video reel?")) return;
+  const handleDeleteVideo = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this video reel from the homepage?")) return;
 
     try {
       const res = await fetch("/api/admin/layout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deleteVideoId: videoId }),
+        body: JSON.stringify({ deleteVideoId: id }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to delete video");
 
       setVideos(data.videos || []);
-      setSuccessMsg("Video reel removed.");
-      setTimeout(() => setSuccessMsg(""), 3000);
+      toast.success("Video reel deleted");
       router.refresh();
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to remove video");
+      toast.error(err.message || "Failed to delete video");
     }
   };
 
-  const handleSaveProductVideo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedProductId) return;
-
-    setIsUpdatingProdVideo(true);
-    setErrorMsg("");
-
-    try {
-      const res = await fetch("/api/admin/layout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          updateProductVideo: {
-            productId: selectedProductId,
-            videoUrl: productVideoUrl,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update product video");
-
-      setSuccessMsg("Product video URL updated successfully! Customer can now view it on the product page.");
-      setTimeout(() => setSuccessMsg(""), 3000);
-      router.refresh();
-    } catch (err: any) {
-      setErrorMsg(err.message || "Failed to update product video");
-    } finally {
-      setIsUpdatingProdVideo(false);
-    }
-  };
+  const tabs = [
+    { id: "announcement", label: "Announcement Bar", icon: Megaphone, badge: "Top" },
+    { id: "marquee", label: "Festive Ticker", icon: Sparkles, badge: "Live" },
+    { id: "hero", label: "Hero Banner & Media", icon: ImageIcon, badge: "Main" },
+    { id: "sections", label: "Homepage Sections", icon: Layers },
+    { id: "heritage", label: "Brand Heritage Story", icon: Layout },
+    { id: "perks", label: "Pakistan Trust Perks", icon: ShieldCheck },
+    { id: "contact", label: "WhatsApp & Studio", icon: Phone },
+    { id: "social", label: "Social Media Links", icon: Share2 },
+    { id: "footer", label: "Footer & Copyright", icon: Globe },
+    { id: "videos", label: "Shoppable Reels", icon: Video },
+    { id: "preview", label: "Live Visual Preview", icon: Eye, badge: "Interactive" },
+  ] as const;
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-sand-300 pb-6">
+    <div className="space-y-8 max-w-7xl mx-auto pb-20">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-sand-200 shadow-sm">
         <div>
-          <span className="text-xs font-bold tracking-widest uppercase text-gold-700">Storefront Design Engine</span>
-          <h1 className="font-serif text-3xl font-bold text-brand-950 mt-1">Website Layout & Media Customizer</h1>
-          <p className="text-xs text-brand-600 mt-1">
-            Customize homepage sections, hero banners, shoppable video reels, and brand contacts in real time
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full bg-gold-100 text-gold-800 text-xs font-bold uppercase tracking-wider">
+              Complete Store Customizer
+            </span>
+            <span className="text-xs text-brand-500 font-medium">100% Live Control</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-serif text-brand-950 mt-1">
+            Website Customization Suite
+          </h1>
+          <p className="text-xs sm:text-sm text-brand-600 mt-0.5">
+            Modify announcements, banners, headlines, WhatsApp contact, trust perks, and homepage sections with 1-click live sync.
           </p>
         </div>
 
@@ -202,374 +196,155 @@ export default function AdminLayoutCustomizer({
           <Link
             href="/"
             target="_blank"
-            className="px-4 py-2.5 bg-white hover:bg-sand-50 border border-sand-300 text-brand-900 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm transition-colors"
+            className="px-4 py-2.5 rounded-xl border border-sand-300 text-brand-800 hover:bg-sand-50 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
           >
-            <ExternalLink className="w-3.5 h-3.5 text-gold-700" /> View Live Storefront
+            <ExternalLink className="w-4 h-4" />
+            <span>View Live Site</span>
           </Link>
           <button
             onClick={handleSaveSettings}
             disabled={isSaving}
-            className="px-5 py-2.5 bg-brand-900 hover:bg-brand-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md transition-all"
+            className="px-6 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-600 text-brand-950 text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 shrink-0 font-serif"
           >
-            <Save className="w-4 h-4 text-gold-400" />
-            {isSaving ? "Saving Live..." : "Save Layout Changes"}
+            {isSaving ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>Applying Changes...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save & Apply Live</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Alert Banners */}
-      {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-600" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-      {errorMsg && (
-        <div className="p-3.5 rounded-xl bg-maroon-50 border border-maroon-200 text-maroon-800 text-xs">
-          {errorMsg}
-        </div>
-      )}
-
-      {/* Navigation Tabs */}
-      <div className="flex border-b border-sand-300 gap-2 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab("layout")}
-          className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === "layout"
-              ? "border-gold-600 text-gold-700 bg-sand-50"
-              : "border-transparent text-brand-700 hover:text-brand-950"
-          }`}
-        >
-          <Layers className="w-4 h-4" /> Homepage Section Toggles
-        </button>
-
-        <button
-          onClick={() => setActiveTab("hero")}
-          className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === "hero"
-              ? "border-gold-600 text-gold-700 bg-sand-50"
-              : "border-transparent text-brand-700 hover:text-brand-950"
-          }`}
-        >
-          <Sparkles className="w-4 h-4" /> Hero Banner & Announcement
-        </button>
-
-        <button
-          onClick={() => setActiveTab("videos")}
-          className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === "videos"
-              ? "border-gold-600 text-gold-700 bg-sand-50"
-              : "border-transparent text-brand-700 hover:text-brand-950"
-          }`}
-        >
-          <Video className="w-4 h-4" /> Product Videos & Shoppable Reels
-        </button>
-
-        <button
-          onClick={() => setActiveTab("contact")}
-          className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 ${
-            activeTab === "contact"
-              ? "border-gold-600 text-gold-700 bg-sand-50"
-              : "border-transparent text-brand-700 hover:text-brand-950"
-          }`}
-        >
-          <Phone className="w-4 h-4" /> Store Contacts & WhatsApp
-        </button>
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-sand-200 scrollbar-thin">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${
+                isActive
+                  ? "bg-brand-950 text-sand-50 shadow-md"
+                  : "bg-white text-brand-700 hover:bg-sand-100 border border-sand-200"
+              }`}
+            >
+              <Icon className={`w-4 h-4 ${isActive ? "text-gold-400" : "text-brand-500"}`} />
+              <span>{tab.label}</span>
+              {"badge" in tab && tab.badge && (
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-widest font-mono ${
+                    isActive ? "bg-gold-500 text-brand-950 font-black" : "bg-sand-200 text-brand-700"
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* TAB 1: SECTION TOGGLES & ORDERING */}
-      {activeTab === "layout" && (
-        <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-6">
-          <div>
-            <h3 className="font-serif font-bold text-lg text-brand-950">Homepage Sections Layout & Visibility</h3>
-            <p className="text-xs text-brand-600">
-              Toggle visibility of individual sections on the homepage. Changes take effect on the live store immediately after saving.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Hero Section Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">1. Hero Haute Couture Showcase</h4>
-                <p className="text-[11px] text-brand-500">Editorial model background, main brand typography, and primary CTA buttons</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showHero: !s.showHero }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showHero ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showHero ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Curated Categories Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">2. Curated Categories Showcase</h4>
-                <p className="text-[11px] text-brand-500">6-category visual navigation (Lawn, Chiffon, Pret, Wedding, Unstitched, Sale)</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showCategories: !s.showCategories }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showCategories ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showCategories ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Trending Products Feed Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">3. Interactive Product Feed</h4>
-                <p className="text-[11px] text-brand-500">Trending, New Arrivals, and Bestsellers catalog tabs with quick-bag & modal</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showTrending: !s.showTrending }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showTrending ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showTrending ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Campaign Lookbook Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">4. Campaign Lookbook & Spotlight</h4>
-                <p className="text-[11px] text-brand-500">Full-bleed editorial cards highlighting Zehra Chiffon and Gul-e-Noor Lawn</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showLookbook: !s.showLookbook }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showLookbook ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showLookbook ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Shoppable Video Reels Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">5. Runway Video Reels (Watch & Buy)</h4>
-                <p className="text-[11px] text-brand-500">Video reels player linked directly to product checkout</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showVideos: !s.showVideos }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showVideos ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showVideos ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Customer Reviews Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">6. Customer Testimonials & Reviews</h4>
-                <p className="text-[11px] text-brand-500">Verified buyer testimonials, ratings, and social proof</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showReviews: !s.showReviews }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showReviews ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showReviews ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-
-            {/* Brand Heritage Banner Toggle */}
-            <div className="p-4 rounded-xl border border-sand-200 bg-sand-50/50 flex items-center justify-between sm:col-span-2">
-              <div>
-                <h4 className="font-serif font-bold text-sm text-brand-950">7. Brand Heritage & Craftsmanship Banner</h4>
-                <p className="text-[11px] text-brand-500">Footer-adjacent signature banner celebrating centuries of Pakistani needlework</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, showHeritage: !s.showHeritage }))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase flex items-center gap-1.5 transition-colors ${
-                  settings.showHeritage ? "bg-emerald-700 text-white" : "bg-sand-300 text-brand-700"
-                }`}
-              >
-                {settings.showHeritage ? <><Eye className="w-3.5 h-3.5" /> Visible</> : <><EyeOff className="w-3.5 h-3.5" /> Hidden</>}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: HERO BANNER & ANNOUNCEMENT */}
-      {activeTab === "hero" && (
-        <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-6">
-          <div>
-            <h3 className="font-serif font-bold text-lg text-brand-950">Hero Showcase & Announcement Bar Content</h3>
-            <p className="text-xs text-brand-600">Customize the headline, subtitle, buttons, and background picture or video</p>
-          </div>
-
-          {/* Announcement Bar */}
-          <div className="space-y-3 p-4 rounded-xl bg-sand-50 border border-sand-200">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-xs text-brand-950">Top Announcement Bar Text</label>
-              <label className="flex items-center gap-2 cursor-pointer text-xs">
-                <input
-                  type="checkbox"
-                  checked={settings.announcementEnabled}
-                  onChange={(e) => setSettings((s) => ({ ...s, announcementEnabled: e.target.checked }))}
-                  className="rounded text-gold-600 focus:ring-gold-500"
-                />
-                <span className="font-medium text-brand-900">Enable Ticker</span>
-              </label>
-            </div>
-            <input
-              type="text"
-              value={settings.announcementText}
-              onChange={(e) => setSettings((s) => ({ ...s, announcementText: e.target.value }))}
-              className="w-full p-2.5 border border-sand-300 rounded-lg bg-white text-xs font-medium text-brand-900"
-            />
-          </div>
-
-          {/* Hero Typography */}
-          <div className="space-y-4">
-            <h4 className="font-serif font-bold text-sm text-brand-950 border-b border-sand-100 pb-1">
-              Hero Copywriting
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-brand-900 mb-1">Badge Tag</label>
-                <input
-                  type="text"
-                  value={settings.heroBadge}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroBadge: e.target.value }))}
-                  placeholder="e.g. Festive Edit 2026 — Live Now"
-                  className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs text-brand-950"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-brand-900 mb-1">Main Headline</label>
-                <input
-                  type="text"
-                  value={settings.heroTitle}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroTitle: e.target.value }))}
-                  placeholder="e.g. Elegance Woven with Pure Heritage"
-                  className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs font-serif font-bold text-brand-950"
-                />
-              </div>
-            </div>
-
+      {/* TAB 1: ANNOUNCEMENT BAR */}
+      {activeTab === "announcement" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
             <div>
-              <label className="block text-xs font-bold text-brand-900 mb-1">Subtitle / Descriptive Copy</label>
-              <textarea
-                rows={2}
-                value={settings.heroSubtitle}
-                onChange={(e) => setSettings((s) => ({ ...s, heroSubtitle: e.target.value }))}
-                className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs text-brand-900"
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-gold-600" />
+                Top Announcement Ribbon
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                The top bar displayed across the website above the navigation header.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.announcementEnabled}
+                onChange={(e) => updateField("announcementEnabled", e.target.checked)}
+                className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
               />
-            </div>
-
-            {/* Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-3 rounded-xl border border-sand-200 bg-sand-50/50 space-y-2">
-                <span className="font-bold text-xs text-brand-900 block">Primary CTA Button</span>
-                <input
-                  type="text"
-                  placeholder="Button Label"
-                  value={settings.heroPrimaryBtnText}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroPrimaryBtnText: e.target.value }))}
-                  className="w-full p-2 border border-sand-300 rounded-lg bg-white text-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Link (/shop?category=...)"
-                  value={settings.heroPrimaryBtnLink}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroPrimaryBtnLink: e.target.value }))}
-                  className="w-full p-2 border border-sand-300 rounded-lg bg-white text-xs font-mono"
-                />
-              </div>
-
-              <div className="p-3 rounded-xl border border-sand-200 bg-sand-50/50 space-y-2">
-                <span className="font-bold text-xs text-brand-900 block">Secondary CTA Button</span>
-                <input
-                  type="text"
-                  placeholder="Button Label"
-                  value={settings.heroSecondaryBtnText}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroSecondaryBtnText: e.target.value }))}
-                  className="w-full p-2 border border-sand-300 rounded-lg bg-white text-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Link (/shop?category=...)"
-                  value={settings.heroSecondaryBtnLink}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroSecondaryBtnLink: e.target.value }))}
-                  className="w-full p-2 border border-sand-300 rounded-lg bg-white text-xs font-mono"
-                />
-              </div>
-            </div>
+              <span className="text-xs font-bold text-brand-900">Enable Bar</span>
+            </label>
           </div>
 
-          {/* Hero Background Media (Image or Video) */}
-          <div className="space-y-4 pt-2 border-t border-sand-200">
-            <h4 className="font-serif font-bold text-sm text-brand-950 flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-gold-600" /> Hero Background Media (Picture or Video)
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-brand-900 mb-1">Media Format</label>
-                <select
-                  value={settings.heroMediaType}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroMediaType: e.target.value as any }))}
-                  className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs font-medium"
-                >
-                  <option value="IMAGE">Still High-Fashion Editorial Image</option>
-                  <option value="VIDEO">Background Video Loop (MP4 or WebM)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-brand-900 mb-1">Media URL</label>
-                <input
-                  type="text"
-                  value={settings.heroMediaUrl}
-                  onChange={(e) => setSettings((s) => ({ ...s, heroMediaUrl: e.target.value }))}
-                  placeholder="/assets/hero-model.jpg or https://..."
-                  className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs font-mono"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Main Announcement Text</label>
+              <input
+                type="text"
+                value={settings.announcementText}
+                onChange={(e) => updateField("announcementText", e.target.value)}
+                placeholder="e.g. Festive Luxury Collection 2026 Live Now"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-medium"
+              />
+              <p className="text-[11px] text-brand-500">Highlighted title text shown with a glowing pulse dot.</p>
             </div>
 
-            {/* Presets */}
-            <div>
-              <span className="text-[11px] font-bold text-brand-800 block mb-1.5">
-                Quick Select From Generated Studio Assets:
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {HERO_MEDIA_PRESETS.map((p) => (
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Subtext / Secondary Promotion</label>
+              <input
+                type="text"
+                value={settings.announcementSubtext}
+                onChange={(e) => updateField("announcementSubtext", e.target.value)}
+                placeholder="e.g. Free nationwide courier delivery on orders above Rs. 4,999"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-medium"
+              />
+              <p className="text-[11px] text-brand-500">Shown next to the main announcement.</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Free Delivery Threshold (Rs.)</label>
+              <input
+                type="number"
+                value={settings.freeShippingThreshold}
+                onChange={(e) => updateField("freeShippingThreshold", parseInt(e.target.value || "0", 10))}
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+              <p className="text-[11px] text-brand-500">Cart value required for automatic free shipping.</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Optional Banner Click URL</label>
+              <input
+                type="text"
+                value={settings.announcementLink}
+                onChange={(e) => updateField("announcementLink", e.target.value)}
+                placeholder="/shop?category=sale"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+              <p className="text-[11px] text-brand-500">When visitors click the announcement, take them here.</p>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Announcement Color Theme</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                {[
+                  { id: "midnight", name: "Midnight Noir", bg: "bg-brand-950", border: "border-sand-700", text: "text-sand-300" },
+                  { id: "gold", name: "Imperial Gold", bg: "bg-amber-950", border: "border-amber-700", text: "text-amber-300" },
+                  { id: "emerald", name: "Festive Emerald", bg: "bg-emerald-950", border: "border-emerald-700", text: "text-emerald-300" },
+                  { id: "maroon", name: "Royal Maroon", bg: "bg-rose-950", border: "border-rose-700", text: "text-rose-300" },
+                ].map((th) => (
                   <button
-                    key={p.label}
+                    key={th.id}
                     type="button"
-                    onClick={() => setSettings((s) => ({ ...s, heroMediaUrl: p.url, heroMediaType: p.type as any }))}
-                    className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-colors flex items-center gap-1.5 ${
-                      settings.heroMediaUrl === p.url
-                        ? "bg-gold-600 text-white border-gold-600 shadow-sm"
-                        : "bg-sand-50 hover:bg-sand-100 border-sand-300 text-brand-900"
+                    onClick={() => updateField("announcementTheme", th.id as any)}
+                    className={`p-3 rounded-2xl border flex items-center gap-2 transition-all ${
+                      settings.announcementTheme === th.id
+                        ? "border-gold-500 ring-2 ring-gold-400 bg-sand-50"
+                        : "border-sand-200 hover:border-sand-400"
                     }`}
                   >
-                    {p.type === "VIDEO" ? <Video className="w-3 h-3 text-gold-400" /> : <ImageIcon className="w-3 h-3 text-gold-600" />}
-                    {p.label}
+                    <div className={`w-5 h-5 rounded-full ${th.bg} ${th.border} border`} />
+                    <span className="text-xs font-bold text-brand-950">{th.name}</span>
                   </button>
                 ))}
               </div>
@@ -578,221 +353,1089 @@ export default function AdminLayoutCustomizer({
         </div>
       )}
 
-      {/* TAB 3: PRODUCT VIDEOS & SHOPPABLE REELS */}
-      {activeTab === "videos" && (
-        <div className="space-y-6">
-          {/* Section A: Direct Product Video Integration */}
-          <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-4">
+      {/* TAB 2: FESTIVE MARQUEE TICKER */}
+      {activeTab === "marquee" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
             <div>
-              <h3 className="font-serif font-bold text-lg text-brand-950 flex items-center gap-2">
-                <Video className="w-5 h-5 text-gold-700" /> Direct Product Video Integration
-              </h3>
-              <p className="text-xs text-brand-600">
-                Attach a runway walk, lookbook video, or reel to ANY product in your store. When attached, a "Watch Video Reel" button & video player appears right on the product page.
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-gold-600" />
+                Festive Sliding Marquee Ticker
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                A gold animated sliding ticker tape shown across the storefront for sales, drops, and festive notices.
               </p>
             </div>
-
-            <form onSubmit={handleSaveProductVideo} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">Select Product from Catalog *</label>
-                  <select
-                    value={selectedProductId}
-                    onChange={(e) => handleProductSelectChange(e.target.value)}
-                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-sand-50 text-xs font-medium text-brand-950"
-                  >
-                    {products.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        [{p.sku}] {p.title} {p.videoUrl ? "(Has Video)" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">Product Video URL (MP4, YouTube, or Reel) *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="https://example.com/dress-walk.mp4 or https://youtu.be/..."
-                    value={productVideoUrl}
-                    onChange={(e) => setProductVideoUrl(e.target.value)}
-                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white text-xs font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isUpdatingProdVideo}
-                  className="px-5 py-2.5 bg-brand-900 hover:bg-brand-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow"
-                >
-                  <Save className="w-3.5 h-3.5 text-gold-400" />
-                  {isUpdatingProdVideo ? "Updating..." : "Save Product Video URL"}
-                </button>
-              </div>
-            </form>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.marqueeEnabled}
+                onChange={(e) => updateField("marqueeEnabled", e.target.checked)}
+                className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+              />
+              <span className="text-xs font-bold text-brand-900">Enable Ticker</span>
+            </label>
           </div>
 
-          {/* Section B: Homepage Shoppable Video Reels (Watch & Buy) */}
-          <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-6">
-            <div>
-              <h3 className="font-serif font-bold text-lg text-brand-950 flex items-center gap-2">
-                <Play className="w-5 h-5 text-gold-700" /> Homepage Shoppable Runway Reels ({videos.length})
-              </h3>
-              <p className="text-xs text-brand-600">
-                Shoppable video clips displayed on the homepage lookbook. Customers can watch the model in motion and tap "Shop This Look".
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Marquee Ticker Text</label>
+              <textarea
+                rows={3}
+                value={settings.marqueeText}
+                onChange={(e) => updateField("marqueeText", e.target.value)}
+                placeholder="⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY • EXPRESS 2-4 DAY COURIER DISPATCH"
+                className="w-full px-4 py-3 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-sans leading-relaxed"
+              />
+              <p className="text-[11px] text-brand-500">
+                Tip: Separate key points with bullets (•) or emojis (⚡, ✨) for luxury editorial styling.
               </p>
             </div>
 
-            {/* List of current videos */}
-            {videos.length === 0 ? (
-              <div className="p-8 text-center rounded-xl bg-sand-50 border border-dashed border-sand-300 text-xs text-brand-600">
-                No video reels added yet. Use the form below to attach a video reel to any product!
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {videos.map((vid) => (
-                  <div key={vid.id} className="p-4 rounded-xl border border-sand-200 bg-sand-50/60 space-y-2 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="px-2 py-0.5 rounded bg-brand-950 text-gold-300 text-[10px] font-bold uppercase">
-                          Reel
-                        </span>
-                        <button
-                          onClick={() => handleDeleteVideo(vid.id)}
-                          className="p-1 rounded text-maroon-600 hover:bg-maroon-50"
-                          title="Delete reel"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                      <h4 className="font-serif font-bold text-sm text-brand-950 mt-1">{vid.title}</h4>
-                      <p className="text-[11px] text-brand-600 truncate font-mono">{vid.videoUrl}</p>
-                    </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Optional Destination Link</label>
+              <input
+                type="text"
+                value={settings.marqueeLink}
+                onChange={(e) => updateField("marqueeLink", e.target.value)}
+                placeholder="/shop"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
 
-                    <div className="pt-2 border-t border-sand-200 text-[11px] flex items-center justify-between">
-                      <span className="text-brand-800 font-bold truncate max-w-[180px]">{vid.product?.title || "Linked Product"}</span>
-                      <span className="text-gold-700 font-mono font-bold">Rs. {vid.product?.basePrice?.toLocaleString()}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Form: Add New Video Reel */}
-            <form onSubmit={handleAddVideo} className="p-4 rounded-xl bg-sand-50/80 border border-sand-200 space-y-3 text-xs">
-              <h4 className="font-serif font-bold text-sm text-brand-950">Add New Shoppable Video Reel</h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">Reel Title *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Zehra Chiffon Runway Walk"
-                    value={newVideoTitle}
-                    onChange={(e) => setNewVideoTitle(e.target.value)}
-                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">Video Stream / MP4 URL *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="https://.../video.mp4"
-                    value={newVideoUrl}
-                    onChange={(e) => setNewVideoUrl(e.target.value)}
-                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">Linked Catalog Product *</label>
-                  <select
-                    value={newVideoProductId}
-                    onChange={(e) => setNewVideoProductId(e.target.value)}
-                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white font-medium"
-                  >
-                    {products.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.title} (PKR {p.basePrice})
-                      </option>
-                    ))}
-                  </select>
+            {/* Live Ticker Preview */}
+            <div className="pt-2">
+              <label className="text-xs font-bold text-brand-900 block mb-2">Live Ticker Preview</label>
+              <div className="w-full bg-gold-500 text-brand-950 py-2.5 px-4 rounded-xl overflow-hidden font-bold text-xs uppercase tracking-widest shadow-inner">
+                <div className="truncate">
+                  {settings.marqueeText || "⚡ LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE"}
                 </div>
               </div>
-
-              <div className="flex justify-end pt-1">
-                <button
-                  type="submit"
-                  disabled={isAddingVideo}
-                  className="px-4 py-2 bg-gold-600 hover:bg-gold-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  {isAddingVideo ? "Adding..." : "Add Video Reel"}
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* TAB 4: STORE CONTACTS & WHATSAPP */}
-      {activeTab === "contact" && (
-        <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-6">
+      {/* TAB 3: HERO BANNER & MEDIA */}
+      {activeTab === "hero" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
+            <div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-gold-600" />
+                Hero Banner Showcase & Media
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                The massive high-impact showcase that visitors see when first entering the website.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.showHero}
+                onChange={(e) => updateField("showHero", e.target.checked)}
+                className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+              />
+              <span className="text-xs font-bold text-brand-900">Show Hero</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Hero Floating Badge</label>
+              <input
+                type="text"
+                value={settings.heroBadge}
+                onChange={(e) => updateField("heroBadge", e.target.value)}
+                placeholder="Festive Edit 2026 — Live Now"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Main Headline Title</label>
+              <input
+                type="text"
+                value={settings.heroTitle}
+                onChange={(e) => updateField("heroTitle", e.target.value)}
+                placeholder="Elegance Woven with Pure Heritage"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-serif font-bold"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Hero Subtitle / Description</label>
+              <textarea
+                rows={3}
+                value={settings.heroSubtitle}
+                onChange={(e) => updateField("heroSubtitle", e.target.value)}
+                placeholder="Discover authentic luxury lawn..."
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 leading-relaxed"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Primary Button Label</label>
+              <input
+                type="text"
+                value={settings.heroPrimaryBtnText}
+                onChange={(e) => updateField("heroPrimaryBtnText", e.target.value)}
+                placeholder="Shop Summer Lawn"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Primary Button Destination Link</label>
+              <input
+                type="text"
+                value={settings.heroPrimaryBtnLink}
+                onChange={(e) => updateField("heroPrimaryBtnLink", e.target.value)}
+                placeholder="/shop?category=lawn-summer"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Secondary Button Label</label>
+              <input
+                type="text"
+                value={settings.heroSecondaryBtnText}
+                onChange={(e) => updateField("heroSecondaryBtnText", e.target.value)}
+                placeholder="Wedding Royale"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Secondary Button Destination Link</label>
+              <input
+                type="text"
+                value={settings.heroSecondaryBtnLink}
+                onChange={(e) => updateField("heroSecondaryBtnLink", e.target.value)}
+                placeholder="/shop?category=wedding-luxury-pret"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            {/* 3 Trust Badges */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Hero Stat Badge 1 (Value|Label)</label>
+              <input
+                type="text"
+                value={settings.heroStats1}
+                onChange={(e) => updateField("heroStats1", e.target.value)}
+                placeholder="100%|Pure Swiss & Egyptian Fabrics"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Hero Stat Badge 2 (Value|Label)</label>
+              <input
+                type="text"
+                value={settings.heroStats2}
+                onChange={(e) => updateField("heroStats2", e.target.value)}
+                placeholder="COD|Available across Pakistan"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Hero Stat Badge 3 (Value|Label)</label>
+              <input
+                type="text"
+                value={settings.heroStats3}
+                onChange={(e) => updateField("heroStats3", e.target.value)}
+                placeholder="2-4 Days|Express Courier Delivery"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            {/* Media Selector */}
+            <div className="space-y-3 md:col-span-2 pt-2 border-t border-sand-100">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-brand-900">Hero Background Media</label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateField("heroMediaType", "IMAGE")}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                      settings.heroMediaType === "IMAGE"
+                        ? "bg-brand-950 text-gold-400 shadow-sm"
+                        : "bg-sand-100 text-brand-700"
+                    }`}
+                  >
+                    Image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateField("heroMediaType", "VIDEO")}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                      settings.heroMediaType === "VIDEO"
+                        ? "bg-brand-950 text-gold-400 shadow-sm"
+                        : "bg-sand-100 text-brand-700"
+                    }`}
+                  >
+                    Ambient Video (MP4)
+                  </button>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                value={settings.heroMediaUrl}
+                onChange={(e) => updateField("heroMediaUrl", e.target.value)}
+                placeholder="/assets/hero-model.jpg"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+
+              {/* Preset Gallery Picker */}
+              <div className="pt-2">
+                <span className="text-[11px] font-bold text-brand-600 block mb-2">Or Choose from High-Res Presets:</span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {HERO_MEDIA_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        updateField("heroMediaUrl", preset.url);
+                        updateField("heroMediaType", preset.type as any);
+                      }}
+                      className={`p-2.5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        settings.heroMediaUrl === preset.url
+                          ? "border-gold-500 ring-2 ring-gold-400 bg-sand-50"
+                          : "border-sand-200 hover:border-sand-400"
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-brand-950 truncate block">{preset.label}</span>
+                      <span className="text-[10px] text-brand-500 font-mono mt-1">{preset.type}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: HOMEPAGE SECTIONS & TITLES */}
+      {activeTab === "sections" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
           <div>
-            <h3 className="font-serif font-bold text-lg text-brand-950">Storewide Contact Information</h3>
-            <p className="text-xs text-brand-600">
-              Update your customer care WhatsApp hotline, email, and flagship studio address. Updates automatically reflect across the Header, Footer, and Checkout page!
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <Layers className="w-5 h-5 text-gold-600" />
+              Homepage Sections & Section Headings
+            </h2>
+            <p className="text-xs text-brand-600 mt-0.5">
+              Turn individual sections on/off and customize their titles and subheadings.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-brand-900 mb-1 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-gold-700" /> Official WhatsApp Number *
-              </label>
-              <input
-                type="text"
-                required
-                value={settings.contactWhatsApp}
-                onChange={(e) => setSettings((s) => ({ ...s, contactWhatsApp: e.target.value }))}
-                placeholder="0340 0262732"
-                className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-xs font-bold text-brand-950"
-              />
-              <span className="text-[10px] text-brand-500 mt-1 block">
-                Formatted as 0340 0262732. Automatically generates click-to-chat links for customers.
-              </span>
+          <div className="space-y-6 divide-y divide-sand-100">
+            {/* 1. Categories Section */}
+            <div className="pt-4 first:pt-0 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-brand-950 font-serif">1. Curated Collections / Categories</h3>
+                  <p className="text-xs text-brand-500">The grid of 6 dress categories (Lawn, Chiffon, Pret, etc.)</p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.showCategories}
+                    onChange={(e) => updateField("showCategories", e.target.checked)}
+                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                  />
+                  <span className="text-xs font-bold text-brand-900">Show Section</span>
+                </label>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  value={settings.categoriesTitle}
+                  onChange={(e) => updateField("categoriesTitle", e.target.value)}
+                  placeholder="Curated Luxury Collections"
+                  className="px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+                />
+                <input
+                  type="text"
+                  value={settings.categoriesSubtitle}
+                  onChange={(e) => updateField("categoriesSubtitle", e.target.value)}
+                  placeholder="From effortless daily lawn to breathtaking bridal kalidars..."
+                  className="px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+                />
+              </div>
             </div>
 
+            {/* 2. Trending & New Arrivals */}
+            <div className="pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-brand-950 font-serif">2. Trending, New Arrivals & Best Sellers</h3>
+                  <p className="text-xs text-brand-500">Interactive tabbed feed with quick add-to-cart and stock badges</p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.showTrending}
+                    onChange={(e) => updateField("showTrending", e.target.checked)}
+                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                  />
+                  <span className="text-xs font-bold text-brand-900">Show Section</span>
+                </label>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  value={settings.trendingTitle}
+                  onChange={(e) => updateField("trendingTitle", e.target.value)}
+                  placeholder="Trending & New Arrivals"
+                  className="px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+                />
+                <input
+                  type="text"
+                  value={settings.trendingSubtitle}
+                  onChange={(e) => updateField("trendingSubtitle", e.target.value)}
+                  placeholder="The season's most sought-after silhouettes..."
+                  className="px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+            </div>
+
+            {/* 3. Lookbook Spotlight */}
+            <div className="pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-brand-950 font-serif">3. Haute Couture Lookbook / Editorial</h3>
+                  <p className="text-xs text-brand-500">Two-column editorial campaign spotlight</p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.showLookbook}
+                    onChange={(e) => updateField("showLookbook", e.target.checked)}
+                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                  />
+                  <span className="text-xs font-bold text-brand-900">Show Section</span>
+                </label>
+              </div>
+              <input
+                type="text"
+                value={settings.lookbookTitle}
+                onChange={(e) => updateField("lookbookTitle", e.target.value)}
+                placeholder="The Couture Editorial"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+            </div>
+
+            {/* 4. Runway Video Reels */}
+            <div className="pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-brand-950 font-serif">4. Shoppable Runway Video Reels</h3>
+                  <p className="text-xs text-brand-500">Watch & Buy vertical reel video cards with direct product links</p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.showVideos}
+                    onChange={(e) => updateField("showVideos", e.target.checked)}
+                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                  />
+                  <span className="text-xs font-bold text-brand-900">Show Section</span>
+                </label>
+              </div>
+              <input
+                type="text"
+                value={settings.videosTitle}
+                onChange={(e) => updateField("videosTitle", e.target.value)}
+                placeholder="Runway Watch & Buy"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+            </div>
+
+            {/* 5. Customer Reviews */}
+            <div className="pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-brand-950 font-serif">5. Verified Customer Reviews</h3>
+                  <p className="text-xs text-brand-500">Testimonials from real buyers across Pakistan</p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.showReviews}
+                    onChange={(e) => updateField("showReviews", e.target.checked)}
+                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                  />
+                  <span className="text-xs font-bold text-brand-900">Show Section</span>
+                </label>
+              </div>
+              <input
+                type="text"
+                value={settings.reviewsTitle}
+                onChange={(e) => updateField("reviewsTitle", e.target.value)}
+                placeholder="Voices of Elegance"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: BRAND HERITAGE & STORY */}
+      {activeTab === "heritage" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
             <div>
-              <label className="block text-xs font-bold text-brand-900 mb-1 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-gold-700" /> Customer Support Email
-              </label>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <Layout className="w-5 h-5 text-gold-600" />
+                Brand Heritage, Story & Craftsmanship
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                The authentic heritage narrative about Tauheed Textile and its needlecraft artistry.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.showHeritage}
+                onChange={(e) => updateField("showHeritage", e.target.checked)}
+                className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+              />
+              <span className="text-xs font-bold text-brand-900">Show Heritage</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Heritage Badge / Established Year</label>
+              <input
+                type="text"
+                value={settings.heritageBadge}
+                onChange={(e) => updateField("heritageBadge", e.target.value)}
+                placeholder="Crafting Luxury Since 1994"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Heritage Main Headline</label>
+              <input
+                type="text"
+                value={settings.heritageTitle}
+                onChange={(e) => updateField("heritageTitle", e.target.value)}
+                placeholder="Tauheed Textile — Where Heritage Meets Modern Grace"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-serif font-bold"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Heritage Full Story Narrative</label>
+              <textarea
+                rows={4}
+                value={settings.heritageSubtitle}
+                onChange={(e) => updateField("heritageSubtitle", e.target.value)}
+                placeholder="Every thread is an ode to centuries of subcontinental needlecraft..."
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 leading-relaxed"
+              />
+            </div>
+
+            {/* 3 Pillars */}
+            <div className="space-y-2 md:col-span-2 pt-2 border-t border-sand-100">
+              <h3 className="text-xs font-bold text-brand-900 uppercase tracking-wider">3 Heritage Pillars</h3>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Pillar 1 Title</label>
+              <input
+                type="text"
+                value={settings.heritageHighlight1Title}
+                onChange={(e) => updateField("heritageHighlight1Title", e.target.value)}
+                placeholder="100% Pure Natural Fibers"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+              <textarea
+                rows={2}
+                value={settings.heritageHighlight1Text}
+                onChange={(e) => updateField("heritageHighlight1Text", e.target.value)}
+                placeholder="Finest combed cotton lawn..."
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Pillar 2 Title</label>
+              <input
+                type="text"
+                value={settings.heritageHighlight2Title}
+                onChange={(e) => updateField("heritageHighlight2Title", e.target.value)}
+                placeholder="Artisanal Subcontinental Needlework"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+              <textarea
+                rows={2}
+                value={settings.heritageHighlight2Text}
+                onChange={(e) => updateField("heritageHighlight2Text", e.target.value)}
+                placeholder="Hand-rendered tilla, sequins..."
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Pillar 3 Title</label>
+              <input
+                type="text"
+                value={settings.heritageHighlight3Title}
+                onChange={(e) => updateField("heritageHighlight3Title", e.target.value)}
+                placeholder="Impeccable Pret Tailoring"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+              />
+              <textarea
+                rows={2}
+                value={settings.heritageHighlight3Text}
+                onChange={(e) => updateField("heritageHighlight3Text", e.target.value)}
+                placeholder="Ready-to-wear perfection featuring structured silhouettes..."
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: PAKISTAN TRUST PERKS */}
+      {activeTab === "perks" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
+            <div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-gold-600" />
+                Pakistan Trust Bar (Perks & Guarantees)
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                The 4 guarantee cards shown in the footer and across product pages.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.showTrustBar}
+                onChange={(e) => updateField("showTrustBar", e.target.checked)}
+                className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+              />
+              <span className="text-xs font-bold text-brand-900">Show Trust Bar</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Perk 1 */}
+            <div className="p-5 rounded-2xl border border-sand-200 bg-sand-50/50 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-950">
+                <Truck className="w-4 h-4 text-gold-600" />
+                Perk 1: Courier Delivery
+              </div>
+              <input
+                type="text"
+                value={settings.trustPerk1Title}
+                onChange={(e) => updateField("trustPerk1Title", e.target.value)}
+                placeholder="Nationwide Delivery"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold bg-white"
+              />
+              <input
+                type="text"
+                value={settings.trustPerk1Desc}
+                onChange={(e) => updateField("trustPerk1Desc", e.target.value)}
+                placeholder="TCS, Trax & Leopards to 250+ cities in Pakistan"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 bg-white"
+              />
+            </div>
+
+            {/* Perk 2 */}
+            <div className="p-5 rounded-2xl border border-sand-200 bg-sand-50/50 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-950">
+                <CreditCard className="w-4 h-4 text-gold-600" />
+                Perk 2: Payment Option
+              </div>
+              <input
+                type="text"
+                value={settings.trustPerk2Title}
+                onChange={(e) => updateField("trustPerk2Title", e.target.value)}
+                placeholder="Cash On Delivery"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold bg-white"
+              />
+              <input
+                type="text"
+                value={settings.trustPerk2Desc}
+                onChange={(e) => updateField("trustPerk2Desc", e.target.value)}
+                placeholder="Pay cash upon parcel receipt or direct Bank Transfer"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 bg-white"
+              />
+            </div>
+
+            {/* Perk 3 */}
+            <div className="p-5 rounded-2xl border border-sand-200 bg-sand-50/50 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-950">
+                <RotateCcw className="w-4 h-4 text-gold-600" />
+                Perk 3: Return Window
+              </div>
+              <input
+                type="text"
+                value={settings.trustPerk3Title}
+                onChange={(e) => updateField("trustPerk3Title", e.target.value)}
+                placeholder="7-Day Return Policy"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold bg-white"
+              />
+              <input
+                type="text"
+                value={settings.trustPerk3Desc}
+                onChange={(e) => updateField("trustPerk3Desc", e.target.value)}
+                placeholder="Customer-first replacement or exchange policy"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 bg-white"
+              />
+            </div>
+
+            {/* Perk 4 */}
+            <div className="p-5 rounded-2xl border border-sand-200 bg-sand-50/50 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-950">
+                <ShieldCheck className="w-4 h-4 text-gold-600" />
+                Perk 4: Fabric Guarantee
+              </div>
+              <input
+                type="text"
+                value={settings.trustPerk4Title}
+                onChange={(e) => updateField("trustPerk4Title", e.target.value)}
+                placeholder="100% Authentic Fabric"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold bg-white"
+              />
+              <input
+                type="text"
+                value={settings.trustPerk4Desc}
+                onChange={(e) => updateField("trustPerk4Desc", e.target.value)}
+                placeholder="Pure Swiss lawn, genuine chiffon and master tailoring"
+                className="w-full px-4 py-2 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 bg-white"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 7: WHATSAPP CONCIERGE, CONTACT & STUDIO */}
+      {activeTab === "contact" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <Phone className="w-5 h-5 text-gold-600" />
+              Direct Concierge, WhatsApp & Studio Info
+            </h2>
+            <p className="text-xs text-brand-600 mt-0.5">
+              These details control the floating WhatsApp chat button, footer address, customer hotline, and contact links across the entire store.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Official WhatsApp Number</label>
+              <input
+                type="text"
+                value={settings.contactWhatsApp}
+                onChange={(e) => updateField("contactWhatsApp", e.target.value)}
+                placeholder="0340 0262732"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono font-bold"
+              />
+              <p className="text-[11px] text-brand-500">Powers floating WhatsApp button & click-to-chat links.</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Default WhatsApp Inquiry Message</label>
+              <input
+                type="text"
+                value={settings.whatsappMessage}
+                onChange={(e) => updateField("whatsappMessage", e.target.value)}
+                placeholder="Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order."
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+              <p className="text-[11px] text-brand-500">Auto-filled in customer's WhatsApp when they tap chat.</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Customer Support Phone Hotline</label>
+              <input
+                type="text"
+                value={settings.contactPhone}
+                onChange={(e) => updateField("contactPhone", e.target.value)}
+                placeholder="0340 0262732"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Official Customer Care Email</label>
               <input
                 type="email"
                 value={settings.contactEmail}
-                onChange={(e) => setSettings((s) => ({ ...s, contactEmail: e.target.value }))}
+                onChange={(e) => updateField("contactEmail", e.target.value)}
                 placeholder="care@tauheedtextile.com"
-                className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-xs text-brand-950"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-brand-900 mb-1 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-gold-700" /> Flagship Studio Physical Address
-              </label>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Flagship Studio Physical Address</label>
               <input
                 type="text"
                 value={settings.contactAddress}
-                onChange={(e) => setSettings((s) => ({ ...s, contactAddress: e.target.value }))}
+                onChange={(e) => updateField("contactAddress", e.target.value)}
                 placeholder="Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan"
-                className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-xs text-brand-950"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-medium"
               />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-brand-900">Customer Service Operating Hours</label>
+              <input
+                type="text"
+                value={settings.operatingHours}
+                onChange={(e) => updateField("operatingHours", e.target.value)}
+                placeholder="Monday - Saturday: 10:00 AM - 9:00 PM PKT"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 8: SOCIAL MEDIA CHANNELS */}
+      {activeTab === "social" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-gold-600" />
+              Social Media Profiles & Channels
+            </h2>
+            <p className="text-xs text-brand-600 mt-0.5">
+              Connect your official Instagram, Facebook, TikTok, and YouTube pages to the storefront.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Instagram Profile URL</label>
+              <input
+                type="text"
+                value={settings.socialInstagram}
+                onChange={(e) => updateField("socialInstagram", e.target.value)}
+                placeholder="https://instagram.com/tauheedtextile"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Facebook Page URL</label>
+              <input
+                type="text"
+                value={settings.socialFacebook}
+                onChange={(e) => updateField("socialFacebook", e.target.value)}
+                placeholder="https://facebook.com/tauheedtextile"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">TikTok Profile URL</label>
+              <input
+                type="text"
+                value={settings.socialTikTok}
+                onChange={(e) => updateField("socialTikTok", e.target.value)}
+                placeholder="https://tiktok.com/@tauheedtextile"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">YouTube Channel URL</label>
+              <input
+                type="text"
+                value={settings.socialYouTube}
+                onChange={(e) => updateField("socialYouTube", e.target.value)}
+                placeholder="https://youtube.com/@tauheedtextile"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 9: FOOTER & COPYRIGHT */}
+      {activeTab === "footer" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-gold-600" />
+              Footer Content, Bio & Newsletter
+            </h2>
+            <p className="text-xs text-brand-600 mt-0.5">
+              Customize the footer brand statement, newsletter pitch, and copyright text.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-900">Footer Brand Statement / Bio</label>
+              <textarea
+                rows={3}
+                value={settings.footerAboutText}
+                onChange={(e) => updateField("footerAboutText", e.target.value)}
+                placeholder="Tauheed Textile celebrates the enduring heritage of Pakistani luxury fashion..."
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 leading-relaxed"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-brand-900">Newsletter Pitch Title</label>
+                <input
+                  type="text"
+                  value={settings.newsletterTitle}
+                  onChange={(e) => updateField("newsletterTitle", e.target.value)}
+                  placeholder="Join the Exclusive Circle"
+                  className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-bold"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-brand-900">Newsletter Subtitle</label>
+                <input
+                  type="text"
+                  value={settings.newsletterSubtitle}
+                  onChange={(e) => updateField("newsletterSubtitle", e.target.value)}
+                  placeholder="Receive private previews of seasonal drops..."
+                  className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-xs font-bold text-brand-900">Footer Copyright Notice</label>
+                <input
+                  type="text"
+                  value={settings.footerCopyright}
+                  onChange={(e) => updateField("footerCopyright", e.target.value)}
+                  placeholder="© 2026 Tauheed Textile. All Rights Reserved. Handcrafted in Pakistan."
+                  className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 10: SHOPPABLE VIDEO REELS */}
+      {activeTab === "videos" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-8">
+          <div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <Video className="w-5 h-5 text-gold-600" />
+              Shoppable Runway Watch & Buy Video Reels
+            </h2>
+            <p className="text-xs text-brand-600 mt-0.5">
+              Add vertical runway videos that link directly to outfits so customers can buy in 1 click while watching.
+            </p>
+          </div>
+
+          {/* Add Video Form */}
+          <form onSubmit={handleAddVideo} className="p-6 rounded-2xl bg-sand-50 border border-sand-200 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-950">Add New Video Reel</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-brand-900">Reel Title</label>
+                <input
+                  type="text"
+                  value={newVideoTitle}
+                  onChange={(e) => setNewVideoTitle(e.target.value)}
+                  placeholder="e.g. Zehra Emerald Runway Walk"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 bg-white"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-brand-900">MP4 Video URL</label>
+                <input
+                  type="text"
+                  value={newVideoUrl}
+                  onChange={(e) => setNewVideoUrl(e.target.value)}
+                  placeholder="https://.../video.mp4"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 bg-white font-mono"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-brand-900">Linked Product to Purchase</label>
+                <select
+                  value={newVideoProductId}
+                  onChange={(e) => setNewVideoProductId(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 bg-white font-serif"
+                  required
+                >
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.title} ({p.sku})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                disabled={isAddingVideo}
+                className="px-5 py-2 rounded-xl bg-brand-950 text-sand-50 hover:bg-gold-500 hover:text-brand-950 text-xs font-bold transition-all flex items-center gap-1.5 disabled:opacity-50 font-serif"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{isAddingVideo ? "Adding Reel..." : "Add to Homepage"}</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Existing Video Reels List */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-950">Active Homepage Reels ({videos.length})</h3>
+            {videos.length === 0 ? (
+              <p className="text-xs text-brand-500 italic">No video reels added yet. Use the form above to add your first reel.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {videos.map((v) => (
+                  <div key={v.id} className="p-4 rounded-2xl border border-sand-200 bg-white shadow-sm flex flex-col justify-between space-y-3">
+                    <div className="relative aspect-[9/14] rounded-xl overflow-hidden bg-black">
+                      <video src={v.videoUrl} controls preload="metadata" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-brand-950 truncate">{v.title}</h4>
+                      <p className="text-[11px] text-brand-500 truncate mt-0.5">{v.product?.title || "No linked product"}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteVideo(v.id)}
+                      className="w-full py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-[11px] font-bold transition-all flex items-center justify-center gap-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove Reel</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 11: LIVE VISUAL PREVIEW */}
+      {activeTab === "preview" && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sand-100 pb-4">
+            <div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+                <Eye className="w-5 h-5 text-gold-600" />
+                Live Interactive Storefront Simulator
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                Simulated real-time rendering of your customized announcement, hero banner, perks, and footer.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 bg-sand-100 p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setPreviewDevice("desktop")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  previewDevice === "desktop" ? "bg-white text-brand-950 shadow-sm" : "text-brand-600"
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                Desktop
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewDevice("mobile")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  previewDevice === "mobile" ? "bg-white text-brand-950 shadow-sm" : "text-brand-600"
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                Mobile
+              </button>
+            </div>
+          </div>
+
+          <div className={`mx-auto transition-all duration-300 ${previewDevice === "mobile" ? "max-w-sm border-8 border-brand-950 rounded-[40px] shadow-2xl overflow-hidden" : "w-full rounded-2xl overflow-hidden border border-sand-300 shadow-lg"}`}>
+            {/* Simulated Top Announcement */}
+            {settings.announcementEnabled && (
+              <div className="bg-brand-950 text-sand-300 text-[11px] py-2 px-3 text-center border-b border-sand-900 flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse inline-block" />
+                <span className="font-bold text-gold-400">{settings.announcementText}</span>
+                <span className="text-sand-400 hidden sm:inline">| {settings.announcementSubtext}</span>
+              </div>
+            )}
+
+            {/* Simulated Header */}
+            <div className="bg-black text-sand-50 px-4 py-3 flex items-center justify-between border-b border-sand-900">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-8 bg-gold-500/30 rounded flex items-center justify-center text-[10px] text-gold-400 font-serif">TT</div>
+                <span className="font-serif font-bold text-sm tracking-widest text-sand-50">TAUHEED</span>
+              </div>
+              <span className="text-[10px] text-gold-400 font-mono">WhatsApp: {settings.contactWhatsApp}</span>
+            </div>
+
+            {/* Simulated Hero */}
+            {settings.showHero && (
+              <div className="relative bg-ink-black text-sand-100 p-6 sm:p-12 min-h-[320px] flex flex-col justify-center space-y-4">
+                <div className="inline-block px-3 py-1 rounded-full bg-gold-500/20 text-gold-300 text-[10px] font-bold uppercase tracking-wider w-fit border border-gold-500/40">
+                  {settings.heroBadge}
+                </div>
+                <h2 className="font-serif text-2xl sm:text-4xl font-bold text-sand-50 leading-tight">
+                  {settings.heroTitle}
+                </h2>
+                <p className="text-xs text-sand-300 max-w-md line-clamp-3">
+                  {settings.heroSubtitle}
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="px-5 py-2.5 rounded-xl bg-gold-500 text-brand-950 font-bold text-xs uppercase tracking-wider font-serif">
+                    {settings.heroPrimaryBtnText}
+                  </span>
+                  <span className="px-5 py-2.5 rounded-xl bg-sand-900 text-sand-200 font-bold text-xs uppercase tracking-wider border border-sand-700">
+                    {settings.heroSecondaryBtnText}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Simulated Marquee */}
+            {settings.marqueeEnabled && (
+              <div className="bg-gold-500 text-brand-950 py-2 px-4 text-xs font-bold uppercase tracking-wider truncate shadow-inner">
+                {settings.marqueeText}
+              </div>
+            )}
+
+            {/* Simulated Trust Bar */}
+            {settings.showTrustBar && (
+              <div className="bg-brand-950 p-4 border-t border-sand-900 grid grid-cols-2 gap-3 text-xs text-sand-300">
+                <div className="p-2 bg-sand-900/40 rounded-lg">
+                  <span className="font-bold text-sand-50 block">{settings.trustPerk1Title}</span>
+                  <span className="text-[10px] text-sand-400">{settings.trustPerk1Desc}</span>
+                </div>
+                <div className="p-2 bg-sand-900/40 rounded-lg">
+                  <span className="font-bold text-sand-50 block">{settings.trustPerk2Title}</span>
+                  <span className="text-[10px] text-sand-400">{settings.trustPerk2Desc}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Simulated Footer */}
+            <div className="bg-black text-sand-400 p-4 text-[10px] border-t border-sand-900 space-y-2">
+              <p className="text-sand-300">{settings.footerAboutText}</p>
+              <p className="text-sand-500 font-mono">{settings.footerCopyright}</p>
             </div>
           </div>
         </div>

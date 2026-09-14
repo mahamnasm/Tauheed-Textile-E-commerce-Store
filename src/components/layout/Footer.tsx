@@ -15,56 +15,88 @@ import {
   Send 
 } from "lucide-react";
 
-export default function Footer() {
+import { SiteLayoutSettings } from "@/lib/settings";
+
+interface FooterProps {
+  initialSettings?: SiteLayoutSettings;
+}
+
+export default function Footer({ initialSettings }: FooterProps) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return null;
 
+  const rawPhone = initialSettings?.contactWhatsApp || "03400262732";
+  const cleanPhone = rawPhone.replace(/\D/g, "");
+  const formattedPhone = cleanPhone.startsWith("0") 
+    ? `92${cleanPhone.slice(1)}` 
+    : cleanPhone.startsWith("92") 
+      ? cleanPhone 
+      : `92${cleanPhone}`;
+
   return (
     <footer className="bg-brand-950 text-sand-300 pt-16 pb-8 border-t border-sand-900">
-      {/* Pakistan Trust Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 border-b border-sand-900">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
-          <div className="flex items-center gap-4 justify-center sm:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
-              <Truck className="w-6 h-6 text-gold-400" />
+      {/* Pakistan Trust Bar (Admin Controlled) */}
+      {(initialSettings?.showTrustBar !== false) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 border-b border-sand-900">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
+            <div className="flex items-center gap-4 justify-center sm:justify-start">
+              <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
+                <Truck className="w-6 h-6 text-gold-400" />
+              </div>
+              <div>
+                <h4 className="font-serif font-bold text-sand-50 text-base">
+                  {initialSettings?.trustPerk1Title || "Nationwide Delivery"}
+                </h4>
+                <p className="text-xs text-sand-400">
+                  {initialSettings?.trustPerk1Desc || "TCS, Trax & Leopards to 250+ cities in Pakistan"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-serif font-bold text-sand-50 text-base">Nationwide Delivery</h4>
-              <p className="text-xs text-sand-400">TCS, Trax & Leopards to 250+ cities in Pakistan</p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 justify-center sm:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
-              <CreditCard className="w-6 h-6 text-gold-400" />
+            <div className="flex items-center gap-4 justify-center sm:justify-start">
+              <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
+                <CreditCard className="w-6 h-6 text-gold-400" />
+              </div>
+              <div>
+                <h4 className="font-serif font-bold text-sand-50 text-base">
+                  {initialSettings?.trustPerk2Title || "Cash On Delivery"}
+                </h4>
+                <p className="text-xs text-sand-400">
+                  {initialSettings?.trustPerk2Desc || "Pay cash upon parcel receipt or direct Bank Transfer"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-serif font-bold text-sand-50 text-base">Cash On Delivery</h4>
-              <p className="text-xs text-sand-400">Pay cash upon parcel receipt or direct Bank Transfer</p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 justify-center sm:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
-              <RotateCcw className="w-6 h-6 text-gold-400" />
+            <div className="flex items-center gap-4 justify-center sm:justify-start">
+              <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
+                <RotateCcw className="w-6 h-6 text-gold-400" />
+              </div>
+              <div>
+                <h4 className="font-serif font-bold text-sand-50 text-base">
+                  {initialSettings?.trustPerk3Title || "7-Day Return Policy"}
+                </h4>
+                <p className="text-xs text-sand-400">
+                  {initialSettings?.trustPerk3Desc || "Customer-first replacement or exchange policy"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-serif font-bold text-sand-50 text-base">7-Day Return Policy</h4>
-              <p className="text-xs text-sand-400">Customer-first replacement or exchange policy</p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 justify-center sm:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-6 h-6 text-gold-400" />
-            </div>
-            <div>
-              <h4 className="font-serif font-bold text-sand-50 text-base">100% Authentic Fabric</h4>
-              <p className="text-xs text-sand-400">Pure Swiss lawn, genuine chiffon and master tailoring</p>
+            <div className="flex items-center gap-4 justify-center sm:justify-start">
+              <div className="w-12 h-12 rounded-2xl bg-sand-900/60 border border-gold-500/30 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-6 h-6 text-gold-400" />
+              </div>
+              <div>
+                <h4 className="font-serif font-bold text-sand-50 text-base">
+                  {initialSettings?.trustPerk4Title || "100% Authentic Fabric"}
+                </h4>
+                <p className="text-xs text-sand-400">
+                  {initialSettings?.trustPerk4Desc || "Pure Swiss lawn, genuine chiffon and master tailoring"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -85,8 +117,13 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-xs text-sand-400 leading-relaxed pr-6">
-              Tauheed Textile celebrates the enduring heritage of Pakistani luxury fashion. Crafting breath-taking lawn, royal formal chiffons, bespoke bridal wear, and effortless pret with unrivaled attention to fabric purity and needlework artistry.
+              {initialSettings?.footerAboutText || "Tauheed Textile celebrates the enduring heritage of Pakistani luxury fashion. Crafting breath-taking lawn, royal formal chiffons, bespoke bridal wear, and effortless pret with unrivaled attention to fabric purity and needlework artistry."}
             </p>
+            {initialSettings?.operatingHours && (
+              <p className="text-[11px] text-gold-400/90 font-medium">
+                🕒 Concierge Hours: {initialSettings.operatingHours}
+              </p>
+            )}
           </div>
 
           {/* Quick Links */}
@@ -128,27 +165,32 @@ export default function Footer() {
             <h4 className="font-serif text-sand-100 font-bold mb-4 tracking-wider text-xs uppercase text-gold-400">Direct Concierge</h4>
             <div className="flex items-start gap-2.5 text-xs text-sand-400">
               <MapPin className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
-              <span>Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan</span>
+              <span>{initialSettings?.contactAddress || "Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan"}</span>
             </div>
             <div className="flex items-center gap-2.5 text-xs text-sand-400">
               <Phone className="w-4 h-4 text-gold-400 shrink-0" />
               <a 
-                href="https://wa.me/923400262732" 
+                href={`https://wa.me/${formattedPhone}?text=Salam%20Tauheed%20Textile`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-gold-400 transition-colors"
               >
-                WhatsApp / Call: 0340 0262732
+                WhatsApp / Call: {initialSettings?.contactWhatsApp || "0340 0262732"}
               </a>
             </div>
             <div className="flex items-center gap-2.5 text-xs text-sand-400">
               <Mail className="w-4 h-4 text-gold-400 shrink-0" />
-              <span>care@tauheedtextile.com</span>
+              <span>{initialSettings?.contactEmail || "care@tauheedtextile.com"}</span>
             </div>
 
             {/* Newsletter Subscription */}
             <div className="pt-3">
-              <p className="text-xs text-sand-300 font-medium mb-1.5">Join the Exclusive Circle</p>
+              <p className="text-xs text-sand-300 font-medium mb-1.5">
+                {initialSettings?.newsletterTitle || "Join the Exclusive Circle"}
+              </p>
+              <p className="text-[10px] text-sand-500 mb-2">
+                {initialSettings?.newsletterSubtitle || "Get private previews of limited edition drops."}
+              </p>
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -174,10 +216,10 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Copyright & Payment Badges */}
+      {/* Bottom Copyright */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-sand-900 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-sand-500">
         <div className="flex flex-wrap items-center gap-3">
-          <span>&copy; {new Date().getFullYear()} Tauheed Textile (Pvt) Ltd. All rights reserved.</span>
+          <span>{initialSettings?.footerCopyright || `© ${new Date().getFullYear()} Tauheed Textile (Pvt) Ltd. All rights reserved.`}</span>
           <span className="hidden sm:inline text-sand-700">•</span>
           <Link href="/admin" className="text-gold-400 hover:text-gold-300 font-mono text-[11px] flex items-center gap-1 transition-colors">
             <span>🔒 Admin Login</span>

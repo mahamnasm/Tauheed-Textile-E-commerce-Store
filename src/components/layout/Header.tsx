@@ -18,7 +18,13 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
-export default function Header() {
+import { SiteLayoutSettings } from "@/lib/settings";
+
+interface HeaderProps {
+  initialSettings?: SiteLayoutSettings;
+}
+
+export default function Header({ initialSettings }: HeaderProps) {
   const pathname = usePathname();
   const { cartCount, openCart, wishlist } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,6 +34,21 @@ export default function Header() {
   const isAdmin = pathname.startsWith("/admin");
 
   if (isAdmin) return null;
+
+  const rawPhone = initialSettings?.contactWhatsApp || "03400262732";
+  const cleanPhone = rawPhone.replace(/\D/g, "");
+  const formattedPhone = cleanPhone.startsWith("0") 
+    ? `92${cleanPhone.slice(1)}` 
+    : cleanPhone.startsWith("92") 
+      ? cleanPhone 
+      : `92${cleanPhone}`;
+
+  const themeClasses = {
+    midnight: "bg-brand-950 text-sand-300 border-sand-900/50",
+    gold: "bg-gold-950 text-gold-200 border-gold-800/40",
+    emerald: "bg-emerald-950 text-emerald-200 border-emerald-800/40",
+    maroon: "bg-rose-950 text-rose-200 border-rose-800/40",
+  }[initialSettings?.announcementTheme || "midnight"] || "bg-brand-950 text-sand-300 border-sand-900/50";
 
   const categories = [
     { name: "Lawn & Summer", href: "/shop?category=lawn-summer", badge: "Hot" },
@@ -40,36 +61,55 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-ink-black/95 backdrop-blur-md transition-all duration-200 border-b border-sand-900/80">
-      {/* Top Announcement Ribbon */}
-      <div className="bg-brand-950 text-sand-300 text-xs py-2 px-4 font-sans tracking-wide border-b border-sand-900/50">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-1 text-center md:text-left">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
-            <span className="font-semibold text-gold-400">Festive Luxury Collection 2026</span>
-            <span className="hidden sm:inline text-sand-400">| Free nationwide courier delivery on orders above Rs. 4,999</span>
-          </div>
+      {/* Top Announcement Ribbon (Admin Controlled) */}
+      {(initialSettings?.announcementEnabled !== false) && (
+        <div className={`text-xs py-2 px-4 font-sans tracking-wide border-b ${themeClasses}`}>
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-1 text-center md:text-left">
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+              {initialSettings?.announcementLink ? (
+                <Link href={initialSettings.announcementLink} className="hover:underline flex items-center gap-1.5">
+                  <span className="font-semibold text-gold-400">
+                    {initialSettings?.announcementText || "Festive Luxury Collection 2026"}
+                  </span>
+                  <span className="hidden sm:inline text-sand-400">
+                    | {initialSettings?.announcementSubtext || `Free nationwide courier delivery on orders above Rs. ${(initialSettings?.freeShippingThreshold || 4999).toLocaleString()}`}
+                  </span>
+                </Link>
+              ) : (
+                <>
+                  <span className="font-semibold text-gold-400">
+                    {initialSettings?.announcementText || "Festive Luxury Collection 2026"}
+                  </span>
+                  <span className="hidden sm:inline text-sand-400">
+                    | {initialSettings?.announcementSubtext || `Free nationwide courier delivery on orders above Rs. ${(initialSettings?.freeShippingThreshold || 4999).toLocaleString()}`}
+                  </span>
+                </>
+              )}
+            </div>
 
-          <div className="flex items-center gap-5 text-xs text-sand-300">
-            <span className="flex items-center gap-1.5 text-sand-300">
-              <Truck className="w-3.5 h-3.5 text-gold-400" />
-              Cash On Delivery
-            </span>
-            <span className="hidden sm:flex items-center gap-1.5 text-sand-300">
-              <RotateCcw className="w-3.5 h-3.5 text-gold-400" />
-              7-Day Returns
-            </span>
-            <a 
-              href="https://wa.me/923400262732?text=Salam%20Tauheed%20Textile%2C%20I%20have%20an%20inquiry" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center gap-1 text-gold-400 hover:text-gold-300 transition-colors font-medium"
-            >
-              <Phone className="w-3 h-3" />
-              0340 0262732
-            </a>
+            <div className="flex items-center gap-5 text-xs text-sand-300">
+              <span className="flex items-center gap-1.5 text-sand-300">
+                <Truck className="w-3.5 h-3.5 text-gold-400" />
+                Cash On Delivery
+              </span>
+              <span className="hidden sm:flex items-center gap-1.5 text-sand-300">
+                <RotateCcw className="w-3.5 h-3.5 text-gold-400" />
+                7-Day Returns
+              </span>
+              <a 
+                href={`https://wa.me/${formattedPhone}?text=Salam%20Tauheed%20Textile%2C%20I%20have%20an%20inquiry`}
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-1 text-gold-400 hover:text-gold-300 transition-colors font-medium"
+              >
+                <Phone className="w-3 h-3" />
+                {initialSettings?.contactWhatsApp || "0340 0262732"}
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

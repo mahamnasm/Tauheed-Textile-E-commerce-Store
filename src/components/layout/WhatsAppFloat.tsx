@@ -4,13 +4,31 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 
-export default function WhatsAppFloat() {
+import { SiteLayoutSettings } from "@/lib/settings";
+
+interface WhatsAppFloatProps {
+  initialSettings?: SiteLayoutSettings;
+}
+
+export default function WhatsAppFloat({ initialSettings }: WhatsAppFloatProps) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return null;
 
+  const rawPhone = initialSettings?.contactWhatsApp || "03400262732";
+  const cleanPhone = rawPhone.replace(/\D/g, "");
+  const formattedPhone = cleanPhone.startsWith("0") 
+    ? `92${cleanPhone.slice(1)}` 
+    : cleanPhone.startsWith("92") 
+      ? cleanPhone 
+      : `92${cleanPhone}`;
+
+  const message = encodeURIComponent(
+    initialSettings?.whatsappMessage || "Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order."
+  );
+
   return (
     <a
-      href="https://wa.me/923400262732?text=Assalam%20o%20Alaikum%20Tauheed%20Textile%2C%20I%20would%20like%20assistance%20with%20my%20order."
+      href={`https://wa.me/${formattedPhone}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contact on WhatsApp"

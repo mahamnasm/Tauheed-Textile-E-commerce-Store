@@ -19,11 +19,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { getSiteSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="en" className="scroll-smooth dark">
       <head>
@@ -54,12 +60,12 @@ export default function RootLayout({
               },
             }}
           />
-          <Header />
+          <Header initialSettings={settings} />
           <CartDrawer />
-          <WhatsAppFloat />
+          <WhatsAppFloat initialSettings={settings} />
           <AIStylistModal />
           <main className="flex-1">{children}</main>
-          <Footer />
+          <Footer initialSettings={settings} />
         </CartProvider>
       </body>
     </html>

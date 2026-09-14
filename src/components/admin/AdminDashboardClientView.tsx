@@ -15,7 +15,8 @@ import {
   Clock,
   Eye,
   Activity,
-  Zap
+  Zap,
+  Sliders
 } from "lucide-react";
 
 interface AdminDashboardClientViewProps {
@@ -56,7 +57,15 @@ export default function AdminDashboardClientView({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href="/admin/layout"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gold-100 hover:bg-gold-200 text-gold-950 border border-gold-300 rounded-full text-xs font-bold transition-all shadow-sm font-serif"
+          >
+            <Sliders className="w-3.5 h-3.5 text-gold-700" />
+            <span>🎨 Customize Website →</span>
+          </Link>
+
           <Link
             href="/admin/health"
             className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-full text-xs font-bold font-mono transition-all shadow-sm"
