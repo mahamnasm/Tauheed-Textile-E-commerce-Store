@@ -1,0 +1,1 @@
+const fs = require('fs'); const path = require('path'); const [filePath, hex] = process.argv.slice(2); fs.mkdirSync(path.dirname(filePath), { recursive: true }); fs.writeFileSync(filePath, Buffer.from(hex, 'hex')); console.log('Wrote ' + filePath);

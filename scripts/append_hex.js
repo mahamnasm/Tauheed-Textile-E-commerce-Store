@@ -1,0 +1,1 @@
+const fs = require('fs'); const [,, file, hex] = process.argv; fs.appendFileSync(file, Buffer.from(hex, 'hex'));

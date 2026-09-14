@@ -1,0 +1,1 @@
+console.log('No variables needed! Works great!');
