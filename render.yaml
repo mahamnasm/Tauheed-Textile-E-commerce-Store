@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tauheed-textile
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install && npm run render:build
+    startCommand: npm run start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"

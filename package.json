@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 3000",
+    "postinstall": "prisma generate",
     "db:push": "npx prisma db push",
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node prisma/seed.js",
+    "render:build": "prisma generate && prisma db push && next build"
   },
   "dependencies": {
     "@google/genai": "^2.21.0",
