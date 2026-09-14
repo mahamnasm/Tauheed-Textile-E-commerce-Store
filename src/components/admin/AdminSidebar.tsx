@@ -25,7 +25,8 @@ import {
   Sparkles,
   Bot,
   Camera,
-  ShieldCheck
+  ShieldCheck,
+  Activity
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -68,6 +69,7 @@ export default function AdminSidebar() {
 
   const navItems = [
     { label: "🏠 Main Dashboard", href: "/admin", icon: LayoutDashboard },
+    { label: "⚡ Health & Optimizer", href: "/admin/health", icon: Activity },
     { label: "🛡️ Security & Lockdown", href: "/admin/security", icon: ShieldCheck },
     { label: "🎥 Runway Reels & Videos", href: "/admin/reels", icon: Video },
     { label: "📸 Make Cover Photos", href: "/admin/nano-banana", icon: Camera },

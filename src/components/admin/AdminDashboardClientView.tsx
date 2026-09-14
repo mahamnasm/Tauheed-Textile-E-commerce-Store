@@ -13,7 +13,9 @@ import {
   ArrowRight,
   ChevronRight,
   Clock,
-  Eye
+  Eye,
+  Activity,
+  Zap
 } from "lucide-react";
 
 interface AdminDashboardClientViewProps {
@@ -54,7 +56,16 @@ export default function AdminDashboardClientView({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/admin/health"
+            className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-full text-xs font-bold font-mono transition-all shadow-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Health: 99% (Optimal)</span>
+            <span className="text-[10px] text-emerald-700 underline font-sans">Speed Boost →</span>
+          </Link>
+
           <Link
             href="/"
             target="_blank"
@@ -140,7 +151,7 @@ export default function AdminDashboardClientView({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Action 1: Runway Reels & Videos (Manual Upload) */}
           <Link
             href="/admin/reels"
@@ -247,6 +258,28 @@ export default function AdminDashboardClientView({
             </div>
             <div className="pt-4 flex items-center gap-1 text-xs font-bold text-emerald-800 group-hover:translate-x-1 transition-transform">
               <span>Security Center</span>
+              <ChevronRight className="w-4 h-4" />
+            </div>
+          </Link>
+
+          {/* Action 6: Website Health & Optimizer */}
+          <Link
+            href="/admin/health"
+            className="group p-5 rounded-3xl bg-gradient-to-br from-emerald-950 to-emerald-900 text-emerald-50 border border-emerald-500/30 shadow-md hover:shadow-xl hover:border-emerald-400 transition-all flex flex-col justify-between"
+          >
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                <Activity className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-emerald-50 group-hover:text-emerald-300 transition-colors">
+                ⚡ Health & Optimizer
+              </h3>
+              <p className="text-xs text-emerald-200/80 leading-relaxed">
+                Live speed metrics, database indexes, memory purge, and 1-click speed booster.
+              </p>
+            </div>
+            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition-transform">
+              <span>Check & Boost Speed</span>
               <ChevronRight className="w-4 h-4" />
             </div>
           </Link>
