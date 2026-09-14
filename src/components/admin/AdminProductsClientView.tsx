@@ -143,6 +143,36 @@ export default function AdminProductsClientView({
     }
   };
 
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingVideo(true);
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success && (json.url || json.urls?.[0])) {
+        const uploaded = json.url || json.urls[0];
+        setVideoUrl(uploaded);
+      } else {
+        alert(json.error || "Failed to upload video.");
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to upload video.");
+    } finally {
+      setUploadingVideo(false);
+      e.target.value = "";
+    }
+  };
+
   const [aiLoading, setAiLoading] = useState(false);
   const [aiBanner, setAiBanner] = useState("");
 
@@ -739,6 +769,62 @@ export default function AdminProductsClientView({
                         </button>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* DRESS RUNWAY VIDEO (MANUAL MP4 UPLOAD) */}
+              <div className="space-y-3 p-4 rounded-2xl bg-sand-50/80 border border-sand-200">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-sand-200 pb-2">
+                  <div>
+                    <h4 className="font-serif font-bold text-sm text-brand-950 flex items-center gap-2">
+                      <Video className="w-4 h-4 text-gold-600" /> Dress Runway Video (MP4)
+                    </h4>
+                    <p className="text-[11px] text-brand-600 mt-0.5">
+                      Upload an authentic runway walk / reel from your mobile phone or PC for this dress.
+                    </p>
+                  </div>
+
+                  <label className="cursor-pointer px-3.5 py-1.5 bg-brand-900 hover:bg-black text-sand-50 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all shrink-0">
+                    <Upload className="w-3.5 h-3.5 text-gold-400" /> {uploadingVideo ? "Uploading..." : "Upload MP4 from Device"}
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      disabled={uploadingVideo}
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                  <div className="sm:col-span-8">
+                    <input
+                      type="text"
+                      placeholder="Paste video URL (e.g. /assets/runway-walk-1.mp4 or /uploads/...)"
+                      value={videoUrl}
+                      onChange={(e) => setVideoUrl(e.target.value)}
+                      className="w-full p-2.5 border border-sand-300 rounded-xl bg-white text-xs font-mono text-brand-950"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4 flex items-center gap-2">
+                    {videoUrl ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="relative w-12 h-10 rounded-lg bg-black overflow-hidden border border-sand-300 shrink-0">
+                          <video src={videoUrl} className="w-full h-full object-cover" muted />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setVideoUrl("")}
+                          className="text-[11px] text-rose-600 hover:underline font-bold"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-sand-500 italic">No video attached</span>
+                    )}
                   </div>
                 </div>
               </div>

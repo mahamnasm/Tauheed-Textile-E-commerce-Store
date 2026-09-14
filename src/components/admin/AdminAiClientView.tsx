@@ -118,11 +118,11 @@ export default function AdminAiClientView({ initialConfig }: AdminAiClientViewPr
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/admin/veo"
+              href="/admin/reels"
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C5A059] hover:bg-[#B38F46] text-[#0B0A09] text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-lg shadow-[#C5A059]/20"
             >
               <Video className="w-4 h-4" />
-              Veo 3 Video Studio
+              Runway Reels & Videos
             </Link>
             <Link
               href="/admin/seo"
@@ -478,10 +478,10 @@ export default function AdminAiClientView({ initialConfig }: AdminAiClientViewPr
             <div className="space-y-3">
               {[
                 {
-                  name: "Google Veo 3 Runway Walk",
-                  method: "POST",
-                  path: "/api/ai/veo",
-                  desc: "Generates high-fashion runway video for any product and publishes to Watch & Buy.",
+                  name: "Runway Reels API",
+                  method: "GET / POST / DELETE",
+                  path: "/api/admin/reels",
+                  desc: "Manages authentic runway reels and attaches manual MP4 videos to dresses.",
                 },
                 {
                   name: "Dynamic AI Config API",

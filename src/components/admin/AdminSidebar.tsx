@@ -69,9 +69,8 @@ export default function AdminSidebar() {
   const navItems = [
     { label: "🏠 Main Dashboard", href: "/admin", icon: LayoutDashboard },
     { label: "🛡️ Security & Lockdown", href: "/admin/security", icon: ShieldCheck },
-    { label: "🎥 Make Model Videos", href: "/admin/veo", icon: Video },
+    { label: "🎥 Runway Reels & Videos", href: "/admin/reels", icon: Video },
     { label: "📸 Make Cover Photos", href: "/admin/nano-banana", icon: Camera },
-    { label: "🤖 Auto Video Bot", href: "/admin/bot", icon: Bot },
     { label: "🔍 Google SEO & Rank", href: "/admin/seo", icon: Globe },
     { label: "⚙️ AI Settings & Prompts", href: "/admin/ai", icon: Sparkles },
     { label: "👗 Dresses & Catalog", href: "/admin/products", icon: ShoppingBag },
