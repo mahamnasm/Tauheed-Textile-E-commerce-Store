@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/settings";
 import HomeClientSection from "@/components/home/HomeClientSection";
 import HeroBannerSlider from "@/components/home/HeroBannerSlider";
+import RunwayReelsSection from "@/components/home/RunwayReelsSection";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -188,61 +189,7 @@ export default async function HomePage() {
 
       {/* 5. RUNWAY WATCH & BUY */}
       {settings.showVideos && videos.length > 0 && (
-        <section className="bg-[#171717] py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center sm:text-left">
-              <span className="text-xs font-semibold uppercase tracking-widest text-[#7A6652] flex items-center justify-center sm:justify-start gap-2 mb-2">
-                <Film className="w-4 h-4" /> Runway Watch & Buy
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-2">
-                {settings.videosTitle || "Watch. Fall in Love. Shop."}
-              </h2>
-              <p className="text-sm text-[#E7E1D8]">
-                Watch our runway reels and shop the look instantly
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {videos.map((v) => (
-                <div key={v.id} className="relative rounded-2xl overflow-hidden bg-[#2A2A2A] group">
-                  <div className="relative aspect-[9/16] w-full">
-                    <video
-                      src={v.videoUrl}
-                      controls
-                      playsInline
-                      poster={v.product?.images?.[0]?.url || "/assets/reel-1.jpg"}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-3 left-3 pointer-events-none">
-                      <span className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                        <Play className="w-3 h-3 fill-white" /> Runway Reel
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 bg-[#222222] border-t border-[#333] flex flex-col gap-3">
-                    <div>
-                      <h4 className="font-bold text-sm text-white truncate">{v.title}</h4>
-                      {v.product && (
-                        <p className="text-white/70 text-xs mt-1">
-                          Rs. {v.product.basePrice.toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                    {v.product && (
-                      <Link
-                        href={`/product/${v.product.slug}`}
-                        className="block text-center w-full bg-white text-[#171717] hover:bg-[#F8F5F0] font-bold rounded-full px-4 py-2 text-xs transition-colors"
-                      >
-                        Shop Look
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <RunwayReelsSection videos={videos} title={settings.videosTitle} />
       )}
 
       {/* 6. WHY SHOP WITH US */}
