@@ -31,7 +31,7 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
 
   return (
-    <html lang="en" className="scroll-smooth dark">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -40,23 +40,23 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-ink-black text-sand-100 antialiased selection:bg-gold-500 selection:text-ink-black flex flex-col min-h-screen">
+      <body className="bg-[#F8F5F0] text-[#171717] antialiased selection:bg-[#7A6652] selection:text-white flex flex-col min-h-screen">
         <CartProvider>
           <Toaster
             position="top-center"
             toastOptions={{
               style: {
-                background: "#12110F",
-                color: "#FAF8F5",
-                border: "1px solid rgba(197, 160, 89, 0.4)",
-                fontSize: "12px",
+                background: "#FFFFFF",
+                color: "#171717",
+                border: "1px solid #E7E1D8",
+                fontSize: "13px",
                 borderRadius: "12px",
                 padding: "12px 16px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
               },
               iconTheme: {
-                primary: "#C5A059",
-                secondary: "#12110F",
+                primary: "#7A6652",
+                secondary: "#FFFFFF",
               },
             }}
           />

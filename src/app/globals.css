@@ -5,13 +5,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --foreground-rgb: 248, 245, 239;
-  --background-rgb: 11, 10, 9;
+  --warm-bg: #F8F5F0;
+  --warm-card: #FFFFFF;
+  --warm-text: #171717;
+  --warm-muted: #6B6259;
+  --warm-border: #E7E1D8;
+  --warm-accent: #7A6652;
 }
 
 body {
-  color: #F8F5EF;
-  background-color: #0B0A09;
+  color: #171717;
+  background-color: #F8F5F0;
   font-family: 'Plus Jakarta Sans', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
 }
@@ -20,19 +24,33 @@ h1, h2, h3, h4, .font-serif {
   font-family: 'Playfair Display', 'Cormorant Garamond', 'Cinzel', serif;
 }
 
+/* Admin portal overrides — keep dark */
+.admin-portal {
+  background-color: #0B0A09;
+  color: #F8F5EF;
+}
+
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0A09;
+  background: #F0EBE3;
 }
 ::-webkit-scrollbar-thumb {
-  background: #B28A3E;
-  border-radius: 4px;
+  background: #C4A882;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #DABF86;
+  background: #9B7E5E;
+}
+
+/* Admin scrollbar stays dark */
+.admin-portal ::-webkit-scrollbar-track {
+  background: #0B0A09;
+}
+.admin-portal ::-webkit-scrollbar-thumb {
+  background: #B28A3E;
 }
 
 .gold-gradient {
@@ -53,25 +71,37 @@ h1, h2, h3, h4, .font-serif {
 }
 
 @keyframes cinematicPan {
-  0% {
-    transform: scale(1.0) translateY(0);
-  }
-  50% {
-    transform: scale(1.06) translateY(-1.5%);
-  }
-  100% {
-    transform: scale(1.0) translateY(0);
-  }
+  0% { transform: scale(1.0) translateY(0); }
+  50% { transform: scale(1.06) translateY(-1.5%); }
+  100% { transform: scale(1.0) translateY(0); }
 }
 
 .animate-cinematic {
   animation: cinematicPan 14s ease-in-out infinite;
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marqueeScroll 25s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
 @media print {
-  .no-print {
-    display: none !important;
-  }
+  .no-print { display: none !important; }
   body {
     background: white !important;
     color: black !important;

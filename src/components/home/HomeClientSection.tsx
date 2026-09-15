@@ -34,41 +34,41 @@ export default function HomeClientSection({
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Tab Selectors */}
-      <div className="flex flex-col sm:flex-row items-center justify-between border-b border-sand-900 pb-4 mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between border-b border-[#E7E1D8] pb-4 mb-8 gap-4">
         <div>
-          <span className="text-xs font-bold tracking-widest uppercase text-gold-400">Handcrafted Couture</span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sand-50 mt-0.5">
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#7A6652]">Our Collection</span>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717] mt-0.5">
             Signature Ensembles
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 bg-brand-900/90 rounded-2xl border border-sand-900">
+        <div className="flex items-center gap-1 p-1 bg-[#F0EBE3] rounded-full border border-[#E7E1D8]">
           <button
             onClick={() => setActiveTab("featured")}
-            className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
               activeTab === "featured"
-                ? "bg-gold-500 text-ink-black shadow-lg"
-                : "text-sand-400 hover:text-sand-100"
+                ? "bg-white text-[#171717] shadow-sm"
+                : "text-[#6B6259] hover:text-[#171717]"
             }`}
           >
             Featured
           </button>
           <button
             onClick={() => setActiveTab("new")}
-            className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
               activeTab === "new"
-                ? "bg-gold-500 text-ink-black shadow-lg"
-                : "text-sand-400 hover:text-sand-100"
+                ? "bg-white text-[#171717] shadow-sm"
+                : "text-[#6B6259] hover:text-[#171717]"
             }`}
           >
             New In
           </button>
           <button
             onClick={() => setActiveTab("bestseller")}
-            className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
               activeTab === "bestseller"
-                ? "bg-gold-500 text-ink-black shadow-lg"
-                : "text-sand-400 hover:text-sand-100"
+                ? "bg-white text-[#171717] shadow-sm"
+                : "text-[#6B6259] hover:text-[#171717]"
             }`}
           >
             Bestsellers
@@ -77,7 +77,7 @@ export default function HomeClientSection({
       </div>
 
       {/* Grid of Product Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {products.map((prod) => (
           <ProductCard
             key={prod.id}

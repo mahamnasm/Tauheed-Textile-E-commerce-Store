@@ -94,45 +94,42 @@ export default function ProductCard({
   };
 
   return (
-    <div 
-      className="group relative flex flex-col bg-brand-900/90 rounded-2xl overflow-hidden border border-sand-900 hover:border-gold-500/50 shadow-xl hover:shadow-2xl transition-all duration-300"
+    <div
+      className="group relative flex flex-col bg-white rounded-xl overflow-hidden border border-[#E7E1D8] hover:shadow-lg transition-all duration-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Media Aspect Container with AI Cinematic Motion on Model */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-brand-950">
+      {/* Media Aspect Container */}
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#F5F0EB]">
         <Link href={`/product/${slug}`} className="block w-full h-full">
           <Image
             src={isHovered ? hoverImage : primaryImage}
             alt={title}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className={`object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105 ${
-              isHovered ? "" : "animate-cinematic"
-            }`}
+            className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-950/60 via-transparent to-transparent pointer-events-none" />
         </Link>
 
         {/* Badges Overlay */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
           {isSale && (
-            <span className="px-2 py-0.5 rounded bg-rose-700 text-white text-[10px] font-bold uppercase tracking-wider shadow">
-              Sale -{discountPercent}%
+            <span className="px-2 py-0.5 rounded bg-[#9B3D3D] text-white text-[10px] font-semibold">
+              Sale
             </span>
           )}
           {isNewArrival && !isSale && (
-            <span className="px-2 py-0.5 rounded bg-gold-500 text-ink-black text-[10px] font-bold uppercase tracking-wider shadow">
+            <span className="px-2 py-0.5 rounded bg-[#171717] text-white text-[10px] font-semibold">
               New In
             </span>
           )}
           {isBestSeller && !isSale && (
-            <span className="px-2 py-0.5 rounded bg-deep-olive text-sand-100 text-[10px] font-bold uppercase tracking-wider shadow">
+            <span className="px-2 py-0.5 rounded bg-[#7A6652] text-white text-[10px] font-semibold">
               Bestseller
             </span>
           )}
           {isPreOrder && (
-            <span className="px-2 py-0.5 rounded bg-brand-950 text-gold-300 text-[10px] font-bold uppercase tracking-wider shadow border border-gold-400">
+            <span className="px-2 py-0.5 rounded bg-[#E7E1D8] text-[#171717] text-[10px] font-semibold">
               Pre-Order
             </span>
           )}
@@ -145,17 +142,17 @@ export default function ProductCard({
             e.stopPropagation();
             toggleWishlist(id);
           }}
-          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-sm z-10 ${
+          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 shadow-sm z-10 ${
             wishlisted
-              ? "bg-rose-600 text-white"
-              : "bg-black/60 text-sand-200 hover:bg-black hover:text-rose-400 border border-sand-800"
+              ? "bg-[#9B3D3D] text-white"
+              : "bg-white/90 text-[#6B6259] hover:text-[#9B3D3D]"
           }`}
           aria-label="Wishlist"
         >
           <Heart className={`w-4 h-4 ${wishlisted ? "fill-current" : ""}`} />
         </button>
 
-        {/* Quick View & Quick Add Floating Pill on Hover */}
+        {/* Quick View & Quick Add Floating Pill on Hover (Desktop) */}
         <div className="absolute bottom-3 inset-x-3 hidden sm:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
           {onQuickView && (
             <button
@@ -174,19 +171,19 @@ export default function ProductCard({
                   variants,
                 });
               }}
-              className="flex-1 py-2 px-3 bg-ink-black/90 hover:bg-ink-black text-sand-100 rounded-xl text-xs font-semibold backdrop-blur shadow-md flex items-center justify-center gap-1.5 border border-sand-800 transition-colors"
+              className="flex-1 py-1.5 px-3 bg-white text-[#171717] border border-[#E7E1D8] rounded-full text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-colors"
             >
-              <Eye className="w-3.5 h-3.5 text-gold-400" />
+              <Eye className="w-3.5 h-3.5" />
               Quick View
             </button>
           )}
 
           <button
             onClick={handleQuickAdd}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold backdrop-blur shadow-md flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-3 rounded-full text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all ${
               justAdded
-                ? "bg-emerald-600 text-white"
-                : "bg-gold-500 hover:bg-gold-600 text-ink-black font-bold"
+                ? "bg-[#2D6A4F] text-white"
+                : "bg-[#171717] text-white hover:bg-black"
             }`}
           >
             {justAdded ? (
@@ -195,7 +192,7 @@ export default function ProductCard({
               </>
             ) : (
               <>
-                <ShoppingBag className="w-3.5 h-3.5 text-ink-black" /> + Add
+                <ShoppingBag className="w-3.5 h-3.5" /> + Add
               </>
             )}
           </button>
@@ -203,39 +200,50 @@ export default function ProductCard({
       </div>
 
       {/* Content Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5 bg-brand-900/60">
+      <div className="p-3 bg-white flex-1 flex flex-col justify-between">
         <div>
-          <span className="text-[10px] uppercase tracking-widest text-gold-400 font-bold">
+          <span className="text-[10px] uppercase tracking-wider text-[#7A6652] font-semibold">
             {fabric}
           </span>
-          <Link href={`/product/${slug}`} className="block group-hover:text-gold-300 transition-colors">
-            <h3 className="font-serif font-semibold text-sm sm:text-base text-sand-50 line-clamp-1 mt-0.5">
+          <Link href={`/product/${slug}`} className="block transition-colors">
+            <h3 className="font-serif font-semibold text-sm text-[#171717] line-clamp-2 mt-0.5 leading-snug">
               {title}
             </h3>
           </Link>
-        </div>
 
-        {/* Pricing */}
-        <div className="pt-1 flex items-baseline gap-2">
-          <span className="font-serif font-bold text-base sm:text-lg text-gold-300">
-            Rs. {effectivePrice.toLocaleString()}
-          </span>
-          {hasDiscount && (
-            <span className="text-xs text-sand-500 line-through">
-              Rs. {comparePrice.toLocaleString()}
+          {/* Pricing */}
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="font-serif font-bold text-base text-[#171717]">
+              Rs. {effectivePrice.toLocaleString()}
             </span>
-          )}
+            {hasDiscount && (
+              <>
+                <span className="text-xs text-[#9B9289] line-through">
+                  Rs. {comparePrice.toLocaleString()}
+                </span>
+                <span className="text-[10px] font-bold text-[#9B3D3D] bg-[#FEF2F2] px-1.5 py-0.5 rounded">
+                  -{discountPercent}%
+                </span>
+              </>
+            )}
+          </div>
         </div>
-
-        {/* Mobile Quick Add Button */}
-        <button
-          onClick={handleQuickAdd}
-          className="sm:hidden w-full py-2 mt-1 bg-gold-500 text-ink-black font-bold rounded-lg text-xs flex items-center justify-center gap-1"
-        >
-          {justAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5 text-ink-black" />}
-          {justAdded ? "Added" : "Quick Add"}
-        </button>
       </div>
+
+      {/* Mobile Quick Add Button */}
+      <button
+        onClick={handleQuickAdd}
+        className={`sm:hidden w-full py-2.5 text-xs font-semibold rounded-b-xl flex items-center justify-center gap-1.5 ${
+          justAdded ? "bg-[#2D6A4F] text-white" : "bg-[#171717] text-white"
+        }`}
+      >
+        {justAdded ? (
+          <Check className="w-4 h-4" />
+        ) : (
+          <ShoppingBag className="w-4 h-4" />
+        )}
+        {justAdded ? "Added" : "Quick Add"}
+      </button>
     </div>
   );
 }
