@@ -63,7 +63,6 @@ export default async function RootLayout({
           <Header initialSettings={settings} />
           <CartDrawer />
           <WhatsAppFloat initialSettings={settings} />
-          <AIStylistModal />
           <main className="flex-1 pt-[88px] lg:pt-[108px]">{children}</main>
           <Footer initialSettings={settings} />
         </CartProvider>

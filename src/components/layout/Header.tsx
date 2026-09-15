@@ -18,6 +18,11 @@ export default function Header({ initialSettings }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [womenDropdownOpen, setWomenDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ── Hide-on-scroll-down / show-on-scroll-up ──────────────────────────
   const [navVisible, setNavVisible] = useState(true);
@@ -113,14 +118,14 @@ export default function Header({ initialSettings }: HeaderProps) {
         <div className="bg-[#0F0F0F] text-[#C8C2BB] text-[11px] py-2 overflow-hidden relative">
           <div className="flex animate-marquee whitespace-nowrap">
             {allItems.map((item, i) => (
-              <span
+              <div
                 key={i}
-                className="flex items-center gap-1.5 mx-8 shrink-0"
+                className="inline-flex items-center gap-1.5 mx-8 shrink-0"
               >
-                <span className="text-[#9B8C7E]">{item.icon}</span>
+                <span className="text-[#9B8C7E] flex items-center">{item.icon}</span>
                 <span>{item.text}</span>
                 <span className="ml-8 text-[#3A3530]">•</span>
-              </span>
+              </div>
             ))}
           </div>
         </div>
@@ -241,7 +246,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 aria-label="Open Shopping Bag"
               >
                 <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
+                {mounted && cartCount > 0 && (
                   <span className="absolute top-0 right-0 w-4 h-4 rounded-full bg-[#7A6652] text-white text-[10px] font-bold flex items-center justify-center">
                     {cartCount}
                   </span>
