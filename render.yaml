@@ -8,7 +8,7 @@ services:
     startCommand: npm run start
     envVars:
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://neondb_owner:npg_sDFJWa1k7dZx@ep-lucky-wave-aeftpyv1-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - key: NODE_ENV
         value: production
       - key: NEXT_TELEMETRY_DISABLED
