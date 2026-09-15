@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, RotateCcw, Star, Play, Shoppi
 import { prisma } from "@/lib/prisma";
 import { getSiteSettings } from "@/lib/settings";
 import HomeClientSection from "@/components/home/HomeClientSection";
+import HeroBannerSlider from "@/components/home/HeroBannerSlider";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -59,94 +60,10 @@ export default async function HomePage() {
     }),
   ]);
 
-  // Parse hero stats (e.g. "100%|Pure Swiss Fabrics")
-  const parseStat = (statStr: string, defaultVal: string, defaultLabel: string) => {
-    if (!statStr) return { value: defaultVal, label: defaultLabel };
-    const parts = statStr.split("|");
-    return {
-      value: parts[0]?.trim() || defaultVal,
-      label: parts[1]?.trim() || defaultLabel,
-    };
-  };
-
-  const stat1 = parseStat(settings.heroStats1, "100%", "Pure Swiss & Egyptian Fabrics");
-  const stat2 = parseStat(settings.heroStats2, "COD", "Available across Pakistan");
-  const stat3 = parseStat(settings.heroStats3, "2-4 Days", "Express Courier Delivery");
-
   return (
-    <div className="bg-[#F8F5F0] space-y-20 pb-24">
-      {/* 1. HERO */}
-      {settings.showHero && (
-        <section className="relative w-full min-h-[80vh] lg:min-h-[88vh] flex items-center overflow-hidden">
-          {/* Background Media */}
-          <div className="absolute inset-0 z-0 bg-black">
-            {settings.heroMediaType === "VIDEO" ? (
-              <video
-                src={settings.heroMediaUrl}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Image
-                src={settings.heroMediaUrl || "/assets/hero-model.jpg"}
-                alt="Tauheed Textile Hero"
-                fill
-                priority
-                className="object-cover object-top lg:object-center"
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/40" />
-          </div>
-
-          {/* Hero Content */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/20 text-white/90 text-xs font-medium mb-6">
-              {settings.heroBadge || "New Collection 2026"}
-            </div>
-
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3">
-              {settings.heroTitle || "Everyday Elegance"}
-            </h1>
-
-            <p className="text-white/80 text-sm sm:text-base max-w-md">
-              {settings.heroSubtitle || "Modern Pakistani fashion made for every day."}
-            </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-              <Link
-                href={settings.heroPrimaryBtnLink || "/shop?isNewArrival=true"}
-                className="bg-white text-[#171717] font-bold text-sm px-6 py-3.5 rounded-full hover:bg-[#F8F5F0] transition-colors"
-              >
-                {settings.heroPrimaryBtnText || "Shop New Arrivals"}
-              </Link>
-              <Link
-                href={settings.heroSecondaryBtnLink || "/shop?isBestSeller=true"}
-                className="border border-white/60 text-white font-semibold text-sm px-6 py-3.5 rounded-full hover:bg-white/10 transition-colors"
-              >
-                {settings.heroSecondaryBtnText || "Shop Best Sellers"}
-              </Link>
-            </div>
-
-            <div className="mt-12 flex items-center justify-center lg:justify-start gap-8 lg:gap-12">
-              <div className="text-white">
-                <p className="font-bold text-lg">{stat1.value}</p>
-                <p className="text-xs text-white/70">{stat1.label}</p>
-              </div>
-              <div className="text-white">
-                <p className="font-bold text-lg">{stat2.value}</p>
-                <p className="text-xs text-white/70">{stat2.label}</p>
-              </div>
-              <div className="text-white">
-                <p className="font-bold text-lg">{stat3.value}</p>
-                <p className="text-xs text-white/70">{stat3.label}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+    <div className="bg-[#F8F5F0] space-y-16 pb-24">
+      {/* 1. AUTO-MOVING 4-BANNER HERO (LIMELIGHT STYLE) */}
+      <HeroBannerSlider />
 
       {/* 2. SHOP BY CATEGORY */}
       {settings.showCategories && (
@@ -157,35 +74,50 @@ export default async function HomePage() {
                 Shop by Category
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
-                {settings.categoriesTitle || "What are you looking for?"}
+                {settings.categoriesTitle || "Curated Collections"}
               </h2>
             </div>
-            <Link href="/shop" className="text-sm text-[#171717] underline hover:text-[#7A6652] transition-colors">
+            <Link href="/shop" className="text-sm font-semibold text-[#171717] underline hover:text-[#7A6652] transition-colors">
               View All
             </Link>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.slice(0, 4).map((cat, idx) => (
-              <Link
-                key={cat.id}
-                href={`/shop?category=${cat.slug}`}
-                className="group relative rounded-xl overflow-hidden aspect-[4/5] bg-[#EDE8E1] block"
-              >
-                <Image
-                  src={cat.image || (idx % 2 === 0 ? "/assets/reel-2.jpg" : "/assets/reel-1.jpg")}
-                  alt={cat.name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-4 left-0 right-0 text-center">
-                  <h3 className="font-serif font-bold text-white text-sm">
-                    {cat.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+            {categories.slice(0, 4).map((cat) => {
+              const fallbackImages: Record<string, string> = {
+                "lawn-summer": "/assets/cat-lawn-summer.jpg",
+                "chiffon-formal": "/assets/cat-chiffon-formal.jpg",
+                "pret-ready-to-wear": "/assets/cat-pret-readytowear.jpg",
+                "wedding-luxury-pret": "/assets/cat-wedding-luxury.jpg",
+                "unstitched": "/assets/cat-unstitched.jpg",
+                "sale": "/assets/banners/banner-sale.jpg",
+              };
+              const catImg = (cat.image && !cat.image.endsWith(".png"))
+                ? cat.image
+                : (fallbackImages[cat.slug] || "/assets/cat-lawn-summer.jpg");
+
+              return (
+                <Link
+                  key={cat.id}
+                  href={`/shop?category=${cat.slug}`}
+                  className="group relative rounded-2xl overflow-hidden aspect-[3/4] bg-[#EDE8E1] block shadow-sm hover:shadow-xl transition-all duration-300"
+                >
+                  <Image
+                    src={catImg}
+                    alt={cat.name}
+                    fill
+                    className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute bottom-4 inset-x-2 text-center">
+                    <h3 className="font-serif font-bold text-white text-sm sm:text-base tracking-wide drop-shadow">
+                      {cat.name}
+                    </h3>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

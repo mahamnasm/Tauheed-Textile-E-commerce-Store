@@ -100,6 +100,20 @@ h1, h2, h3, h4, .font-serif {
   width: max-content;
 }
 
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marqueeScroll 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
 @media print {
   .no-print { display: none !important; }
   body {
