@@ -173,12 +173,21 @@ export default function Footer({ initialSettings }: FooterProps) {
         </div>
       </div>
 
-      {/* Copyright Strip */}
-      <div className="bg-[#E7E1D8] py-4">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-xs text-[#6B6259]">
+      {/* Copyright Strip & Discreet Admin Access */}
+      <div className="bg-[#E7E1D8] py-4 border-t border-[#DDD6CC]">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B6259]">
+          <p>
             © 2026 Tauheed Textile. All rights reserved. Made with ❤️ in Pakistan.
           </p>
+          <div className="flex items-center gap-4 text-[11px]">
+            <Link
+              href="/admin"
+              className="text-[#8E857B] hover:text-[#171717] transition-colors flex items-center gap-1 opacity-70 hover:opacity-100"
+              title="Staff Portal (Shortcut: Ctrl+Shift+A)"
+            >
+              <span>🔒 Staff Portal</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

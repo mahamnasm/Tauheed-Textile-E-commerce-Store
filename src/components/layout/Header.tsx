@@ -50,6 +50,21 @@ export default function Header({ initialSettings }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ── Secret Admin Shortcut (Ctrl+Shift+A or Alt+A) ───────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") ||
+        (e.altKey && e.key.toLowerCase() === "a")
+      ) {
+        e.preventDefault();
+        window.location.href = "/admin";
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const isAdmin = pathname.startsWith("/admin");
   if (isAdmin) return null;
 
@@ -147,9 +162,17 @@ export default function Header({ initialSettings }: HeaderProps) {
               </button>
             </div>
 
-            {/* Logo */}
+            {/* Logo (Double-click secretly accesses admin portal) */}
             <div className="flex items-center justify-center flex-1 lg:flex-none">
-              <Link href="/" className="flex items-center gap-3 group py-1" title="Tauheed Textile">
+              <Link
+                href="/"
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/admin";
+                }}
+                className="flex items-center gap-3 group py-1 select-none"
+                title="Tauheed Textile (Double-click for Admin)"
+              >
                 <div className="relative h-10 w-8 sm:h-12 sm:w-9 transition-transform duration-300 group-hover:scale-105 shrink-0">
                   <Image
                     src="/logo-calligraphy.png"

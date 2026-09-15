@@ -117,6 +117,38 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
         </div>
       ),
     },
+    faq: {
+      title: "Frequently Asked Questions (FAQ)",
+      subtitle: "Everything you need to know about ordering, delivery, and fabric care",
+      content: (
+        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
+          <h3 className="font-serif font-bold text-sm text-brand-950">1. How do I place an order?</h3>
+          <p>
+            You can place an order directly on our website by adding items to your bag and choosing Cash On Delivery at checkout, or tap the green <strong>"Order on WhatsApp"</strong> button on any product page to chat directly with our sales team.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-brand-950">2. Is Cash On Delivery (COD) available in my city?</h3>
+          <p>
+            Yes! We offer COD across 250+ cities, towns, and tehsils in Pakistan via TCS, Trax, and Leopards courier.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-brand-950">3. How long will delivery take?</h3>
+          <p>
+            Orders in Lahore are delivered in 1-2 days. Major cities (Karachi, Islamabad, Rawalpindi, Faisalabad) receive parcels in 2-3 business days. Other regions take 3-5 days.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-brand-950">4. Can I exchange an item if the size does not fit?</h3>
+          <p>
+            Yes, we provide a 7-day hassle-free exchange window. Simply contact us via WhatsApp at <strong>0340 0262732</strong> with your order number.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-brand-950">5. Are all fabrics 100% authentic?</h3>
+          <p>
+            Tauheed Textile guarantees 100% original, pure natural fibers, authentic Swiss lawns, and handcrafted zari embroidery.
+          </p>
+        </div>
+      ),
+    },
   };
 
   const currentPolicy = policies[slug];
