@@ -30,12 +30,12 @@ async function seed() {
   console.log('Created admin and customer users');
 
   const categories = [
-    { name: 'Lawn & Summer', slug: 'lawn-summer', description: 'Breathable luxury lawn with intricate threadwork and chiffon dupattas', image: '/assets/1.png', displayOrder: 1 },
-    { name: 'Chiffon & Formal', slug: 'chiffon-formal', description: 'Flowing sheer chiffon adorned with sequins, tilla and adda work', image: '/assets/2.png', displayOrder: 2 },
-    { name: 'Pret / Ready to Wear', slug: 'pret-ready-to-wear', description: 'Impeccably tailored Pakistani kurtas, co-ords and statement suits', image: '/assets/1.png', displayOrder: 3 },
-    { name: 'Wedding & Luxury Pret', slug: 'wedding-luxury-pret', description: 'Opulent festive ensembles crafted for weddings, nikah and celebratory soirees', image: '/assets/2.png', displayOrder: 4 },
-    { name: 'Unstitched', slug: 'unstitched', description: 'Premium 3-piece and 2-piece unstitched fabrics ready for bespoke tailoring', image: '/assets/1.png', displayOrder: 5 },
-    { name: 'Sale', slug: 'sale', description: 'Exclusive seasonal markdowns on authentic designer creations', image: '/assets/2.png', displayOrder: 6 }
+    { name: 'Lawn & Summer', slug: 'lawn-summer', description: 'Breathable luxury lawn with intricate threadwork and chiffon dupattas', image: '/assets/cat-lawn-summer.jpg', displayOrder: 1 },
+    { name: 'Chiffon & Formal', slug: 'chiffon-formal', description: 'Flowing sheer chiffon adorned with sequins, tilla and adda work', image: '/assets/cat-chiffon-formal.jpg', displayOrder: 2 },
+    { name: 'Pret / Ready to Wear', slug: 'pret-ready-to-wear', description: 'Impeccably tailored Pakistani kurtas, co-ords and statement suits', image: '/assets/cat-pret-readytowear.jpg', displayOrder: 3 },
+    { name: 'Wedding & Luxury Pret', slug: 'wedding-luxury-pret', description: 'Opulent festive ensembles crafted for weddings, nikah and celebratory soirees', image: '/assets/cat-wedding-luxury.jpg', displayOrder: 4 },
+    { name: 'Unstitched', slug: 'unstitched', description: 'Premium 3-piece and 2-piece unstitched fabrics ready for bespoke tailoring', image: '/assets/cat-unstitched.jpg', displayOrder: 5 },
+    { name: 'Sale', slug: 'sale', description: 'Exclusive seasonal markdowns on authentic designer creations', image: '/assets/banners/banner-sale.jpg', displayOrder: 6 }
   ];
 
   const catMap = {};
