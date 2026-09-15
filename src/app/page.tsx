@@ -11,54 +11,79 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [settings, categories, featuredProducts, newArrivals, bestSellers, videos, reviews] = await Promise.all([
-    getSiteSettings(),
-    prisma.category.findMany({
-      orderBy: { displayOrder: "asc" },
-      take: 6,
-    }),
-    prisma.product.findMany({
-      where: { isFeatured: true },
-      include: {
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: true,
-      },
-      take: 4,
-    }),
-    prisma.product.findMany({
-      where: { isNewArrival: true },
-      include: {
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: true,
-      },
-      take: 4,
-    }),
-    prisma.product.findMany({
-      where: { isBestSeller: true },
-      include: {
-        images: { orderBy: { displayOrder: "asc" } },
-        variants: true,
-      },
-      take: 4,
-    }),
-    prisma.watchBuyVideo.findMany({
-      where: { isActive: true },
-      include: {
-        product: {
-          include: {
-            images: { take: 1, select: { url: true } },
+  let settings: any = { showCategories: true, showTrending: true, showVideos: true, showReviews: true };
+  let categories: any[] = [
+    { id: "1", name: "Lawn & Summer", slug: "lawn-summer", image: "/assets/cat-lawn-summer.jpg" },
+    { id: "2", name: "Chiffon & Formal", slug: "chiffon-formal", image: "/assets/cat-chiffon-formal.jpg" },
+    { id: "3", name: "Pret / Ready to Wear", slug: "pret-ready-to-wear", image: "/assets/cat-pret-readytowear.jpg" },
+    { id: "4", name: "Wedding & Luxury Pret", slug: "wedding-luxury-pret", image: "/assets/cat-wedding-luxury.jpg" },
+  ];
+  let featuredProducts: any[] = [];
+  let newArrivals: any[] = [];
+  let bestSellers: any[] = [];
+  let videos: any[] = [];
+  let reviews: any[] = [];
+
+  try {
+    const [fetchedSettings, fetchedCats, featProds, newProds, bestProds, fetchedVideos, fetchedReviews] = await Promise.all([
+      getSiteSettings(),
+      prisma.category.findMany({
+        orderBy: { displayOrder: "asc" },
+        take: 6,
+      }),
+      prisma.product.findMany({
+        where: { isFeatured: true },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+        take: 4,
+      }),
+      prisma.product.findMany({
+        where: { isNewArrival: true },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+        take: 4,
+      }),
+      prisma.product.findMany({
+        where: { isBestSeller: true },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+        take: 4,
+      }),
+      prisma.watchBuyVideo.findMany({
+        where: { isActive: true },
+        include: {
+          product: {
+            include: {
+              images: { take: 1, select: { url: true } },
+            },
           },
         },
-      },
-      orderBy: { displayOrder: "asc" },
-      take: 4,
-    }),
-    prisma.review.findMany({
-      where: { isApproved: true, isFeatured: true },
-      include: { product: true },
-      take: 3,
-    }),
-  ]);
+        orderBy: { displayOrder: "asc" },
+        take: 4,
+      }),
+      prisma.review.findMany({
+        where: { isApproved: true, isFeatured: true },
+        include: { product: true },
+        take: 3,
+      }),
+    ]);
+
+    if (fetchedSettings) settings = fetchedSettings;
+    if (fetchedCats && fetchedCats.length > 0) categories = fetchedCats;
+    if (featProds) featuredProducts = featProds;
+    if (newProds) newArrivals = newProds;
+    if (bestProds) bestSellers = bestProds;
+    if (fetchedVideos) videos = fetchedVideos;
+    if (fetchedReviews) reviews = fetchedReviews;
+  } catch (dbError) {
+    console.warn("Database cold start / connection retry:", dbError);
+  }
 
   return (
     <div className="bg-[#F8F5F0] space-y-16 pb-24">
