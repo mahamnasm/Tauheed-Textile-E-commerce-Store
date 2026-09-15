@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductDetailClient from "@/components/shop/ProductDetailClient";
 
+import { FALLBACK_PRODUCTS } from "@/lib/fallbackProducts";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -15,36 +17,52 @@ interface ProductPageProps {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = params;
 
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      images: { orderBy: { displayOrder: "asc" } },
-      variants: { orderBy: { priceAdjustment: "asc" } },
-      category: true,
-      collection: true,
-      reviews: {
-        where: { isApproved: true },
-        orderBy: { createdAt: "desc" },
+  let product: any = null;
+  let relatedProducts: any[] = [];
+
+  try {
+    product = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        images: { orderBy: { displayOrder: "asc" } },
+        variants: { orderBy: { priceAdjustment: "asc" } },
+        category: true,
+        collection: true,
+        reviews: {
+          where: { isApproved: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
-    },
-  });
+    });
+
+    if (product) {
+      relatedProducts = await prisma.product.findMany({
+        where: {
+          ...(product.categoryId ? { categoryId: product.categoryId } : {}),
+          id: { not: product.id },
+        },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+        take: 4,
+      });
+    }
+  } catch (err) {
+    console.warn("Product page database query fallback:", err);
+  }
+
+  // Graceful fallback if database is offline or not yet seeded on host
+  if (!product) {
+    product = FALLBACK_PRODUCTS.find((p) => p.slug === slug) || null;
+    if (product) {
+      relatedProducts = FALLBACK_PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4);
+    }
+  }
 
   if (!product) {
     notFound();
   }
-
-  // Related products
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      ...(product.categoryId ? { categoryId: product.categoryId } : {}),
-      id: { not: product.id },
-    },
-    include: {
-      images: { orderBy: { displayOrder: "asc" } },
-      variants: true,
-    },
-    take: 4,
-  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">

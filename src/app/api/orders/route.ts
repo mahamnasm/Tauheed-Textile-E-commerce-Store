@@ -35,6 +35,18 @@ export async function POST(req: NextRequest) {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderNumber = `TT-${new Date().getFullYear()}-${randomSuffix}`;
 
+    const firstProd = await prisma.product.findFirst({ select: { id: true } });
+    const defaultProductId = firstProd?.id || "";
+
+    const orderItemsData = items.map((item: any) => ({
+      productId: item.productId || item.id || defaultProductId,
+      variantDetails: `Size: ${item.size || item.selectedSize || "Standard"}, Color: ${item.color || item.selectedColor || "Standard"}, ${item.stitchedType || "Unstitched"}`,
+      price: parseFloat(item.price || 0),
+      costPrice: parseFloat(item.costPrice || 0),
+      quantity: parseInt(item.quantity || 1, 10),
+      total: parseFloat(item.price || 0) * parseInt(item.quantity || 1, 10),
+    }));
+
     // Create Order with Prisma
     const order = await prisma.order.create({
       data: {
@@ -56,14 +68,7 @@ export async function POST(req: NextRequest) {
         total: parseFloat(total),
         staffNotes: notes || null,
         items: {
-          create: items.map((item: any) => ({
-            productId: item.productId,
-            variantDetails: `Size: ${item.size}, Color: ${item.color}, ${item.stitchedType}`,
-            price: parseFloat(item.price),
-            costPrice: parseFloat(item.costPrice || 0),
-            quantity: parseInt(item.quantity, 10),
-            total: parseFloat(item.price) * parseInt(item.quantity, 10),
-          })),
+          create: orderItemsData,
         },
         ...(paymentMethod === "BANK_TRANSFER" && bankTransferDetails
           ? {

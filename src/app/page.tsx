@@ -7,6 +7,7 @@ import { getSiteSettings } from "@/lib/settings";
 import HomeClientSection from "@/components/home/HomeClientSection";
 import HeroBannerSlider from "@/components/home/HeroBannerSlider";
 import RunwayReelsSection from "@/components/home/RunwayReelsSection";
+import { FALLBACK_PRODUCTS, FALLBACK_CATEGORIES } from "@/lib/fallbackProducts";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -77,13 +78,27 @@ export default async function HomePage() {
 
     if (fetchedSettings) settings = fetchedSettings;
     if (fetchedCats && fetchedCats.length > 0) categories = fetchedCats;
-    if (featProds) featuredProducts = featProds;
-    if (newProds) newArrivals = newProds;
-    if (bestProds) bestSellers = bestProds;
+    if (featProds && featProds.length > 0) featuredProducts = featProds;
+    if (newProds && newProds.length > 0) newArrivals = newProds;
+    if (bestProds && bestProds.length > 0) bestSellers = bestProds;
     if (fetchedVideos) videos = fetchedVideos;
     if (fetchedReviews) reviews = fetchedReviews;
   } catch (dbError) {
     console.warn("Database cold start / connection retry:", dbError);
+  }
+
+  // Graceful fallback: Storefront will ALWAYS display products even during database cold-start
+  if (!categories || categories.length === 0) {
+    categories = FALLBACK_CATEGORIES;
+  }
+  if (!featuredProducts || featuredProducts.length === 0) {
+    featuredProducts = FALLBACK_PRODUCTS.filter((p) => p.isFeatured);
+  }
+  if (!newArrivals || newArrivals.length === 0) {
+    newArrivals = FALLBACK_PRODUCTS.filter((p) => p.isNewArrival);
+  }
+  if (!bestSellers || bestSellers.length === 0) {
+    bestSellers = FALLBACK_PRODUCTS.filter((p) => p.isBestSeller);
   }
 
   return (
