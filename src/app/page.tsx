@@ -88,7 +88,7 @@ export default async function HomePage() {
   return (
     <div className="bg-[#F8F5F0] space-y-16 pb-24">
       {/* 1. AUTO-MOVING 4-BANNER HERO (LIMELIGHT STYLE) */}
-      <HeroBannerSlider />
+      <HeroBannerSlider settings={settings} />
 
       {/* 2. SHOP BY CATEGORY */}
       {settings.showCategories && (

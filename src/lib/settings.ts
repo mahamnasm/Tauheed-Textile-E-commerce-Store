@@ -85,6 +85,36 @@ export interface SiteLayoutSettings {
   footerCopyright: string;
   newsletterTitle: string;
   newsletterSubtitle: string;
+
+  // 10. Limelight 4 Moving Banners
+  banner1Image: string;
+  banner1Tag: string;
+  banner1SaleBadge: string;
+  banner1Title: string;
+  banner1Subtitle: string;
+  banner1BtnText: string;
+  banner1Link: string;
+
+  banner2Image: string;
+  banner2Tag: string;
+  banner2Title: string;
+  banner2Subtitle: string;
+  banner2BtnText: string;
+  banner2Link: string;
+
+  banner3Image: string;
+  banner3Tag: string;
+  banner3Title: string;
+  banner3Subtitle: string;
+  banner3BtnText: string;
+  banner3Link: string;
+
+  banner4Image: string;
+  banner4Tag: string;
+  banner4Title: string;
+  banner4Subtitle: string;
+  banner4BtnText: string;
+  banner4Link: string;
 }
 
 export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
@@ -172,6 +202,36 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   footerCopyright: "© 2026 Tauheed Textile. All Rights Reserved. Handcrafted in Pakistan.",
   newsletterTitle: "Join the Tauheed Haute Circle",
   newsletterSubtitle: "Receive private previews of limited edition seasonal drops, runway access, and private boutique sales.",
+
+  // 10. Limelight 4 Moving Banners
+  banner1Image: "/assets/banners/banner-sale.jpg",
+  banner1Tag: "FESTIVE SALE",
+  banner1SaleBadge: "SPECIAL DISCOUNT",
+  banner1Title: "UP TO 50% OFF",
+  banner1Subtitle: "Exclusive seasonal markdowns on luxury stitched & unstitched",
+  banner1BtnText: "SHOP SALE",
+  banner1Link: "/shop?category=sale",
+
+  banner2Image: "/assets/banners/banner-lawn.jpg",
+  banner2Tag: "NEW ARRIVALS 2026",
+  banner2Title: "SUMMER LAWN '26",
+  banner2Subtitle: "Breathable pure Egyptian cotton lawn with handcrafted dupattas",
+  banner2BtnText: "EXPLORE LAWN",
+  banner2Link: "/shop?category=lawn-summer",
+
+  banner3Image: "/assets/banners/banner-chiffon.jpg",
+  banner3Tag: "LUXURY FORMALS",
+  banner3Title: "ROYAL CHIFFON EDIT",
+  banner3Subtitle: "Hand-embellished tilla, sequins and master-tailored silhouettes",
+  banner3BtnText: "SHOP FORMALS",
+  banner3Link: "/shop?category=chiffon-formal",
+
+  banner4Image: "/assets/banners/banner-festive.jpg",
+  banner4Tag: "SIGNATURE COUTURE",
+  banner4Title: "EVERYDAY ELEGANCE",
+  banner4Subtitle: "Timeless ivory & antique gold ensembles for weddings and soirees",
+  banner4BtnText: "SHOP COLLECTION",
+  banner4Link: "/shop?category=pret-ready-to-wear",
 };
 
 export async function getSiteSettings(): Promise<SiteLayoutSettings> {

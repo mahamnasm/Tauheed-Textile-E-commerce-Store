@@ -32,7 +32,8 @@ import {
   Layout,
   RefreshCw,
   Smartphone,
-  Monitor
+  Monitor,
+  Upload
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -75,9 +76,45 @@ export default function AdminLayoutCustomizer({
   const [newVideoProductId, setNewVideoProductId] = useState(products[0]?.id || "");
   const [isAddingVideo, setIsAddingVideo] = useState(false);
 
+  const [uploadingBanner, setUploadingBanner] = useState<number | null>(null);
+
   // Field change helper
   const updateField = <K extends keyof SiteLayoutSettings>(key: K, value: SiteLayoutSettings[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleBannerFileUpload = async (bannerIndex: 1 | 2 | 3 | 4, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingBanner(bannerIndex);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to upload image");
+
+      const uploadedUrl = data.url || data.urls?.[0];
+      if (uploadedUrl) {
+        if (bannerIndex === 1) updateField("banner1Image", uploadedUrl);
+        else if (bannerIndex === 2) updateField("banner2Image", uploadedUrl);
+        else if (bannerIndex === 3) updateField("banner3Image", uploadedUrl);
+        else if (bannerIndex === 4) updateField("banner4Image", uploadedUrl);
+
+        toast.success(`Banner ${bannerIndex} uploaded successfully!`, { icon: "📸" });
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload banner image");
+    } finally {
+      setUploadingBanner(null);
+      e.target.value = "";
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -92,7 +129,7 @@ export default function AdminLayoutCustomizer({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save settings");
 
-      toast.success("Website customizations applied live to storefront!", { icon: "✨" });
+      toast.success("Website customizations applied live to storefront!", { icon: "âœ¨" });
       router.refresh();
     } catch (err: any) {
       toast.error(err.message || "Failed to update layout settings");
@@ -384,11 +421,11 @@ export default function AdminLayoutCustomizer({
                 rows={3}
                 value={settings.marqueeText}
                 onChange={(e) => updateField("marqueeText", e.target.value)}
-                placeholder="⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY • EXPRESS 2-4 DAY COURIER DISPATCH"
+                placeholder="âš¡ EID LUXURY LAWN DROP NOW LIVE â€¢ CASH ON DELIVERY NATIONWIDE â€¢ EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY â€¢ EXPRESS 2-4 DAY COURIER DISPATCH"
                 className="w-full px-4 py-3 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-sans leading-relaxed"
               />
               <p className="text-[11px] text-brand-500">
-                Tip: Separate key points with bullets (•) or emojis (⚡, ✨) for luxury editorial styling.
+                Tip: Separate key points with bullets (â€¢) or emojis (âš¡, âœ¨) for luxury editorial styling.
               </p>
             </div>
 
@@ -408,7 +445,7 @@ export default function AdminLayoutCustomizer({
               <label className="text-xs font-bold text-brand-900 block mb-2">Live Ticker Preview</label>
               <div className="w-full bg-gold-500 text-brand-950 py-2.5 px-4 rounded-xl overflow-hidden font-bold text-xs uppercase tracking-widest shadow-inner">
                 <div className="truncate">
-                  {settings.marqueeText || "⚡ LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE"}
+                  {settings.marqueeText || "âš¡ LUXURY LAWN DROP NOW LIVE â€¢ CASH ON DELIVERY NATIONWIDE"}
                 </div>
               </div>
             </div>
@@ -440,6 +477,503 @@ export default function AdminLayoutCustomizer({
             </label>
           </div>
 
+          {/* SECTION: 4 AUTO-MOVING EDITORIAL BANNERS (LIMELIGHT STYLE) */}
+          <div className="bg-sand-50 border border-sand-200 rounded-2xl p-5 sm:p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sand-200 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-gold-500 text-brand-950 text-[10px] font-black uppercase tracking-wider">
+                    Limelight-Style Slider
+                  </span>
+                  <span className="text-xs font-bold text-brand-950 font-serif">4 Auto-Moving Homepage Banners</span>
+                </div>
+                <p className="text-xs text-brand-600 mt-1">
+                  Upload high-resolution model photos directly from your PC or enter URLs. Customize titles, subtitles, tags, and button links.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* BANNER 1: FESTIVE SALE */}
+              <div className="bg-white p-5 rounded-2xl border border-sand-300 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-sand-100 pb-2">
+                  <span className="text-xs font-bold font-serif text-brand-950 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#9B3D3D] text-white flex items-center justify-center text-[10px] font-mono">1</span>
+                    Banner 1 (Featured Sale Banner)
+                  </span>
+                  <span className="text-[10px] uppercase font-bold text-[#9B3D3D] bg-red-50 px-2 py-0.5 rounded-full">
+                    Sale Special
+                  </span>
+                </div>
+
+                {/* Banner 1 Image Preview & Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-brand-900 block">Banner Photo (Model Editorial)</label>
+                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
+                    {settings.banner1Image ? (
+                      <Image
+                        src={settings.banner1Image}
+                        alt="Banner 1"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
+                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
+                        {uploadingBanner === 1 ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 text-brand-900" />
+                            <span>Upload Photo from PC</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBanner === 1}
+                          onChange={(e) => handleBannerFileUpload(1, e)}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    value={settings.banner1Image}
+                    onChange={(e) => updateField("banner1Image", e.target.value)}
+                    placeholder="/assets/banners/banner-sale.jpg"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Banner Tag</label>
+                    <input
+                      type="text"
+                      value={settings.banner1Tag}
+                      onChange={(e) => updateField("banner1Tag", e.target.value)}
+                      placeholder="FESTIVE SALE"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Sale Badge</label>
+                    <input
+                      type="text"
+                      value={settings.banner1SaleBadge}
+                      onChange={(e) => updateField("banner1SaleBadge", e.target.value)}
+                      placeholder="UP TO 50% OFF"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 text-[#9B3D3D] font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Headline Title</label>
+                  <input
+                    type="text"
+                    value={settings.banner1Title}
+                    onChange={(e) => updateField("banner1Title", e.target.value)}
+                    placeholder="UP TO 50% OFF"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-serif font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Subtitle / Caption</label>
+                  <input
+                    type="text"
+                    value={settings.banner1Subtitle}
+                    onChange={(e) => updateField("banner1Subtitle", e.target.value)}
+                    placeholder="Exclusive seasonal markdowns on luxury stitched & unstitched"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Button Text</label>
+                    <input
+                      type="text"
+                      value={settings.banner1BtnText}
+                      onChange={(e) => updateField("banner1BtnText", e.target.value)}
+                      placeholder="SHOP SALE"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
+                    <input
+                      type="text"
+                      value={settings.banner1Link}
+                      onChange={(e) => updateField("banner1Link", e.target.value)}
+                      placeholder="/shop?category=sale"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* BANNER 2: SUMMER LAWN */}
+              <div className="bg-white p-5 rounded-2xl border border-sand-300 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-sand-100 pb-2">
+                  <span className="text-xs font-serif font-bold text-brand-950 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-900 text-white flex items-center justify-center text-[10px] font-mono">2</span>
+                    Banner 2 (Summer Lawn)
+                  </span>
+                  <span className="text-[10px] uppercase font-bold text-brand-600 bg-sand-100 px-2 py-0.5 rounded-full">
+                    Lawn Drop
+                  </span>
+                </div>
+
+                {/* Banner 2 Image Preview & Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
+                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
+                    {settings.banner2Image ? (
+                      <Image
+                        src={settings.banner2Image}
+                        alt="Banner 2"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
+                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
+                        {uploadingBanner === 2 ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 text-brand-900" />
+                            <span>Upload Photo from PC</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBanner === 2}
+                          onChange={(e) => handleBannerFileUpload(2, e)}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    value={settings.banner2Image}
+                    onChange={(e) => updateField("banner2Image", e.target.value)}
+                    placeholder="/assets/banners/banner-lawn.jpg"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Banner Tag</label>
+                  <input
+                    type="text"
+                    value={settings.banner2Tag}
+                    onChange={(e) => updateField("banner2Tag", e.target.value)}
+                    placeholder="NEW ARRIVALS 2026"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Headline Title</label>
+                  <input
+                    type="text"
+                    value={settings.banner2Title}
+                    onChange={(e) => updateField("banner2Title", e.target.value)}
+                    placeholder="SUMMER LAWN '26"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-serif font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Subtitle / Caption</label>
+                  <input
+                    type="text"
+                    value={settings.banner2Subtitle}
+                    onChange={(e) => updateField("banner2Subtitle", e.target.value)}
+                    placeholder="Breathable pure Egyptian cotton lawn with handcrafted dupattas"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Button Text</label>
+                    <input
+                      type="text"
+                      value={settings.banner2BtnText}
+                      onChange={(e) => updateField("banner2BtnText", e.target.value)}
+                      placeholder="EXPLORE LAWN"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
+                    <input
+                      type="text"
+                      value={settings.banner2Link}
+                      onChange={(e) => updateField("banner2Link", e.target.value)}
+                      placeholder="/shop?category=lawn-summer"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* BANNER 3: ROYAL CHIFFON */}
+              <div className="bg-white p-5 rounded-2xl border border-sand-300 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-sand-100 pb-2">
+                  <span className="text-xs font-serif font-bold text-brand-950 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-900 text-white flex items-center justify-center text-[10px] font-mono">3</span>
+                    Banner 3 (Luxury Formals & Chiffon)
+                  </span>
+                  <span className="text-[10px] uppercase font-bold text-brand-600 bg-sand-100 px-2 py-0.5 rounded-full">
+                    Formals
+                  </span>
+                </div>
+
+                {/* Banner 3 Image Preview & Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
+                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
+                    {settings.banner3Image ? (
+                      <Image
+                        src={settings.banner3Image}
+                        alt="Banner 3"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
+                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
+                        {uploadingBanner === 3 ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 text-brand-900" />
+                            <span>Upload Photo from PC</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBanner === 3}
+                          onChange={(e) => handleBannerFileUpload(3, e)}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    value={settings.banner3Image}
+                    onChange={(e) => updateField("banner3Image", e.target.value)}
+                    placeholder="/assets/banners/banner-chiffon.jpg"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Banner Tag</label>
+                  <input
+                    type="text"
+                    value={settings.banner3Tag}
+                    onChange={(e) => updateField("banner3Tag", e.target.value)}
+                    placeholder="LUXURY FORMALS"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Headline Title</label>
+                  <input
+                    type="text"
+                    value={settings.banner3Title}
+                    onChange={(e) => updateField("banner3Title", e.target.value)}
+                    placeholder="ROYAL CHIFFON EDIT"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-serif font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Subtitle / Caption</label>
+                  <input
+                    type="text"
+                    value={settings.banner3Subtitle}
+                    onChange={(e) => updateField("banner3Subtitle", e.target.value)}
+                    placeholder="Hand-embellished tilla, sequins and master-tailored silhouettes"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Button Text</label>
+                    <input
+                      type="text"
+                      value={settings.banner3BtnText}
+                      onChange={(e) => updateField("banner3BtnText", e.target.value)}
+                      placeholder="SHOP FORMALS"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
+                    <input
+                      type="text"
+                      value={settings.banner3Link}
+                      onChange={(e) => updateField("banner3Link", e.target.value)}
+                      placeholder="/shop?category=chiffon-formal"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* BANNER 4: SIGNATURE COUTURE */}
+              <div className="bg-white p-5 rounded-2xl border border-sand-300 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-sand-100 pb-2">
+                  <span className="text-xs font-serif font-bold text-brand-950 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-900 text-white flex items-center justify-center text-[10px] font-mono">4</span>
+                    Banner 4 (Signature Couture & Pret)
+                  </span>
+                  <span className="text-[10px] uppercase font-bold text-brand-600 bg-sand-100 px-2 py-0.5 rounded-full">
+                    Pret / Couture
+                  </span>
+                </div>
+
+                {/* Banner 4 Image Preview & Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
+                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
+                    {settings.banner4Image ? (
+                      <Image
+                        src={settings.banner4Image}
+                        alt="Banner 4"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
+                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
+                        {uploadingBanner === 4 ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 text-brand-900" />
+                            <span>Upload Photo from PC</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingBanner === 4}
+                          onChange={(e) => handleBannerFileUpload(4, e)}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    value={settings.banner4Image}
+                    onChange={(e) => updateField("banner4Image", e.target.value)}
+                    placeholder="/assets/banners/banner-festive.jpg"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Banner Tag</label>
+                  <input
+                    type="text"
+                    value={settings.banner4Tag}
+                    onChange={(e) => updateField("banner4Tag", e.target.value)}
+                    placeholder="SIGNATURE COUTURE"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Headline Title</label>
+                  <input
+                    type="text"
+                    value={settings.banner4Title}
+                    onChange={(e) => updateField("banner4Title", e.target.value)}
+                    placeholder="EVERYDAY ELEGANCE"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-serif font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-brand-900">Subtitle / Caption</label>
+                  <input
+                    type="text"
+                    value={settings.banner4Subtitle}
+                    onChange={(e) => updateField("banner4Subtitle", e.target.value)}
+                    placeholder="Timeless ivory & antique gold ensembles for weddings and soirees"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Button Text</label>
+                    <input
+                      type="text"
+                      value={settings.banner4BtnText}
+                      onChange={(e) => updateField("banner4BtnText", e.target.value)}
+                      placeholder="SHOP COLLECTION"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
+                    <input
+                      type="text"
+                      value={settings.banner4Link}
+                      onChange={(e) => updateField("banner4Link", e.target.value)}
+                      placeholder="/shop?category=pret-ready-to-wear"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-sand-200 pt-6">
+            <h3 className="text-xs font-bold text-brand-900 uppercase tracking-wider mb-4">
+              Single Hero Media / Fallback Headline Settings
+            </h3>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-brand-900">Hero Floating Badge</label>
@@ -447,7 +981,7 @@ export default function AdminLayoutCustomizer({
                 type="text"
                 value={settings.heroBadge}
                 onChange={(e) => updateField("heroBadge", e.target.value)}
-                placeholder="Festive Edit 2026 — Live Now"
+                placeholder="Festive Edit 2026 â€” Live Now"
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500"
               />
             </div>
@@ -826,7 +1360,7 @@ export default function AdminLayoutCustomizer({
                 type="text"
                 value={settings.heritageTitle}
                 onChange={(e) => updateField("heritageTitle", e.target.value)}
-                placeholder="Tauheed Textile — Where Heritage Meets Modern Grace"
+                placeholder="Tauheed Textile â€” Where Heritage Meets Modern Grace"
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-serif font-bold"
               />
             </div>
@@ -1220,7 +1754,7 @@ export default function AdminLayoutCustomizer({
                   type="text"
                   value={settings.footerCopyright}
                   onChange={(e) => updateField("footerCopyright", e.target.value)}
-                  placeholder="© 2026 Tauheed Textile. All Rights Reserved. Handcrafted in Pakistan."
+                  placeholder="Â© 2026 Tauheed Textile. All Rights Reserved. Handcrafted in Pakistan."
                   className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
                 />
               </div>

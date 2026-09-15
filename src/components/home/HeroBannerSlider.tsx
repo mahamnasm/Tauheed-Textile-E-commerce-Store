@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { SiteLayoutSettings } from "@/lib/settings";
 
 export interface HeroBanner {
   id: string;
@@ -17,72 +18,76 @@ export interface HeroBanner {
   alignment?: "left" | "right" | "center";
 }
 
-const DEFAULT_BANNERS: HeroBanner[] = [
-  {
-    id: "sale-banner",
-    image: "/assets/banners/banner-sale.jpg",
-    tag: "FESTIVE SALE",
-    title: "UP TO 50% OFF",
-    subtitle: "Exclusive seasonal markdowns on luxury stitched & unstitched",
-    btnText: "SHOP SALE",
-    link: "/shop?category=sale",
-    saleBadge: "SPECIAL DISCOUNT",
-    alignment: "left",
-  },
-  {
-    id: "lawn-banner",
-    image: "/assets/banners/banner-lawn.jpg",
-    tag: "NEW ARRIVALS 2026",
-    title: "SUMMER LAWN '26",
-    subtitle: "Breathable pure Egyptian cotton lawn with handcrafted dupattas",
-    btnText: "EXPLORE LAWN",
-    link: "/shop?category=lawn-summer",
-    alignment: "left",
-  },
-  {
-    id: "chiffon-banner",
-    image: "/assets/banners/banner-chiffon.jpg",
-    tag: "LUXURY FORMALS",
-    title: "ROYAL CHIFFON EDIT",
-    subtitle: "Hand-embellished tilla, sequins and master-tailored silhouettes",
-    btnText: "SHOP FORMALS",
-    link: "/shop?category=chiffon-formal",
-    alignment: "left",
-  },
-  {
-    id: "festive-banner",
-    image: "/assets/banners/banner-festive.jpg",
-    tag: "SIGNATURE COUTURE",
-    title: "EVERYDAY ELEGANCE",
-    subtitle: "Timeless ivory & antique gold ensembles for weddings and soirees",
-    btnText: "SHOP COLLECTION",
-    link: "/shop?category=pret-ready-to-wear",
-    alignment: "left",
-  },
-];
+interface HeroBannerSliderProps {
+  settings?: SiteLayoutSettings;
+}
 
-export default function HeroBannerSlider() {
+export default function HeroBannerSlider({ settings }: HeroBannerSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
+  const banners: HeroBanner[] = [
+    {
+      id: "banner-1",
+      image: settings?.banner1Image || "/assets/banners/banner-sale.jpg",
+      tag: settings?.banner1Tag || "FESTIVE SALE",
+      title: settings?.banner1Title || "UP TO 50% OFF",
+      subtitle: settings?.banner1Subtitle || "Exclusive seasonal markdowns on luxury stitched & unstitched",
+      btnText: settings?.banner1BtnText || "SHOP SALE",
+      link: settings?.banner1Link || "/shop?category=sale",
+      saleBadge: settings?.banner1SaleBadge || "SPECIAL DISCOUNT",
+      alignment: "left",
+    },
+    {
+      id: "banner-2",
+      image: settings?.banner2Image || "/assets/banners/banner-lawn.jpg",
+      tag: settings?.banner2Tag || "NEW ARRIVALS 2026",
+      title: settings?.banner2Title || "SUMMER LAWN '26",
+      subtitle: settings?.banner2Subtitle || "Breathable pure Egyptian cotton lawn with handcrafted dupattas",
+      btnText: settings?.banner2BtnText || "EXPLORE LAWN",
+      link: settings?.banner2Link || "/shop?category=lawn-summer",
+      alignment: "left",
+    },
+    {
+      id: "banner-3",
+      image: settings?.banner3Image || "/assets/banners/banner-chiffon.jpg",
+      tag: settings?.banner3Tag || "LUXURY FORMALS",
+      title: settings?.banner3Title || "ROYAL CHIFFON EDIT",
+      subtitle: settings?.banner3Subtitle || "Hand-embellished tilla, sequins and master-tailored silhouettes",
+      btnText: settings?.banner3BtnText || "SHOP FORMALS",
+      link: settings?.banner3Link || "/shop?category=chiffon-formal",
+      alignment: "left",
+    },
+    {
+      id: "banner-4",
+      image: settings?.banner4Image || "/assets/banners/banner-festive.jpg",
+      tag: settings?.banner4Tag || "SIGNATURE COUTURE",
+      title: settings?.banner4Title || "EVERYDAY ELEGANCE",
+      subtitle: settings?.banner4Subtitle || "Timeless ivory & antique gold ensembles for weddings and soirees",
+      btnText: settings?.banner4BtnText || "SHOP COLLECTION",
+      link: settings?.banner4Link || "/shop?category=pret-ready-to-wear",
+      alignment: "left",
+    },
+  ];
+
   // Auto-play interval (4.5 seconds like Limelight / Sapphire)
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % DEFAULT_BANNERS.length);
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
     }, 4500);
 
     return () => clearInterval(timer);
-  }, [isPaused]);
+  }, [isPaused, banners.length]);
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % DEFAULT_BANNERS.length);
+    setCurrentIndex((prev) => (prev + 1) % banners.length);
   };
 
   const goToPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + DEFAULT_BANNERS.length) % DEFAULT_BANNERS.length);
+    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
   // Mobile Touch Swipe Handling
@@ -116,7 +121,7 @@ export default function HeroBannerSlider() {
       onTouchEnd={handleTouchEnd}
     >
       <div className="relative w-full h-[65vh] sm:h-[75vh] lg:h-[84vh] min-h-[460px]">
-        {DEFAULT_BANNERS.map((banner, index) => {
+        {banners.map((banner, index) => {
           const isActive = index === currentIndex;
           return (
             <div
@@ -199,7 +204,7 @@ export default function HeroBannerSlider() {
 
         {/* Slide Indicators / Dots */}
         <div className="absolute bottom-5 left-0 right-0 z-20 flex items-center justify-center gap-2.5">
-          {DEFAULT_BANNERS.map((_, idx) => (
+          {banners.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
