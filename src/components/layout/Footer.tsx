@@ -30,13 +30,13 @@ export default function Footer({ initialSettings }: FooterProps) {
             <span>🚚</span> Free Delivery Over Rs. 10,000
           </div>
           <div className="flex items-center gap-2">
-            <span>🏷️</span> Flat 5% Off on Advance Payments
+            <span>🏷️</span> Flat 5% Off: Bank &amp; EasyPaisa
           </div>
           <div className="flex items-center gap-2">
-            <span>🔄</span> 7-Day Exchange (No Returns)
+            <span>🔄</span> 7-Day Exchange Only
           </div>
           <div className="flex items-center gap-2">
-            <span>🇵🇰</span> Karachi 1-2d • Nationwide 4-7d
+            <span>🇵🇰</span> Nationwide 5–7 Working Days
           </div>
         </div>
       </div>

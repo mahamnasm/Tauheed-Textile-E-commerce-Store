@@ -700,7 +700,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                     className="text-[#E8E3DC] hover:text-white py-1 border-b border-[#2A2626]/50 block font-medium"
                   >
-                    Shipping Rates (Karachi 1-2d • Nationwide 4-7d)
+                    Shipping Rates (5–7 Working Days)
                   </Link>
 
                   <div className="text-[11px] text-[#9B8C7E] pt-1">

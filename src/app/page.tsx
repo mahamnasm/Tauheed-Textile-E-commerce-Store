@@ -142,12 +142,12 @@ export default async function HomePage() {
             <div className="flex flex-col items-center">
               <Truck className="w-8 h-8 text-[#7A6652] mb-3" />
               <h4 className="font-semibold text-sm text-[#171717]">COD &amp; 5% Off Advance</h4>
-              <p className="text-xs text-[#6B6259] mt-1">Pay COD or save 5% on Bank / JazzCash</p>
+              <p className="text-xs text-[#6B6259] mt-1">Bank Transfer &amp; EasyPaisa</p>
             </div>
             <div className="flex flex-col items-center">
               <Package className="w-8 h-8 text-[#7A6652] mb-3" />
               <h4 className="font-semibold text-sm text-[#171717]">Nationwide Delivery</h4>
-              <p className="text-xs text-[#6B6259] mt-1">Karachi 1-2d • Major 4-5d • Rural 5-7d</p>
+              <p className="text-xs text-[#6B6259] mt-1">5–7 Working Days</p>
             </div>
             <div className="flex flex-col items-center">
               <RotateCcw className="w-8 h-8 text-[#7A6652] mb-3" />
