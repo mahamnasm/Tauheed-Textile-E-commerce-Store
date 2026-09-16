@@ -29,7 +29,8 @@ import {
   MessageSquare,
   FolderTree,
   Bell,
-  Check
+  Check,
+  TrendingUp
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -43,12 +44,14 @@ export default function AdminSidebar() {
   const [notifications, setNotifications] = useState<{
     pendingOrdersCount: number;
     pendingReviewsCount: number;
+    pendingBankProofsCount: number;
     totalNotifications: number;
     recentOrders: any[];
     recentReviews: any[];
   }>({
     pendingOrdersCount: 0,
     pendingReviewsCount: 0,
+    pendingBankProofsCount: 0,
     totalNotifications: 0,
     recentOrders: [],
     recentReviews: [],
@@ -104,42 +107,85 @@ export default function AdminSidebar() {
     };
   }, [mobileDrawerOpen]);
 
-  const navItems = [
-    { label: "🏠 Main Dashboard", href: "/admin", icon: LayoutDashboard },
-    { 
-      label: "📦 Customer Orders", 
-      href: "/admin/orders", 
-      icon: Receipt,
-      badge: notifications.pendingOrdersCount > 0 ? `${notifications.pendingOrdersCount} NEW` : null 
+  const navGroups = [
+    {
+      title: "Daily Operations",
+      isDaily: true,
+      items: [
+        { label: "🏠 Dashboard", href: "/admin", icon: LayoutDashboard },
+        { 
+          label: "📦 Customer Orders", 
+          href: "/admin/orders", 
+          icon: Receipt,
+          badge: notifications.pendingOrdersCount > 0 ? `${notifications.pendingOrdersCount} NEW` : null 
+        },
+        { 
+          label: "💰 Daily Sales & Slips", 
+          href: "/admin/payments", 
+          icon: TrendingUp,
+          badge: notifications.pendingBankProofsCount > 0 ? `${notifications.pendingBankProofsCount} NEW` : null 
+        },
+        { label: "👗 Dresses & Catalog", href: "/admin/products", icon: ShoppingBag },
+        { label: "🎥 Runway Reels", href: "/admin/reels", icon: Video },
+        { label: "🎨 Website & Banners", href: "/admin/layout", icon: LayoutTemplate },
+      ],
     },
-    { 
-      label: "💬 Customer Reviews", 
-      href: "/admin/reviews", 
-      icon: MessageSquare,
-      badge: notifications.pendingReviewsCount > 0 ? `${notifications.pendingReviewsCount} NEW` : null 
+    {
+      title: "Store Management",
+      isDaily: false,
+      items: [
+        { label: "🗂️ Categories & Subs", href: "/admin/categories", icon: FolderTree },
+        { label: "📊 Warehouse & Stock", href: "/admin/inventory", icon: Boxes },
+        { 
+          label: "💬 Customer Reviews", 
+          href: "/admin/reviews", 
+          icon: MessageSquare,
+          badge: notifications.pendingReviewsCount > 0 ? `${notifications.pendingReviewsCount} NEW` : null 
+        },
+        { label: "🏷️ Coupons & Discounts", href: "/admin/marketing", icon: Megaphone },
+        { label: "👥 Customer Phone List", href: "/admin/customers", icon: Users },
+        { label: "🚚 Delivery & Couriers", href: "/admin/shipping", icon: Truck },
+        { label: "🔄 Returns & Exchanges", href: "/admin/returns", icon: RotateCcw },
+      ],
     },
-    { label: "🗂️ Categories & Subs", href: "/admin/categories", icon: FolderTree },
-    { label: "👗 Dresses & Catalog", href: "/admin/products", icon: ShoppingBag },
-    { label: "🎥 Runway Reels & Videos", href: "/admin/reels", icon: Video },
-    { label: "🎨 Website Customizer", href: "/admin/layout", icon: LayoutTemplate },
-    { label: "📸 Make Cover Photos", href: "/admin/nano-banana", icon: Camera },
-    { label: "🔍 Google SEO & Rank", href: "/admin/seo", icon: Globe },
-    { label: "⚙️ AI Settings & Prompts", href: "/admin/ai", icon: Sparkles },
-    { label: "📊 Warehouse & Stock", href: "/admin/inventory", icon: Boxes },
-    { label: "💰 Bank Slips & Profits", href: "/admin/payments", icon: CreditCard },
-    { label: "🔄 Returns & Exchanges", href: "/admin/returns", icon: RotateCcw },
-    { label: "👥 Customer Phone List", href: "/admin/customers", icon: Users },
-    { label: "🚚 Delivery & Couriers", href: "/admin/shipping", icon: Truck },
-    { label: "🏷️ Coupons & Discounts", href: "/admin/marketing", icon: Megaphone },
-    { label: "🛡️ Security & Lockdown", href: "/admin/security", icon: ShieldCheck },
-    { label: "⚡ Health & Optimizer", href: "/admin/health", icon: Activity },
+    {
+      title: "System & Tools",
+      isDaily: false,
+      items: [
+        { label: "📸 Cover Photos Studio", href: "/admin/nano-banana", icon: Camera },
+        { label: "🔍 Google SEO & Rank", href: "/admin/seo", icon: Globe },
+        { label: "⚙️ AI Settings & Prompts", href: "/admin/ai", icon: Sparkles },
+        { label: "🛡️ Security & Lockdown", href: "/admin/security", icon: ShieldCheck },
+        { label: "⚡ Health & Optimizer", href: "/admin/health", icon: Activity },
+      ],
+    },
   ];
 
   const bottomNavItems = [
-    { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { label: "Orders", href: "/admin/orders", icon: Receipt },
-    { label: "Reviews", href: "/admin/reviews", icon: MessageSquare },
-    { label: "Catalog", href: "/admin/products", icon: ShoppingBag },
+    { 
+      label: "Dashboard", 
+      href: "/admin", 
+      icon: LayoutDashboard,
+      badge: null 
+    },
+    { 
+      label: "Orders", 
+      href: "/admin/orders", 
+      icon: Receipt,
+      badge: notifications.pendingOrdersCount > 0 ? notifications.pendingOrdersCount : null 
+    },
+    { 
+      label: "Sales", 
+      href: "/admin/payments", 
+      icon: TrendingUp,
+      badge: notifications.pendingBankProofsCount > 0 ? notifications.pendingBankProofsCount : null 
+    },
+    { 
+      label: "Dresses", 
+      href: "/admin/products", 
+      icon: ShoppingBag,
+      badge: null 
+    },
   ];
 
   return (
@@ -245,6 +291,21 @@ export default function AdminSidebar() {
               </div>
             )}
 
+            {/* Bank slips alert */}
+            {notifications.pendingBankProofsCount > 0 && (
+              <div className="p-3 rounded-xl bg-sand-900 border border-sand-800 space-y-1.5">
+                <div className="flex items-center justify-between text-gold-400 font-bold">
+                  <span>💰 {notifications.pendingBankProofsCount} Bank Slips Awaiting Review</span>
+                  <Link
+                    href="/admin/payments"
+                    className="text-[10px] text-emerald-400 underline"
+                  >
+                    Verify Slips
+                  </Link>
+                </div>
+              </div>
+            )}
+
             {/* Reviews alert */}
             {notifications.pendingReviewsCount > 0 ? (
               <div className="p-3 rounded-xl bg-sand-900 border border-sand-800 space-y-1.5">
@@ -313,33 +374,47 @@ export default function AdminSidebar() {
                 </button>
               </div>
 
-              {/* Drawer Links */}
-              <nav className="p-3 space-y-1 max-h-[calc(100vh-180px)] overflow-y-auto text-xs">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all ${
-                        isActive
-                          ? "bg-gold-500 text-brand-950 font-bold shadow-md"
-                          : "text-sand-300 hover:bg-sand-900 hover:text-sand-50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isActive ? "text-brand-950" : "text-gold-400"}`} />
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge && (
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-600 text-white">
-                          {item.badge}
+              {/* Drawer Links Grouped */}
+              <nav className="p-3 space-y-4 max-h-[calc(100vh-180px)] overflow-y-auto text-xs">
+                {navGroups.map((group) => (
+                  <div key={group.title} className="space-y-1">
+                    <div className="px-3 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-wider text-sand-400 flex items-center justify-between">
+                      <span>{group.title}</span>
+                      {group.isDaily && (
+                        <span className="text-[8px] bg-gold-500/20 text-gold-400 px-1.5 py-0.5 rounded font-mono font-bold">
+                          DAILY
                         </span>
                       )}
-                    </Link>
-                  );
-                })}
+                    </div>
+                    <div className="space-y-0.5">
+                      {group.items.map((item) => {
+                        const isActive = pathname === item.href;
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center justify-between px-3 py-2 rounded-xl font-medium transition-all ${
+                              isActive
+                                ? "bg-gold-500 text-brand-950 font-bold shadow-md"
+                                : "text-sand-300 hover:bg-sand-900 hover:text-sand-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-brand-950" : "text-gold-400"}`} />
+                              <span className="truncate">{item.label}</span>
+                            </div>
+                            {item.badge && (
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-600 text-white shrink-0 ml-1.5">
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </nav>
             </div>
 
@@ -420,33 +495,47 @@ export default function AdminSidebar() {
             </span>
           </div>
 
-          {/* Nav Links */}
-          <nav className="p-3 space-y-1 text-xs">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl font-medium transition-all ${
-                    isActive
-                      ? "bg-gold-500 text-brand-950 font-bold shadow-md"
-                      : "text-sand-300 hover:bg-sand-900/80 hover:text-sand-50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? "text-brand-950" : "text-gold-400"}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-600 text-white">
-                      {item.badge}
+          {/* Nav Links Grouped */}
+          <nav className="p-3 space-y-4 text-xs">
+            {navGroups.map((group) => (
+              <div key={group.title} className="space-y-1">
+                <div className="px-3 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-wider text-sand-400 flex items-center justify-between">
+                  <span>{group.title}</span>
+                  {group.isDaily && (
+                    <span className="text-[8px] bg-gold-500/20 text-gold-400 px-1.5 py-0.5 rounded font-mono font-bold">
+                      DAILY
                     </span>
                   )}
-                </Link>
-              );
-            })}
+                </div>
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl font-medium transition-all ${
+                          isActive
+                            ? "bg-gold-500 text-brand-950 font-bold shadow-md"
+                            : "text-sand-300 hover:bg-sand-900/80 hover:text-sand-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-brand-950" : "text-gold-400"}`} />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        {item.badge && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-600 text-white shrink-0 ml-1.5">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </div>
 
@@ -488,7 +577,14 @@ export default function AdminSidebar() {
                 isActive ? "text-gold-400 font-bold" : "text-sand-400 hover:text-sand-200"
               }`}
             >
-              <Icon className={`w-4 h-4 mb-0.5 ${isActive ? "text-gold-400" : "text-sand-400"}`} />
+              <div className="relative">
+                <Icon className={`w-4 h-4 mb-0.5 ${isActive ? "text-gold-400" : "text-sand-400"}`} />
+                {item.badge && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[15px] h-[15px] px-1 bg-rose-600 text-white rounded-full text-[8px] font-bold flex items-center justify-center shadow-xs">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
               <span>{item.label}</span>
             </Link>
           );

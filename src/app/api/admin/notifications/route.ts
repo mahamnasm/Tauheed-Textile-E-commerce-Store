@@ -3,13 +3,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const [pendingOrdersCount, pendingReviewsCount, recentOrders, recentReviews] =
+    const [pendingOrdersCount, pendingReviewsCount, pendingBankProofsCount, recentOrders, recentReviews] =
       await Promise.all([
         prisma.order.count({
           where: { orderStatus: "PENDING" },
         }),
         prisma.review.count({
           where: { isApproved: false },
+        }),
+        prisma.bankTransferProof.count({
+          where: { status: "PENDING" },
         }),
         prisma.order.findMany({
           where: { orderStatus: "PENDING" },
@@ -41,7 +44,8 @@ export async function GET() {
       success: true,
       pendingOrdersCount,
       pendingReviewsCount,
-      totalNotifications: pendingOrdersCount + pendingReviewsCount,
+      pendingBankProofsCount,
+      totalNotifications: pendingOrdersCount + pendingReviewsCount + pendingBankProofsCount,
       recentOrders,
       recentReviews,
     });
