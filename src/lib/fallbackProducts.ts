@@ -32,16 +32,147 @@ export interface FallbackProduct {
     priceAdjustment: number;
     stockQuantity: number;
   }[];
+  weight?: number;
+  subcategoryId?: string;
+  subcategory?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
   reviews?: any[];
 }
 
-export const FALLBACK_CATEGORIES = [
-  { id: "cat-1", name: "Lawn & Summer", slug: "lawn-summer", image: "/assets/banners/banner-lawn.jpg", displayOrder: 1 },
-  { id: "cat-2", name: "Chiffon & Formal", slug: "chiffon-formal", image: "/assets/banners/banner-chiffon.jpg", displayOrder: 2 },
-  { id: "cat-3", name: "Pret / Ready to Wear", slug: "pret-ready-to-wear", image: "/assets/banners/banner-festive.jpg", displayOrder: 3 },
-  { id: "cat-4", name: "Wedding & Luxury Pret", slug: "wedding-luxury-pret", image: "/assets/products/prod-noor-bridal.jpg", displayOrder: 4 },
-  { id: "cat-5", name: "Unstitched", slug: "unstitched", image: "/assets/products/prod-bano-printed.jpg", displayOrder: 5 },
-  { id: "cat-6", name: "Sale & Clearance", slug: "sale", image: "/assets/banners/banner-sale.jpg", displayOrder: 6 },
+export interface FallbackCategory {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  displayOrder: number;
+  subcategories: { id: string; name: string; slug: string }[];
+}
+
+export const FALLBACK_CATEGORIES: FallbackCategory[] = [
+  {
+    id: "cat-lawn-summer",
+    name: "Lawn & Summer",
+    slug: "lawn-summer",
+    image: "/assets/banners/banner-lawn.jpg",
+    displayOrder: 1,
+    subcategories: [
+      { id: "sub-lawn-2pc", name: "2 Piece", slug: "2-piece" },
+      { id: "sub-lawn-3pc", name: "3 Piece", slug: "3-piece" },
+      { id: "sub-lawn-printed", name: "Printed", slug: "printed" },
+      { id: "sub-lawn-emb", name: "Embroidered", slug: "embroidered" },
+    ],
+  },
+  {
+    id: "cat-lawn-formals",
+    name: "Lawn Formals",
+    slug: "lawn-formals",
+    image: "/assets/products/prod-bano-printed.jpg",
+    displayOrder: 2,
+    subcategories: [
+      { id: "sub-lf-2pc", name: "2 Piece", slug: "2-piece" },
+      { id: "sub-lf-3pc", name: "3 Piece", slug: "3-piece" },
+      { id: "sub-lf-emb", name: "Heavy Embroidered", slug: "heavy-embroidered" },
+    ],
+  },
+  {
+    id: "cat-chiffon-formal",
+    name: "Chiffon & Formal",
+    slug: "chiffon-formal",
+    image: "/assets/banners/banner-chiffon.jpg",
+    displayOrder: 3,
+    subcategories: [
+      { id: "sub-ch-suit", name: "Suit", slug: "suit" },
+      { id: "sub-ch-maxi", name: "Maxi", slug: "maxi" },
+      { id: "sub-ch-sari", name: "Sari", slug: "sari" },
+    ],
+  },
+  {
+    id: "cat-silk",
+    name: "Silk",
+    slug: "silk",
+    image: "/assets/banners/banner-festive.jpg",
+    displayOrder: 4,
+    subcategories: [
+      { id: "sub-silk-suit", name: "Suit", slug: "suit" },
+      { id: "sub-silk-sari", name: "Sari", slug: "sari" },
+      { id: "sub-silk-tunic", name: "Tunic & Co-ord", slug: "tunic" },
+    ],
+  },
+  {
+    id: "cat-net-formals",
+    name: "Net Formals",
+    slug: "net-formals",
+    image: "/assets/products/prod-noor-bridal.jpg",
+    displayOrder: 5,
+    subcategories: [
+      { id: "sub-net-suit", name: "Suit", slug: "suit" },
+      { id: "sub-net-maxi", name: "Maxi", slug: "maxi" },
+      { id: "sub-net-gown", name: "Gown", slug: "gown" },
+    ],
+  },
+  {
+    id: "cat-organza-formals",
+    name: "Organza Formals",
+    slug: "organza-formals",
+    image: "/assets/banners/banner-lawn.jpg",
+    displayOrder: 6,
+    subcategories: [
+      { id: "sub-org-suit", name: "Suit", slug: "suit" },
+      { id: "sub-org-maxi", name: "Maxi", slug: "maxi" },
+      { id: "sub-org-dupatta", name: "Dupatta Set", slug: "dupatta-set" },
+    ],
+  },
+  {
+    id: "cat-bridal-maxies",
+    name: "Bridal Maxies",
+    slug: "bridal-maxies",
+    image: "/assets/products/prod-bridal.jpg",
+    displayOrder: 7,
+    subcategories: [
+      { id: "sub-bm-barat", name: "Barat Maxi", slug: "barat-maxi" },
+      { id: "sub-bm-walima", name: "Walima Maxi", slug: "walima-maxi" },
+      { id: "sub-bm-nikkah", name: "Nikkah / Engagement", slug: "nikkah-maxi" },
+    ],
+  },
+  {
+    id: "cat-saries",
+    name: "Saries",
+    slug: "saries",
+    image: "/assets/products/prod-zehra-chiffon.jpg",
+    displayOrder: 8,
+    subcategories: [
+      { id: "sub-sari-chiffon", name: "Chiffon Sari", slug: "chiffon-sari" },
+      { id: "sub-sari-silk", name: "Silk Sari", slug: "silk-sari" },
+      { id: "sub-sari-organza", name: "Organza Sari", slug: "organza-sari" },
+    ],
+  },
+  {
+    id: "cat-winter-collection",
+    name: "Winter Collection",
+    slug: "winter-collection",
+    image: "/assets/products/prod-aira-velvet.jpg",
+    displayOrder: 9,
+    subcategories: [
+      { id: "sub-w-velvet", name: "Velvet", slug: "velvet" },
+      { id: "sub-w-marina", name: "Marina", slug: "marina" },
+      { id: "sub-w-shawl", name: "Pashmina Shawl Suits", slug: "shawl-suits" },
+    ],
+  },
+  {
+    id: "cat-sale",
+    name: "Sale & Clearance",
+    slug: "sale",
+    image: "/assets/banners/banner-sale.jpg",
+    displayOrder: 10,
+    subcategories: [
+      { id: "sub-sale-20", name: "Flat 20% Off", slug: "flat-20" },
+      { id: "sub-sale-30", name: "Flat 30% Off", slug: "flat-30" },
+      { id: "sub-sale-50", name: "Flat 50% Off", slug: "flat-50" },
+    ],
+  },
 ];
 
 export const FALLBACK_PRODUCTS: FallbackProduct[] = [

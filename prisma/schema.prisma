@@ -36,13 +36,25 @@ model AuditLog {
 }
 
 model Category {
+  id            String        @id @default(uuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  image         String?
+  displayOrder  Int           @default(0)
+  products      Product[]
+  subcategories Subcategory[]
+  createdAt     DateTime      @default(now())
+}
+
+model Subcategory {
   id           String     @id @default(uuid())
   name         String
   slug         String     @unique
-  description  String?
-  image        String?
-  displayOrder Int        @default(0)
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products     Product[]
+  displayOrder Int        @default(0)
   createdAt    DateTime   @default(now())
 }
 
@@ -68,6 +80,7 @@ model Product {
   fabric           String
   workType         String
   pieceCount       Int              @default(3)
+  weight           Float            @default(1.0)
   packageIncludes  String?
   careInstructions String?
   sizeChartJson    String?
@@ -87,6 +100,8 @@ model Product {
   metaDesc         String?
   categoryId       String?
   category         Category?        @relation(fields: [categoryId], references: [id])
+  subcategoryId    String?
+  subcategory      Subcategory?     @relation(fields: [subcategoryId], references: [id])
   collectionId     String?
   collection       Collection?      @relation(fields: [collectionId], references: [id])
   images           ProductImage[]
@@ -254,9 +269,11 @@ model Review {
   userId       String?
   user         User?    @relation(fields: [userId], references: [id])
   customerName String
+  reviewerCity String?
   rating       Int      @default(5)
   title        String?
   comment      String
+  imageUrl     String?
   isApproved   Boolean  @default(true)
   isFeatured   Boolean  @default(false)
   createdAt    DateTime @default(now())

@@ -27,16 +27,16 @@ export default function Footer({ initialSettings }: FooterProps) {
       <div className="bg-[#E7E1D8] py-3">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center sm:justify-between items-center text-xs text-[#6B6259] gap-4">
           <div className="flex items-center gap-2">
-            <span>🚚</span> Free Delivery Above Rs. 9,999
+            <span>🚚</span> Free Delivery Over Rs. 10,000
           </div>
           <div className="flex items-center gap-2">
             <span>🏷️</span> Flat 5% Off on Advance Payments
           </div>
           <div className="flex items-center gap-2">
-            <span>🔄</span> Easy Exchange
+            <span>🔄</span> 7-Day Exchange (No Returns)
           </div>
           <div className="flex items-center gap-2">
-            <span>★</span> Quality Fabric
+            <span>🇵🇰</span> Karachi 1-2d • Nationwide 4-7d
           </div>
         </div>
       </div>
@@ -44,8 +44,8 @@ export default function Footer({ initialSettings }: FooterProps) {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Unified Logo and Tagline */}
         <div className="mb-10 text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-3.5 mb-2 select-none">
-            <div className="relative h-13 w-10 sm:h-14 sm:w-11 shrink-0">
+          <Link href="/" className="inline-flex items-center justify-center sm:justify-start gap-3.5 mb-2 select-none group">
+            <div className="relative h-13 w-10 sm:h-14 sm:w-11 shrink-0 transition-transform duration-200 group-hover:scale-105">
               <Image
                 src="/logo-calligraphy.png"
                 alt="Tauheed Textile Logo"
@@ -61,9 +61,9 @@ export default function Footer({ initialSettings }: FooterProps) {
                 TEXTILE
               </span>
             </div>
-          </div>
-          <p className="text-sm text-[#6B6259]">
-            Crafting elegance and tradition for the modern era.
+          </Link>
+          <p className="text-sm font-medium text-[#6B6259]">
+            Premium Quality at Best Price
           </p>
         </div>
 
@@ -71,41 +71,61 @@ export default function Footer({ initialSettings }: FooterProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* SHOP */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Shop</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Shop Collections</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/shop?isNewArrival=true" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  New In
+                <Link href="/shop?isNewArrival=true" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  New In 2026
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Women
+                <Link href="/shop?category=lawn-summer" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Lawn & Summer
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=unstitched" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  2 Piece
+                <Link href="/shop?category=lawn-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Lawn Formals
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=lawn-summer" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  3 Piece
+                <Link href="/shop?category=chiffon-formal" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Chiffon & Formal
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=pret-ready-to-wear" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Ready to Wear
+                <Link href="/shop?category=silk" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Silk Collection
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=wedding-luxury-pret" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Wedding & Luxury
+                <Link href="/shop?category=net-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Net Formals
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=sale" className="text-sm text-[#9B3D3D] hover:text-[#171717] transition-colors block">
-                  Sale
+                <Link href="/shop?category=organza-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Organza Formals
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=bridal-maxies" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Bridal Maxies
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=saries" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Saries
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=winter-collection" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Winter Collection
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=sale" className="text-[#9B3D3D] font-semibold hover:text-[#7A2D2D] transition-colors block">
+                  Sale & Clearance
                 </Link>
               </li>
             </ul>
@@ -113,53 +133,54 @@ export default function Footer({ initialSettings }: FooterProps) {
 
           {/* HELP */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Help</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Customer Care</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/track-order" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Track Order
+                <Link href="/track-order" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Track Your Order (TCS • Leopards • Trax)
                 </Link>
               </li>
               <li>
-                <Link href="/policies/shipping" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Shipping Info
+                <Link href="/policies/shipping" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Shipping Info (Rates & Weight)
                 </Link>
               </li>
               <li>
-                <Link href="/policies/returns" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Returns & Exchange
+                <Link href="/policies/returns" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  7-Day Exchange Policy (No Returns)
                 </Link>
               </li>
               <li>
-                <Link href="/policies/size-guide" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Size Guide
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/faq" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  FAQ
+                <Link href="/policies/faq" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Frequently Asked Questions
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* CUSTOMER CARE */}
+          {/* CONCIERGE & TIMINGS */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Customer Care</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Store Hours & Concierge</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href={`https://wa.me/${formattedWa}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  WhatsApp
+                <span className="text-[#171717] font-semibold block">Store Hours:</span>
+                <span className="text-[#6B6259] block">
+                  Mon - Sat: 1:00 PM – 9:00 PM PKT
+                </span>
+              </li>
+              <li>
+                <a href={`https://wa.me/${formattedWa}`} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  WhatsApp: +92 340 0262732
                 </a>
               </li>
               <li>
-                <a href={`mailto:${initialSettings?.contactEmail || "care@tauheedtextile.com"}`} className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Email
+                <a href={`mailto:${initialSettings?.contactEmail || "care@tauheedtextile.com"}`} className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                  Email: {initialSettings?.contactEmail || "care@tauheedtextile.com"}
                 </a>
               </li>
               <li>
-                <span className="text-sm text-[#6B6259] block">
-                  Store Hours (Mon-Sat 10am-8pm)
+                <span className="text-xs text-[#6B6259] block pt-2">
+                  Need Custom Stitching? Order unstitched & request tailor fitting via WhatsApp!
                 </span>
               </li>
             </ul>
@@ -167,21 +188,26 @@ export default function Footer({ initialSettings }: FooterProps) {
 
           {/* SOCIAL */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Social</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Connect With Us</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href={initialSettings?.socialInstagram || "#"} target="_blank" rel="noopener noreferrer" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Instagram
+                <a href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#C4302B] transition-colors flex items-center gap-2">
+                  <span>▶️</span> YouTube Channel
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialFacebook || "#"} target="_blank" rel="noopener noreferrer" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Facebook
+                <a href={initialSettings?.socialInstagram || "https://instagram.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#E1306C] transition-colors flex items-center gap-2">
+                  <span>📸</span> Instagram
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialTikTok || "#"} target="_blank" rel="noopener noreferrer" className="text-sm text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  TikTok
+                <a href={initialSettings?.socialFacebook || "https://facebook.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#1877F2] transition-colors flex items-center gap-2">
+                  <span>📘</span> Facebook
+                </a>
+              </li>
+              <li>
+                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#171717] transition-colors flex items-center gap-2">
+                  <span>🎵</span> TikTok
                 </a>
               </li>
             </ul>

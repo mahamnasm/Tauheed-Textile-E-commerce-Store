@@ -11,20 +11,19 @@ import {
   ShieldCheck, 
   Star, 
   Check, 
-  Ruler, 
   Share2,
   Clock,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Maximize2,
   X,
   Package,
   Scissors,
-  Video,
   Play,
   Image as ImageIcon,
-  MessageCircle
+  MessageCircle,
+  Camera,
+  Upload
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
@@ -41,74 +40,54 @@ export default function ProductDetailClient({
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
 
   const variants = product.variants || [];
-  const [selectedVariantId, setSelectedVariantId] = useState<string>(variants[0]?.id || "");
+  const defaultVariant = variants[0] || {
+    id: `unstitched-${product.id}`,
+    size: "Unstitched",
+    color: "Original",
+    stitchedType: "Unstitched",
+    priceAdjustment: 0,
+    stockQuantity: 50,
+  };
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [showSizeModal, setShowSizeModal] = useState(false);
-  const [showAIFitModal, setShowAIFitModal] = useState(false);
-  const [fitHeightFeet, setFitHeightFeet] = useState(5);
-  const [fitHeightInches, setFitHeightInches] = useState(4);
-  const [fitChest, setFitChest] = useState(36);
-  const [fitWaist, setFitWaist] = useState(30);
-  const [fitPreference, setFitPreference] = useState<"tailored" | "regular" | "modest_loose">("regular");
-  const [fitResult, setFitResult] = useState<any | null>(null);
-
-  const handleCalculateFit = () => {
-    const chest = Number(fitChest);
-    const waist = Number(fitWaist);
-    let size = "Medium";
-    let ease = fitPreference === "modest_loose" ? 3.5 : fitPreference === "regular" ? 2.5 : 1.5;
-    if (chest <= 34) size = "Small";
-    else if (chest <= 37) size = "Medium";
-    else if (chest <= 41) size = "Large";
-    else size = "XL";
-
-    const advice = fitPreference === "modest_loose"
-      ? `For a graceful, modest flowing drape with generous room around waist & hips, Size ${size} is optimal (+${ease}" ease).`
-      : fitPreference === "tailored"
-      ? `Size ${size} provides a clean contoured silhouette highlighting the neckline and waistline (+${ease}" ease).`
-      : `Size ${size} provides our standard balanced luxury cut with a straight drop (+${ease}" ease).`;
-
-    setFitResult({
-      size,
-      advice,
-      finishedChest: chest + ease,
-      finishedWaist: waist + (ease * 0.8)
-    });
-
-    const match = variants.find((v: any) => v.size.toLowerCase().includes(size.toLowerCase()));
-    if (match) setSelectedVariantId(match.id);
-  };
-
   const [showZoomModal, setShowZoomModal] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("Lahore");
+  const [selectedCity, setSelectedCity] = useState("Karachi");
   const [mediaMode, setMediaMode] = useState<"PHOTO" | "VIDEO">("PHOTO");
+
+  // Reviews state
+  const [reviewsList, setReviewsList] = useState<any[]>(product.reviews || []);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [revRating, setRevRating] = useState(5);
+  const [revName, setRevName] = useState("");
+  const [revCity, setRevCity] = useState("");
+  const [revTitle, setRevTitle] = useState("");
+  const [revComment, setRevComment] = useState("");
+  const [revImage, setRevImage] = useState<string | null>(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
 
   const images = product.images?.length > 0 ? product.images : [{ url: "/assets/hero-model.jpg" }];
   const currentImage = images[selectedImageIndex] || images[0];
 
-  const selectedVariant = variants.find((v: any) => v.id === selectedVariantId) || variants[0];
   const effectiveBasePrice = product.salePrice || product.basePrice;
-  const effectivePrice = effectiveBasePrice + (selectedVariant?.priceAdjustment || 0);
-
+  const effectivePrice = effectiveBasePrice + (defaultVariant?.priceAdjustment || 0);
   const isWishlisted = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    if (!selectedVariant) return;
-
     addToCart(
       {
-        variantId: selectedVariant.id,
+        variantId: defaultVariant.id,
         productId: product.id,
         productTitle: product.title,
         productSlug: product.slug,
         image: currentImage.url,
-        size: selectedVariant.size,
-        color: selectedVariant.color,
-        stitchedType: selectedVariant.stitchedType,
+        size: "Unstitched",
+        color: defaultVariant.color || "Original",
+        stitchedType: "Unstitched",
         price: effectivePrice,
-        maxStock: selectedVariant.stockQuantity || 10,
+        maxStock: defaultVariant.stockQuantity || 50,
       },
       quantity
     );
@@ -126,17 +105,77 @@ export default function ProductDetailClient({
   };
 
   const getCityDeliveryEstimate = (city: string) => {
-    if (city === "Lahore") return "1-2 Business Days (Same-Day / Next-Day Dispatch)";
-    if (["Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Sialkot", "Gujranwala"].includes(city)) {
-      return "2-3 Business Days via TCS Express";
+    if (city === "Karachi") return "1-2 Working Days (Flat Rs. 350)";
+    if (["Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Sialkot", "Gujranwala"].includes(city)) {
+      return "4-5 Working Days (Weight-Based)";
     }
-    return "3-5 Business Days via Trax / Leopards";
+    return "5-7 Working Days (Regional & Rural Areas)";
+  };
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 6 * 1024 * 1024) {
+      alert("Image size should be less than 6MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setRevImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!revName.trim() || !revComment.trim()) {
+      alert("Please fill in your name and review comments.");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id,
+          customerName: revName.trim(),
+          reviewerCity: revCity.trim() || undefined,
+          rating: revRating,
+          title: revTitle.trim() || "Verified Buyer Review",
+          comment: revComment.trim(),
+          imageUrl: revImage || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setReviewSuccess(true);
+        if (data.review) {
+          setReviewsList((prev) => [data.review, ...prev]);
+        }
+        setTimeout(() => {
+          setShowReviewModal(false);
+          setReviewSuccess(false);
+          setRevTitle("");
+          setRevComment("");
+          setRevImage(null);
+        }, 2200);
+      } else {
+        alert(data.error || "Failed to submit review. Please try again.");
+      }
+    } catch (err) {
+      alert("Error submitting review. Please check your connection.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   return (
-    <div className="space-y-10 pb-20 sm:pb-10">
+    <div className="space-y-10 pb-24 sm:pb-12">
       {/* Breadcrumbs */}
-      <nav className="text-xs text-[#6B6259] flex items-center gap-1.5">
+      <nav className="text-xs text-[#6B6259] flex items-center gap-1.5 flex-wrap">
         <Link href="/" className="hover:text-[#171717]">Home</Link>
         <span>/</span>
         <Link href="/shop" className="hover:text-[#171717]">Shop</Link>
@@ -149,104 +188,72 @@ export default function ProductDetailClient({
           </>
         )}
         <span>/</span>
-        <span className="text-[#171717] font-semibold truncate max-w-xs">{product.title}</span>
+        <span className="text-[#171717] font-semibold truncate max-w-[200px] sm:max-w-none">
+          {product.title}
+        </span>
       </nav>
 
-      {/* Main PDP Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-        {/* Gallery Column */}
+      {/* Main Grid: Gallery on Left, Details on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
+        {/* Left Column: Image Gallery & Video Reel */}
         <div className="space-y-4">
-          {/* Media Mode Selector */}
+          {/* Media Switcher Tab (Only shown if videoUrl exists) */}
           {product.videoUrl && (
-            <div className="flex rounded-xl p-1 bg-[#F0EBE3] border border-[#E7E1D8]">
+            <div className="flex gap-2 p-1 rounded-xl bg-[#F0EBE3] border border-[#E7E1D8] w-fit">
               <button
-                type="button"
                 onClick={() => setMediaMode("PHOTO")}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   mediaMode === "PHOTO"
                     ? "bg-white text-[#171717] shadow-sm"
                     : "text-[#6B6259] hover:text-[#171717]"
                 }`}
               >
-                <ImageIcon className="w-3.5 h-3.5" /> Photo Gallery ({images.length})
+                <ImageIcon className="w-3.5 h-3.5" /> Photo Gallery
               </button>
               <button
-                type="button"
                 onClick={() => setMediaMode("VIDEO")}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   mediaMode === "VIDEO"
                     ? "bg-white text-[#171717] shadow-sm"
                     : "text-[#6B6259] hover:text-[#171717]"
                 }`}
               >
-                <Video className="w-3.5 h-3.5" /> Watch Runway Reel
+                <Play className="w-3.5 h-3.5 fill-current" /> Runway Reel
               </button>
             </div>
           )}
 
-          {/* Media Player or Main Display Image */}
+          {/* Media Viewport */}
           {mediaMode === "VIDEO" && product.videoUrl ? (
-            <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-black border border-[#E7E1D8] shadow-xl flex items-center justify-center">
-              {product.videoUrl.includes("youtube.com") || product.videoUrl.includes("youtu.be") ? (
-                <iframe
-                  src={product.videoUrl.replace("watch?v=", "embed/")}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video
-                  src={product.videoUrl}
-                  controls
-                  autoPlay
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-              )}
-              <div className="absolute top-4 left-4 pointer-events-none">
-                <span className="px-3 py-1 bg-black/80 text-white text-xs font-bold uppercase rounded-lg shadow border border-[#E7E1D8] flex items-center gap-1">
-                  <Play className="w-3 h-3 fill-current" /> Runway Walk
-                </span>
-              </div>
+            <div className="relative aspect-[9/16] max-h-[620px] mx-auto rounded-2xl overflow-hidden bg-black shadow-lg">
+              <video
+                src={product.videoUrl}
+                poster={currentImage.url}
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              />
             </div>
           ) : (
-            <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#F0EBE3] border border-[#E7E1D8] group">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#F0EBE3] border border-[#E7E1D8] group">
               <Image
                 src={currentImage.url}
-                alt={currentImage.alt || product.title}
+                alt={product.title}
                 fill
                 priority
-                className="object-cover object-top cursor-zoom-in transition-transform duration-500 hover:scale-105"
-                onClick={() => setShowZoomModal(true)}
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
-
-              {/* Badges Overlay */}
-              <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10">
-                {product.isSale && (
-                  <span className="px-3 py-1 bg-[#9B3D3D] text-white text-xs font-bold uppercase rounded-lg shadow">
-                    Sale
-                  </span>
-                )}
-                {product.isNewArrival && (
-                  <span className="px-3 py-1 bg-[#171717] text-white text-xs font-bold uppercase rounded-lg shadow">
-                    New Arrival
-                  </span>
-                )}
-                {product.isPreOrder && (
-                  <span className="px-3 py-1 bg-[#7A5C00] text-white text-xs font-bold uppercase rounded-lg shadow">
-                    Pre-Order
-                  </span>
-                )}
-              </div>
 
               {/* Wishlist Button */}
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className={`absolute top-4 right-4 p-3 rounded-full backdrop-blur-md transition-all shadow-md z-10 ${
+                className={`absolute top-4 right-4 p-2.5 rounded-full transition-all backdrop-blur-md shadow-sm z-10 ${
                   isWishlisted
                     ? "bg-[#9B3D3D] text-white"
-                    : "bg-white/80 text-[#171717] hover:text-[#9B3D3D]"
+                    : "bg-white/80 text-[#6B6259] hover:text-[#9B3D3D] hover:bg-white"
                 }`}
                 aria-label="Toggle Wishlist"
               >
@@ -321,7 +328,7 @@ export default function ProductDetailClient({
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase tracking-widest text-[#7A6652] font-semibold">
-                {product.fabric} • {product.workType}
+                {product.fabric} {product.workType ? `• ${product.workType}` : ""}
               </span>
               <span className="text-xs text-[#9B9289]">SKU: {product.sku}</span>
             </div>
@@ -330,29 +337,29 @@ export default function ProductDetailClient({
               {product.title}
             </h1>
 
-            {/* Ratings & Occasion */}
+            {/* Ratings & Suit Type */}
             <div className="flex items-center gap-3 mt-3 text-xs">
               <div className="flex items-center gap-1 text-[#D4A017]">
                 <Star className="w-4 h-4 fill-current" />
                 <span className="font-bold text-[#171717]">5.0</span>
               </div>
               <span className="text-[#6B6259]">|</span>
-              <span className="text-[#6B6259]">({product.reviews?.length || 4} reviews)</span>
+              <span className="text-[#6B6259]">({reviewsList.length || 2} customer reviews)</span>
               <span className="text-[#6B6259]">|</span>
-              <span className="px-2 py-0.5 rounded bg-[#F0EBE3] text-[#171717] text-xs">
-                {product.pieceCount}-Piece Set
+              <span className="px-2.5 py-0.5 rounded-full bg-[#F0EBE3] text-[#171717] text-xs font-semibold">
+                {product.pieceCount || 3}-Piece Unstitched
               </span>
             </div>
           </div>
 
-          {/* Video Reel Callout Button */}
+          {/* Runway Video Reel Callout Button (if video exists) */}
           {product.videoUrl && (
             <button
               type="button"
               onClick={() => setMediaMode(mediaMode === "VIDEO" ? "PHOTO" : "VIDEO")}
               className="w-full p-3 rounded-xl bg-[#171717] text-white border border-[#2A2626] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md font-serif hover:bg-black"
             >
-              <Play className="w-4 h-4 fill-current" />
+              <Play className="w-4 h-4 fill-current text-[#C4A882]" />
               {mediaMode === "VIDEO" ? "Switch to Photo Gallery" : "Watch Runway Reel in Motion"}
             </button>
           )}
@@ -362,7 +369,7 @@ export default function ProductDetailClient({
             <div className="p-3 bg-[#FEF3CD] border border-[#F5D87E] text-[#7A5C00] rounded-xl text-xs font-semibold flex items-center gap-2">
               <Clock className="w-4 h-4 shrink-0" />
               <span>
-                Pre-Order Ensembles: Estimated dispatch {product.preOrderDate || "within 10 to 14 business days"}.
+                Pre-Order Ensembles: Estimated dispatch {product.preOrderDate || "within 7 to 10 business days"}.
               </span>
             </div>
           )}
@@ -383,87 +390,61 @@ export default function ProductDetailClient({
               </>
             )}
             <span className="ml-auto text-xs text-[#1A6B3C] font-semibold flex items-center gap-1">
-              <Check className="w-4 h-4" /> In Stock
+              <Check className="w-4 h-4" /> In Stock (Unstitched)
             </span>
           </div>
 
-          {/* Variants Selector */}
-          <div className="space-y-3">
+          {/* Unstitched Format Notice & Custom Stitching Option */}
+          <div className="p-4 rounded-xl bg-white border border-[#E7E1D8] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#171717] uppercase tracking-wider">
-                Select Option (Stitched / Unstitched)
-              </label>
-              <div className="flex items-center gap-2.5">
-                <button
-                  onClick={() => setShowAIFitModal(true)}
-                  className="text-xs text-[#7A6652] bg-[#F0EBE3] border border-[#E7E1D8] rounded-lg px-2.5 py-1 flex items-center gap-1 transition-all hover:bg-[#E7E1D8] shadow-sm"
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> AI Fit Advisor
-                </button>
-                <button
-                  onClick={() => setShowSizeModal(true)}
-                  className="text-xs text-[#6B6259] hover:text-[#171717] font-semibold flex items-center gap-1"
-                >
-                  <Ruler className="w-3.5 h-3.5" /> Size Chart
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1A6B3C]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#171717]">
+                  Unstitched Ensemble ({product.pieceCount || 3} Piece)
+                </span>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {variants.map((v: any) => {
-                const isSelected = selectedVariant?.id === v.id;
-                return (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedVariantId(v.id)}
-                    className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all ${
-                      isSelected
-                        ? "border-[#7A6652] bg-[#F8F5F0] ring-2 ring-[#7A6652]/20"
-                        : "border-[#E7E1D8] bg-white hover:border-[#C4A882]"
-                    }`}
-                  >
-                    <span className="text-xs font-bold text-[#171717]">{v.size}</span>
-                    <span className="text-[11px] text-[#6B6259]">{v.stitchedType}</span>
-                    <span className="text-[10px] text-[#7A6652] font-semibold mt-1">
-                      {v.priceAdjustment > 0 ? `+Rs. ${v.priceAdjustment}` : "Standard"}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom Sizing Callout */}
-            <div className="p-3 rounded-xl bg-[#F0EBE3] border border-[#E7E1D8] flex items-center justify-between text-xs text-[#6B6259]">
-              <span className="flex items-center gap-1.5">
-                <Scissors className="w-3.5 h-3.5" /> Need Custom Stitching?
+              <span className="text-xs font-semibold text-[#7A6652] bg-[#F0EBE3] px-2.5 py-1 rounded-md">
+                Standard Cut
               </span>
+            </div>
+            <p className="text-xs text-[#6B6259] leading-relaxed">
+              Includes complete authentic unstitched shirt, dupatta, and trousers as crafted by Tauheed Textile. Ready for custom tailor stitching according to your preferred measurements and fit.
+            </p>
+
+            {/* Custom Stitching Callout via WhatsApp */}
+            <div className="pt-3 border-t border-[#E7E1D8] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2 text-xs text-[#171717] font-semibold">
+                <Scissors className="w-4 h-4 text-[#7A6652]" />
+                <span>Need Custom Tailor Stitching?</span>
+              </div>
               <a
                 href={`https://wa.me/923400262732?text=${encodeURIComponent(
-                  `Salam Tauheed Textile, I want custom made-to-measure stitching for "${product.title}" (SKU: ${product.sku}).`
+                  `Salam Tauheed Textile, I would like to order custom stitching for "${product.title}" (SKU: ${product.sku}). Please share your stitching catalog and measurement guide.`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#7A6652] hover:underline font-bold"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-sm"
               >
-                Request via WhatsApp
+                <MessageCircle className="w-4 h-4" />
+                Order Stitching via WhatsApp
               </a>
             </div>
           </div>
 
-          {/* Quantity & Add to Cart / WhatsApp Buttons */}
+          {/* Quantity & Add to Bag / WhatsApp Buttons */}
           <div className="space-y-3 pt-2">
             <div className="flex gap-3">
               <div className="flex items-center border border-[#E7E1D8] rounded-xl px-3 bg-white text-[#171717]">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-2 py-2 hover:text-[#7A6652] font-bold"
+                  className="px-2 py-2 hover:text-[#7A6652] font-bold text-base"
                 >
                   -
                 </button>
                 <span className="px-3 text-sm font-bold">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-2 py-2 hover:text-[#7A6652] font-bold"
+                  className="px-2 py-2 hover:text-[#7A6652] font-bold text-base"
                 >
                   +
                 </button>
@@ -479,7 +460,7 @@ export default function ProductDetailClient({
               >
                 {added ? (
                   <>
-                    <Check className="w-5 h-5" /> Added
+                    <Check className="w-5 h-5" /> Added to Bag
                   </>
                 ) : (
                   <>
@@ -492,7 +473,7 @@ export default function ProductDetailClient({
             {/* Direct Order via WhatsApp */}
             <a
               href={`https://wa.me/923400262732?text=${encodeURIComponent(
-                `Salam Tauheed Textile, I want to order "${product.title}" (${selectedVariant?.size || "Unstitched"}, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
+                `Salam Tauheed Textile, I want to order "${product.title}" (Unstitched, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -507,15 +488,15 @@ export default function ProductDetailClient({
           <div className="p-4 rounded-xl bg-white border border-[#E7E1D8] shadow-sm space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-[#171717] flex items-center gap-1.5">
-                <Truck className="w-4 h-4" /> Nationwide Delivery Estimate:
+                <Truck className="w-4 h-4" /> Nationwide Delivery Timeline:
               </span>
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="bg-[#F8F5F0] border border-[#E7E1D8] rounded px-2 py-1 text-xs text-[#171717] focus:outline-none"
+                className="bg-[#F8F5F0] border border-[#E7E1D8] rounded px-2.5 py-1 text-xs text-[#171717] focus:outline-none"
               >
-                <option value="Lahore">Lahore</option>
                 <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
                 <option value="Islamabad">Islamabad</option>
                 <option value="Rawalpindi">Rawalpindi</option>
                 <option value="Faisalabad">Faisalabad</option>
@@ -528,8 +509,8 @@ export default function ProductDetailClient({
               </select>
             </div>
             <p className="text-sm text-[#6B6259]">
-              Estimated delivery to <span className="font-bold">{selectedCity}</span>: {getCityDeliveryEstimate(selectedCity)}. 
-              Free delivery on orders over Rs. 9,999. Flat 5% off on advance payment orders.
+              Estimated delivery to <span className="font-bold text-[#171717]">{selectedCity}</span>: {getCityDeliveryEstimate(selectedCity)}. 
+              <strong className="text-[#171717]"> Free nationwide delivery on orders over Rs. 10,000.</strong> Flat 5% off on advance payment orders.
             </p>
           </div>
 
@@ -541,7 +522,7 @@ export default function ProductDetailClient({
             </div>
             <div className="flex items-center gap-2 text-xs text-[#6B6259] p-2.5 rounded-xl bg-[#F0EBE3] border border-[#E7E1D8]">
               <RotateCcw className="w-4 h-4 text-[#7A6652] shrink-0" />
-              <span>7-Day Exchange Window</span>
+              <span>7-Day Exchange Policy</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-[#6B6259] p-2.5 rounded-xl bg-[#F0EBE3] border border-[#E7E1D8]">
               <Truck className="w-4 h-4 text-[#7A6652] shrink-0" />
@@ -549,7 +530,7 @@ export default function ProductDetailClient({
             </div>
             <div className="flex items-center gap-2 text-xs text-[#6B6259] p-2.5 rounded-xl bg-[#F0EBE3] border border-[#E7E1D8]">
               <Package className="w-4 h-4 text-[#7A6652] shrink-0" />
-              <span>Luxury Garment Packaging</span>
+              <span>Luxury Packaging</span>
             </div>
           </div>
 
@@ -572,12 +553,247 @@ export default function ProductDetailClient({
             <div>
               <h3 className="font-serif font-bold text-sm text-[#171717] mb-1">Care & Preservation:</h3>
               <p className="text-sm text-[#6B6259] leading-relaxed bg-[#F8F5F0] p-3 rounded-lg border border-[#E7E1D8]">
-                {product.careInstructions || "Dry clean recommended. Gentle hand wash in cold water. Iron on reverse side."}
+                {product.careInstructions || "Dry clean recommended. Gentle hand wash in cold water. Iron on reverse side with mild steam."}
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Customer Reviews Section */}
+      <div className="border-t border-[#E7E1D8] pt-12">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+          <div>
+            <h2 className="font-serif text-2xl font-bold text-[#171717]">
+              Customer Reviews ({reviewsList.length})
+            </h2>
+            <p className="text-xs text-[#6B6259] mt-0.5">Authentic feedback with unboxing and wearing photos</p>
+          </div>
+          <button
+            onClick={() => setShowReviewModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#171717] hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
+          >
+            <Camera className="w-4 h-4" />
+            Write a Review & Add Photo
+          </button>
+        </div>
+
+        {reviewsList.length === 0 ? (
+          <div className="p-8 text-center bg-white rounded-xl border border-[#E7E1D8] space-y-3">
+            <p className="text-sm text-[#6B6259]">Be the first to share your experience with this outfit!</p>
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="text-xs font-bold text-[#7A6652] hover:underline"
+            >
+              Click here to write a review
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {reviewsList.map((r: any) => (
+              <div key={r.id || r.customerName} className="p-5 rounded-xl bg-white border border-[#E7E1D8] shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[#D4A017]">
+                    {[...Array(r.rating || 5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-[#9B9289]">
+                    {r.reviewerCity ? `${r.reviewerCity} • ` : ""}Verified Customer
+                  </span>
+                </div>
+
+                <h4 className="font-serif font-bold text-sm text-[#171717]">{r.title}</h4>
+                <p className="text-sm text-[#6B6259] italic">"{r.comment}"</p>
+
+                {/* Customer Review Image (PC / Mobile uploaded) */}
+                {r.imageUrl && (
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border border-[#E7E1D8] bg-[#F8F5F0]">
+                    <Image
+                      src={r.imageUrl}
+                      alt="Customer review photo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+
+                <div className="pt-2 text-xs text-[#9B9289] font-medium border-t border-[#F0EBE3] flex items-center justify-between">
+                  <span>— {r.customerName}</span>
+                  {r.isFeatured && (
+                    <span className="text-[10px] bg-[#F0EBE3] text-[#7A6652] font-semibold px-2 py-0.5 rounded">
+                      Featured Review
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Review Submission Modal (PC & Mobile Photo Upload) */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => !submittingReview && setShowReviewModal(false)} />
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl z-10 space-y-4 text-[#171717] max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-3">
+              <div>
+                <h3 className="font-serif font-bold text-lg">Write a Customer Review</h3>
+                <p className="text-xs text-[#6B6259]">Share your thoughts & photos with other buyers</p>
+              </div>
+              <button 
+                onClick={() => setShowReviewModal(false)} 
+                className="p-1.5 rounded-full text-[#6B6259] hover:bg-[#F0EBE3]"
+                disabled={submittingReview}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {reviewSuccess ? (
+              <div className="p-6 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-[#1A6B3C]/10 text-[#1A6B3C] mx-auto flex items-center justify-center">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h4 className="font-serif font-bold text-lg text-[#171717]">Review Submitted!</h4>
+                <p className="text-sm text-[#6B6259]">
+                  Thank you for your feedback. Your review will help fellow fashion lovers.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitReview} className="space-y-4 text-xs">
+                {/* Star Rating Selection */}
+                <div>
+                  <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1.5">
+                    Your Rating:
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setRevRating(star)}
+                        className="p-1 hover:scale-110 transition-transform"
+                      >
+                        <Star
+                          className={`w-6 h-6 ${
+                            star <= revRating ? "text-[#D4A017] fill-current" : "text-[#D4CFC9]"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                    <span className="text-xs font-semibold text-[#6B6259] ml-2">
+                      {revRating} of 5 Stars
+                    </span>
+                  </div>
+                </div>
+
+                {/* Customer Name & City */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1">
+                      Your Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={revName}
+                      onChange={(e) => setRevName(e.target.value)}
+                      placeholder="e.g. Ayesha Khan"
+                      className="w-full p-2.5 rounded-lg border border-[#E7E1D8] bg-[#F8F5F0] text-sm text-[#171717] focus:outline-none focus:border-[#7A6652]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1">
+                      City (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={revCity}
+                      onChange={(e) => setRevCity(e.target.value)}
+                      placeholder="e.g. Lahore / Karachi"
+                      className="w-full p-2.5 rounded-lg border border-[#E7E1D8] bg-[#F8F5F0] text-sm text-[#171717] focus:outline-none focus:border-[#7A6652]"
+                    />
+                  </div>
+                </div>
+
+                {/* Review Headline */}
+                <div>
+                  <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1">
+                    Review Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={revTitle}
+                    onChange={(e) => setRevTitle(e.target.value)}
+                    placeholder="e.g. Stunning fabric quality and rich colors!"
+                    className="w-full p-2.5 rounded-lg border border-[#E7E1D8] bg-[#F8F5F0] text-sm text-[#171717] focus:outline-none focus:border-[#7A6652]"
+                  />
+                </div>
+
+                {/* Review Comment */}
+                <div>
+                  <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1">
+                    Your Review *
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={revComment}
+                    onChange={(e) => setRevComment(e.target.value)}
+                    placeholder="Tell us about the fabric texture, embroidery details, and your wearing experience..."
+                    className="w-full p-2.5 rounded-lg border border-[#E7E1D8] bg-[#F8F5F0] text-sm text-[#171717] focus:outline-none focus:border-[#7A6652]"
+                  />
+                </div>
+
+                {/* Photo Upload (PC & Mobile Supported) */}
+                <div>
+                  <label className="block font-bold text-[#171717] uppercase tracking-wider mb-1">
+                    Add Photo (PC / Mobile)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#E7E1D8] bg-[#F0EBE3] hover:bg-[#E7E1D8] text-xs font-bold text-[#171717] transition-all">
+                      <Camera className="w-4 h-4 text-[#7A6652]" />
+                      <span>{revImage ? "Change Photo" : "Upload Unboxing Photo"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                    {revImage && (
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#7A6652]">
+                        <Image src={revImage} alt="Uploaded preview" fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setRevImage(null)}
+                          className="absolute top-0 right-0 p-0.5 bg-black/70 text-white rounded-bl"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#6B6259] mt-1">
+                    Upload a photo from your gallery or take one directly with your camera.
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="w-full py-3.5 bg-[#171717] hover:bg-black disabled:opacity-50 text-white rounded-xl font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 text-sm shadow-sm"
+                >
+                  {submittingReview ? "Submitting Review..." : "Submit Verified Review"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Fullscreen Image Zoom Modal */}
       {showZoomModal && (
@@ -598,182 +814,6 @@ export default function ProductDetailClient({
           </div>
         </div>
       )}
-
-      {/* Size Chart Modal */}
-      {showSizeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowSizeModal(false)} />
-          <div className="relative w-full max-w-xl bg-white rounded-2xl p-6 shadow-2xl z-10 space-y-4 text-[#171717]">
-            <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-3">
-              <h3 className="font-serif font-bold text-lg">Size Chart (Inches)</h3>
-              <button 
-                onClick={() => setShowSizeModal(false)} 
-                className="p-1 rounded-full text-[#6B6259] hover:bg-[#F0EBE3]"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-[#F8F5F0] uppercase">
-                  <tr>
-                    <th className="p-2.5">Size</th>
-                    <th className="p-2.5">Chest</th>
-                    <th className="p-2.5">Waist</th>
-                    <th className="p-2.5">Hips</th>
-                    <th className="p-2.5">Length</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E7E1D8]">
-                  <tr><td className="p-2.5 font-bold">XS</td><td className="p-2.5">36"</td><td className="p-2.5">32"</td><td className="p-2.5">38"</td><td className="p-2.5">40"</td></tr>
-                  <tr><td className="p-2.5 font-bold">S</td><td className="p-2.5">38"</td><td className="p-2.5">34"</td><td className="p-2.5">40"</td><td className="p-2.5">42"</td></tr>
-                  <tr><td className="p-2.5 font-bold">M</td><td className="p-2.5">40"</td><td className="p-2.5">36"</td><td className="p-2.5">42"</td><td className="p-2.5">44"</td></tr>
-                  <tr><td className="p-2.5 font-bold">L</td><td className="p-2.5">44"</td><td className="p-2.5">40"</td><td className="p-2.5">46"</td><td className="p-2.5">45"</td></tr>
-                  <tr><td className="p-2.5 font-bold">XL</td><td className="p-2.5">48"</td><td className="p-2.5">44"</td><td className="p-2.5">50"</td><td className="p-2.5">46"</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="text-[11px] text-[#6B6259] italic">
-              * Measurements are in inches. Custom tailored orders can also be requested via WhatsApp.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* AI Fit Modal */}
-      {showAIFitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl relative text-[#171717]">
-            <button
-              onClick={() => setShowAIFitModal(false)}
-              className="absolute top-5 right-5 p-2 rounded-full text-[#6B6259] hover:text-[#171717] hover:bg-[#F0EBE3] transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#F0EBE3] flex items-center justify-center text-[#7A6652]">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold text-[#7A6652] tracking-wider uppercase">Atelier Fit Advisor</span>
-                <h3 className="font-serif font-bold text-xl">AI Smart Sizing</h3>
-              </div>
-            </div>
-
-            <p className="text-[#6B6259] leading-relaxed text-sm">
-              Enter your measurements to calculate your optimal size.
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <label className="block font-bold mb-1">Height</label>
-                <div className="flex gap-2">
-                  <select
-                    value={fitHeightFeet}
-                    onChange={(e) => setFitHeightFeet(Number(e.target.value))}
-                    className="w-full p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
-                  >
-                    {[4, 5, 6].map((ft) => (
-                      <option key={ft} value={ft}>{ft} ft</option>
-                    ))}
-                  </select>
-                  <select
-                    value={fitHeightInches}
-                    onChange={(e) => setFitHeightInches(Number(e.target.value))}
-                    className="w-full p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
-                  >
-                    {[...Array(12)].map((_, i) => (
-                      <option key={i} value={i}>{i} in</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold mb-1">Chest (Inches)</label>
-                <input
-                  type="number"
-                  value={fitChest}
-                  onChange={(e) => setFitChest(Number(e.target.value))}
-                  className="w-full p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
-                  placeholder="e.g. 36"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold mb-1">Waist (Inches)</label>
-                <input
-                  type="number"
-                  value={fitWaist}
-                  onChange={(e) => setFitWaist(Number(e.target.value))}
-                  className="w-full p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
-                  placeholder="e.g. 30"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold mb-1">Preference</label>
-                <select
-                  value={fitPreference}
-                  onChange={(e) => setFitPreference(e.target.value as any)}
-                  className="w-full p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
-                >
-                  <option value="regular">Standard</option>
-                  <option value="tailored">Tailored</option>
-                  <option value="modest_loose">Modest</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              onClick={handleCalculateFit}
-              className="w-full py-3 bg-[#171717] hover:bg-black text-white rounded-xl font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm text-sm"
-            >
-              <Sparkles className="w-4 h-4" /> Calculate Size
-            </button>
-
-            {fitResult && (
-              <div className="p-4 rounded-xl bg-[#F8F5F0] border border-[#E7E1D8] space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs uppercase tracking-wider">Recommended:</span>
-                  <span className="px-3 py-1 bg-white border border-[#E7E1D8] font-serif font-bold text-sm rounded-lg">
-                    {fitResult.size}
-                  </span>
-                </div>
-                <p className="text-sm text-[#6B6259]">{fitResult.advice}</p>
-                <div className="pt-2 border-t border-[#E7E1D8] flex items-center justify-between text-xs text-[#6B6259]">
-                  <span>Finished Chest: <strong>{fitResult.finishedChest}"</strong></span>
-                  <span>Finished Waist: <strong>{fitResult.finishedWaist}"</strong></span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Customer Reviews Section */}
-      <div className="border-t border-[#E7E1D8] pt-12">
-        <h2 className="font-serif text-2xl font-bold text-[#171717] mb-6">
-          Customer Reviews ({product.reviews?.length || 2})
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {product.reviews?.map((r: any) => (
-            <div key={r.id} className="p-5 rounded-xl bg-white border border-[#E7E1D8] shadow-sm space-y-2">
-              <div className="flex items-center gap-1 text-[#D4A017]">
-                {[...Array(r.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-              <h4 className="font-serif font-bold text-sm text-[#171717]">{r.title}</h4>
-              <p className="text-sm text-[#6B6259] italic">"{r.comment}"</p>
-              <div className="pt-2 text-xs text-[#9B9289] font-medium">
-                — {r.customerName}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
@@ -804,25 +844,26 @@ export default function ProductDetailClient({
       )}
 
       {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-[#E7E1D8] px-4 py-3 z-50 flex gap-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-[#E7E1D8] px-4 py-3 z-50 flex gap-3 shadow-lg" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
         <button
           onClick={handleAddToCart}
-          className={`flex-1 rounded-full py-3 text-sm font-bold flex items-center justify-center gap-2 ${
+          className={`flex-1 rounded-full py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${
             added ? "bg-[#1A6B3C] text-white" : "bg-[#171717] text-white"
           }`}
         >
-          {added ? <Check className="w-5 h-5" /> : "ADD TO BAG"}
+          {added ? <Check className="w-4 h-4" /> : "ADD TO BAG"}
         </button>
         <a
           href={`https://wa.me/923400262732?text=${encodeURIComponent(
-            `Salam Tauheed Textile, I want to order "${product.title}" (${selectedVariant?.size || "Unstitched"}, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
+            `Salam Tauheed Textile, I want to order "${product.title}" (Unstitched, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-shrink-0 bg-[#128C7E] text-white rounded-full py-3 px-4 text-sm font-bold flex items-center justify-center"
+          className="flex-shrink-0 bg-[#128C7E] text-white rounded-full py-3 px-4 text-xs font-bold flex items-center justify-center gap-1.5"
           aria-label="Order via WhatsApp"
         >
-          <MessageCircle className="w-5 h-5" />
+          <MessageCircle className="w-4 h-4" />
+          <span>WhatsApp</span>
         </a>
       </div>
     </div>

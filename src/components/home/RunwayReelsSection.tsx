@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Film, Play, Pause, Volume2, VolumeX, Sparkles } from "lucide-react";
+import { Film, Play, Pause, Volume2, VolumeX, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface RunwayVideoItem {
   id: string;
@@ -30,6 +30,14 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const playPromiseRef = useRef<Map<string, Promise<void> | null>>(new Map());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === "left" ? -320 : 320;
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   // Register video ref
   const setVideoRef = (id: string, el: HTMLVideoElement | null) => {
@@ -215,14 +223,34 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
             </p>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs text-[#A89F91]">
-            <Sparkles className="w-3.5 h-3.5 text-[#C4A882]" />
-            <span>1 Video at a Time (Glitch-Free Smooth Play)</span>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 text-xs text-[#A89F91] mr-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#C4A882]" />
+              <span>Scroll left-to-right</span>
+            </div>
+            {/* Scroll Navigation Arrows */}
+            <button
+              onClick={() => scroll("left")}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20 shadow-md"
+              aria-label="Scroll reels left"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20 shadow-md"
+              aria-label="Scroll reels right"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        {/* Video Reels Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Video Reels Horizontal Scrollable Track */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-5 overflow-x-auto pb-4 scroll-smooth scrollbar-thin snap-x snap-mandatory"
+        >
           {videos.map((v) => {
             const isActive = activeVideoId === v.id;
             const playing = !!isPlaying[v.id];
@@ -232,7 +260,7 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                 key={v.id}
                 ref={(el) => setCardRef(v.id, el)}
                 data-video-id={v.id}
-                className={`relative rounded-2xl overflow-hidden bg-[#222222] border transition-all duration-300 group ${
+                className={`w-[260px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start relative rounded-2xl overflow-hidden bg-[#222222] border transition-all duration-300 group ${
                   isActive && playing
                     ? "border-[#C4A882] shadow-2xl shadow-black/60 ring-1 ring-[#C4A882]/40"
                     : "border-[#333333] hover:border-[#555555]"

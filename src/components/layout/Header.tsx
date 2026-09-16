@@ -18,6 +18,8 @@ export default function Header({ initialSettings }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [womenDropdownOpen, setWomenDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -107,23 +109,79 @@ export default function Header({ initialSettings }: HeaderProps) {
   // Duplicate for seamless loop
   const allItems = [...marqueeItems, ...marqueeItems];
 
-  const navLinks = [
-    { name: "NEW IN", href: "/shop?isNewArrival=true" },
+  const navCategories = [
     {
-      name: "WOMEN",
-      href: "/shop",
-      isDropdown: true,
+      name: "LAWN & SUMMER",
+      href: "/shop?category=lawn-summer",
       children: [
-        { name: "Daily Wear", href: "/shop?category=pret-ready-to-wear" },
-        { name: "Formal Lawn", href: "/shop?category=lawn-summer" },
-        { name: "Pret", href: "/shop?category=pret-ready-to-wear" },
-        { name: "Unstitched", href: "/shop?category=unstitched" },
+        { name: "All Lawn & Summer", href: "/shop?category=lawn-summer" },
+        { name: "2 Piece Suits", href: "/shop?category=lawn-summer&subcategory=2-piece" },
+        { name: "3 Piece Suits", href: "/shop?category=lawn-summer&subcategory=3-piece" },
+        { name: "Printed Lawn", href: "/shop?category=lawn-summer&subcategory=printed" },
+        { name: "Embroidered Lawn", href: "/shop?category=lawn-summer&subcategory=embroidered" },
       ],
     },
-    { name: "2 PIECE", href: "/shop?category=unstitched" },
-    { name: "3 PIECE", href: "/shop?pieces=3" },
-    { name: "READY TO WEAR", href: "/shop?category=pret-ready-to-wear" },
-    { name: "SALE", href: "/shop?category=sale", isSale: true },
+    {
+      name: "LAWN FORMALS",
+      href: "/shop?category=lawn-formals",
+      children: [
+        { name: "All Lawn Formals", href: "/shop?category=lawn-formals" },
+        { name: "2 Piece Formals", href: "/shop?category=lawn-formals&subcategory=2-piece" },
+        { name: "3 Piece Formals", href: "/shop?category=lawn-formals&subcategory=3-piece" },
+        { name: "Heavy Embroidered", href: "/shop?category=lawn-formals&subcategory=heavy-embroidered" },
+      ],
+    },
+    {
+      name: "CHIFFON & FORMAL",
+      href: "/shop?category=chiffon-formal",
+      children: [
+        { name: "All Chiffon Formals", href: "/shop?category=chiffon-formal" },
+        { name: "Chiffon Suits", href: "/shop?category=chiffon-formal&subcategory=suit" },
+        { name: "Chiffon Maxies", href: "/shop?category=chiffon-formal&subcategory=maxi" },
+        { name: "Chiffon Saries", href: "/shop?category=chiffon-formal&subcategory=sari" },
+      ],
+    },
+    {
+      name: "SILK",
+      href: "/shop?category=silk",
+      children: [
+        { name: "All Silk Collection", href: "/shop?category=silk" },
+        { name: "Silk Suits", href: "/shop?category=silk&subcategory=suit" },
+        { name: "Silk Saries", href: "/shop?category=silk&subcategory=sari" },
+        { name: "Silk Tunics & Co-ords", href: "/shop?category=silk&subcategory=tunic" },
+      ],
+    },
+    {
+      name: "LUXURY FORMALS",
+      href: "/shop",
+      children: [
+        { name: "Net Formals", href: "/shop?category=net-formals" },
+        { name: "Organza Formals", href: "/shop?category=organza-formals" },
+        { name: "Bridal Maxies", href: "/shop?category=bridal-maxies" },
+        { name: "Saries", href: "/shop?category=saries" },
+      ],
+    },
+    {
+      name: "WINTER",
+      href: "/shop?category=winter-collection",
+      children: [
+        { name: "All Winter Collection", href: "/shop?category=winter-collection" },
+        { name: "Velvet Ensembles", href: "/shop?category=winter-collection&subcategory=velvet" },
+        { name: "Marina & Karandi", href: "/shop?category=winter-collection&subcategory=marina" },
+        { name: "Pashmina Shawl Suits", href: "/shop?category=winter-collection&subcategory=shawl-suits" },
+      ],
+    },
+    {
+      name: "SALE",
+      href: "/shop?category=sale",
+      isSale: true,
+      children: [
+        { name: "All Sale Items", href: "/shop?category=sale" },
+        { name: "Flat 20% Off", href: "/shop?category=sale&subcategory=flat-20" },
+        { name: "Flat 30% Off", href: "/shop?category=sale&subcategory=flat-30" },
+        { name: "Flat 50% Off", href: "/shop?category=sale&subcategory=flat-50" },
+      ],
+    },
   ];
 
   return (
@@ -200,55 +258,49 @@ export default function Header({ initialSettings }: HeaderProps) {
             </div>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden lg:flex items-center justify-center flex-1 space-x-7">
-              {navLinks.map((link) => {
-                if (link.isDropdown) {
-                  return (
-                    <div
-                      key={link.name}
-                      className="relative group py-6"
-                      onMouseEnter={() => setWomenDropdownOpen(true)}
-                      onMouseLeave={() => setWomenDropdownOpen(false)}
-                    >
-                      <button className="flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors">
-                        {link.name}
-                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${womenDropdownOpen ? "rotate-180" : ""}`} />
-                      </button>
-                      {womenDropdownOpen && (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 bg-[#171717] border border-[#2A2626] shadow-2xl py-2 min-w-[200px] rounded-b-lg">
-                          {link.children?.map((child) => (
-                            <Link
-                              key={child.name}
-                              href={child.href}
-                              className="block px-5 py-2.5 text-sm text-[#D4CFC9] hover:text-white hover:bg-[#2A2626] transition-colors"
-                            >
-                              {child.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
-                const isActive =
-                  pathname === link.href ||
-                  (link.href !== "#" && pathname.startsWith(link.href) && link.href !== "/");
-
+            <nav className="hidden lg:flex items-center justify-center flex-1 space-x-5 xl:space-x-7">
+              <Link
+                href="/shop?isNewArrival=true"
+                className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+              >
+                NEW IN
+              </Link>
+              {navCategories.map((cat) => {
+                const isOpen = activeDropdown === cat.name;
                 return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`text-xs uppercase tracking-wider font-semibold transition-colors duration-150 ${
-                      link.isSale
-                        ? "text-[#E87070] hover:text-[#F08080]"
-                        : isActive
-                          ? "text-white font-bold"
-                          : "text-[#D4CFC9] hover:text-white"
-                    }`}
+                  <div
+                    key={cat.name}
+                    className="relative group py-6"
+                    onMouseEnter={() => setActiveDropdown(cat.name)}
+                    onMouseLeave={() => setActiveDropdown(null)}
                   >
-                    {link.name}
-                  </Link>
+                    <Link
+                      href={cat.href}
+                      className={`flex items-center gap-1 text-xs uppercase tracking-wider font-semibold transition-colors ${
+                        cat.isSale
+                          ? "text-[#E87070] hover:text-[#F08080]"
+                          : "text-[#D4CFC9] hover:text-white"
+                      }`}
+                    >
+                      {cat.name}
+                      {cat.children && (
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      )}
+                    </Link>
+                    {cat.children && isOpen && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 bg-[#171717] border border-[#2A2626] shadow-2xl py-2 min-w-[210px] rounded-b-lg z-50">
+                        {cat.children.map((child) => (
+                          <Link
+                            key={child.name}
+                            href={child.href}
+                            className="block px-5 py-2.5 text-xs uppercase tracking-wide text-[#D4CFC9] hover:text-white hover:bg-[#2A2626] transition-colors"
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>
@@ -335,7 +387,11 @@ export default function Header({ initialSettings }: HeaderProps) {
           />
           <div className="fixed inset-y-0 left-0 max-w-[280px] w-full bg-[#141414] shadow-2xl flex flex-col z-10">
             <div className="flex items-center justify-between p-5 border-b border-[#2A2626]">
-              <div className="flex items-center gap-3 select-none">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 select-none"
+              >
                 <div className="relative h-10 w-8 shrink-0">
                   <Image
                     src="/logo-calligraphy.png"
@@ -352,55 +408,120 @@ export default function Header({ initialSettings }: HeaderProps) {
                     TEXTILE
                   </span>
                 </div>
-              </div>
+              </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 -mr-2 text-[#C8C2BB] hover:text-white"
+                aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-8">
-              {/* SHOP SECTION */}
+            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+              {/* ALL COLLECTIONS & CATEGORIES */}
               <div>
-                <h3 className="text-[#7A6652] uppercase tracking-wider text-xs font-bold mb-4">SHOP</h3>
-                <div className="flex flex-col space-y-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`text-sm uppercase font-semibold ${
-                        link.isSale ? "text-[#E87070] hover:text-[#F08080]" : "text-[#E8E3DC] hover:text-white"
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
+                <h3 className="text-[#7A6652] uppercase tracking-wider text-xs font-bold mb-3 flex items-center justify-between">
+                  <span>COLLECTIONS</span>
+                  <span className="text-[10px] text-[#9B8C7E] lowercase">tap to expand</span>
+                </h3>
+                <div className="flex flex-col space-y-2">
+                  <Link
+                    href="/shop?isNewArrival=true"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs uppercase font-semibold text-white py-1.5 border-b border-[#2A2626]/50 flex items-center justify-between"
+                  >
+                    <span>✨ NEW ARRIVALS</span>
+                    <span className="text-[10px] bg-gold-600/30 text-gold-300 px-1.5 py-0.5 rounded">2026</span>
+                  </Link>
+
+                  {navCategories.map((cat) => {
+                    const isExpanded = mobileExpandedCat === cat.name;
+                    return (
+                      <div key={cat.name} className="border-b border-[#2A2626]/40 pb-1">
+                        <div className="flex items-center justify-between py-1.5">
+                          <Link
+                            href={cat.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`text-xs uppercase font-semibold tracking-wide flex-1 ${
+                              cat.isSale ? "text-[#E87070] font-bold" : "text-[#E8E3DC] hover:text-white"
+                            }`}
+                          >
+                            {cat.name}
+                          </Link>
+                          {cat.children && cat.children.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMobileExpandedCat(isExpanded ? null : cat.name);
+                              }}
+                              className="p-1 text-[#9B8C7E] hover:text-white"
+                            >
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform duration-200 ${
+                                  isExpanded ? "rotate-180 text-white" : ""
+                                }`}
+                              />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Subcategories */}
+                        {isExpanded && cat.children && (
+                          <div className="pl-3 py-1 space-y-1.5 bg-[#1a1a1a] rounded-lg my-1">
+                            {cat.children.map((sub) => (
+                              <Link
+                                key={sub.name}
+                                href={sub.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block text-[11px] uppercase tracking-wide text-[#C8C2BB] hover:text-white py-1 transition-colors"
+                              >
+                                • {sub.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* HELP SECTION */}
+              {/* HELP & POLICIES SECTION */}
               <div>
-                <h3 className="text-[#7A6652] uppercase tracking-wider text-xs font-bold mb-4">HELP</h3>
-                <div className="flex flex-col space-y-4 text-sm">
-                  <Link href="/track-order" onClick={() => setMobileMenuOpen(false)} className="text-[#E8E3DC] hover:text-white font-medium">
-                    Track Order
+                <h3 className="text-[#7A6652] uppercase tracking-wider text-xs font-bold mb-3">CUSTOMER CARE</h3>
+                <div className="flex flex-col space-y-2.5 text-xs">
+                  <Link
+                    href="/track-order"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-[#E8E3DC] hover:text-white flex items-center justify-between"
+                  >
+                    <span>Track Order (TCS • Leopards • Trax)</span>
+                    <Truck className="w-3.5 h-3.5 text-[#9B8C7E]" />
                   </Link>
                   <a
                     href={`https://wa.me/${formattedPhone}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#E8E3DC] hover:text-white font-medium"
+                    className="text-[#E8E3DC] hover:text-white flex items-center justify-between"
                   >
-                    WhatsApp Us
+                    <span>WhatsApp Concierge</span>
+                    <Phone className="w-3.5 h-3.5 text-[#25D366]" />
                   </a>
-                  <Link href="/policies/shipping" onClick={() => setMobileMenuOpen(false)} className="text-[#E8E3DC] hover:text-white font-medium">
-                    Shipping Info
+                  <Link
+                    href="/policies/shipping"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-[#E8E3DC] hover:text-white"
+                  >
+                    Shipping Info (Karachi 1-2d • Major 4-5d)
                   </Link>
-                  <Link href="/policies/returns" onClick={() => setMobileMenuOpen(false)} className="text-[#E8E3DC] hover:text-white font-medium">
-                    Returns & Exchange
+                  <Link
+                    href="/policies/returns"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-[#E8E3DC] hover:text-white"
+                  >
+                    7-Day Exchange Policy (No Returns)
                   </Link>
                 </div>
               </div>

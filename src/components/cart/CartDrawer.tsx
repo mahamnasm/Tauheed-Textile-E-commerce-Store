@@ -19,7 +19,7 @@ export default function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const FREE_SHIPPING_THRESHOLD = 9999;
+  const FREE_SHIPPING_THRESHOLD = 10000;
   const progress = Math.min(100, Math.round((cartSubtotal / FREE_SHIPPING_THRESHOLD) * 100));
   const diffToFree = FREE_SHIPPING_THRESHOLD - cartSubtotal;
 

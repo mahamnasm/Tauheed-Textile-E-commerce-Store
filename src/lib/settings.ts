@@ -119,37 +119,37 @@ export interface SiteLayoutSettings {
 
 export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 1. Announcement Ribbon
-  announcementText: "Free Delivery Above Rs. 9,999",
+  announcementText: "Free Delivery Over Rs. 10,000",
   announcementSubtext: "Flat 5% Off on Advance Payment Orders",
   announcementEnabled: true,
   announcementLink: "/shop?category=sale",
   announcementTheme: "midnight",
-  freeShippingThreshold: 9999,
+  freeShippingThreshold: 10000,
 
   // 2. Festive Marquee Ticker
   marqueeEnabled: true,
-  marqueeText: "⚡ FREE DELIVERY ABOVE RS. 9,999 • FLAT 5% OFF ON ADVANCE PAYMENT ORDERS • 7-DAY EASY EXCHANGE • EXPRESS 2-4 DAY DISPATCH",
+  marqueeText: "⚡ FREE DELIVERY OVER RS. 10,000 • FLAT 5% OFF ON ADVANCE PAYMENT ORDERS • 7-DAY EXCHANGE ONLY • KARACHI 1-2 DAYS • NATIONWIDE 4-7 DAYS",
   marqueeLink: "/shop",
 
   // 3. Hero Showcase
   showHero: true,
   heroBadge: "Festive Edit 2026 — Live Now",
-  heroTitle: "Elegance Woven with Pure Heritage",
-  heroSubtitle: "Discover authentic luxury lawn, royal embroidered chiffons, and impeccably tailored pret. Crafted with devotion in Pakistan, delivered with care to your doorstep.",
+  heroTitle: "Premium Quality at Best Price",
+  heroSubtitle: "Discover authentic luxury lawn, royal embroidered chiffons, and bespoke unstitched designer wear. Crafted with devotion in Pakistan, delivered with care to your doorstep.",
   heroPrimaryBtnText: "Shop Summer Lawn",
   heroPrimaryBtnLink: "/shop?category=lawn-summer",
-  heroSecondaryBtnText: "Wedding Royale",
-  heroSecondaryBtnLink: "/shop?category=wedding-luxury-pret",
+  heroSecondaryBtnText: "Silk Collection",
+  heroSecondaryBtnLink: "/shop?category=silk",
   heroMediaType: "IMAGE",
   heroMediaUrl: "/assets/hero-model.jpg",
   heroStats1: "100%|Pure Swiss & Egyptian Fabrics",
   heroStats2: "COD|Available across Pakistan",
-  heroStats3: "2-4 Days|Express Courier Delivery",
+  heroStats3: "1-2 Days|Express Karachi Dispatch",
 
   // 4. Section Controls & Headings
   showCategories: true,
-  categoriesTitle: "Curated Luxury Collections",
-  categoriesSubtitle: "From effortless daily lawn to breathtaking bridal kalidars, discover bespoke silhouettes woven with Pakistani elegance.",
+  categoriesTitle: "Curated Designer Collections",
+  categoriesSubtitle: "From effortless daily lawn to breathtaking bridal maxies and saries, discover unstitched luxury woven with Pakistani elegance.",
   showTrending: true,
   trendingTitle: "Trending & New Arrivals",
   trendingSubtitle: "The season's most sought-after silhouettes, crafted in limited boutique batches.",
@@ -158,30 +158,30 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   showVideos: true,
   videosTitle: "Runway Watch & Buy",
   showReviews: true,
-  reviewsTitle: "Voices of Elegance",
-  showHeritage: true,
+  reviewsTitle: "Customer Voices & Reviews",
+  showHeritage: false,
 
   // 5. Brand Heritage & Story
-  heritageBadge: "Crafting Luxury Since 1994",
-  heritageTitle: "Tauheed Textile — Where Heritage Meets Modern Grace",
-  heritageSubtitle: "Every thread is an ode to centuries of subcontinental needlecraft, woven into breathable Swiss lawns and regal chiffons. Exquisite quality, verified nationwide delivery, and dedicated customer care.",
+  heritageBadge: "Designer Couture",
+  heritageTitle: "Tauheed Textile — Premium Quality at Best Price",
+  heritageSubtitle: "Every thread is an ode to subcontinental needlecraft, woven into breathable Swiss lawns and regal chiffons. Pure unstitched perfection with optional custom stitching via WhatsApp.",
   heritageHighlight1Title: "100% Pure Natural Fibers",
   heritageHighlight1Text: "Finest combed cotton lawn, mulberry silks, and ethereal organzas tested for extreme durability in summer heat.",
   heritageHighlight2Title: "Artisanal Subcontinental Needlework",
-  heritageHighlight2Text: "Hand-rendered tilla, sequins, marori, and fine resham embroidery created by master craftsmen in Punjab.",
-  heritageHighlight3Title: "Impeccable Pret Tailoring",
-  heritageHighlight3Text: "Ready-to-wear perfection featuring structured silhouettes, luxury inner linings, and handcrafted tassels.",
+  heritageHighlight2Text: "Hand-rendered tilla, sequins, marori, and fine resham embroidery created by master craftsmen.",
+  heritageHighlight3Title: "Custom Stitching via WhatsApp",
+  heritageHighlight3Text: "Order unstitched or request bespoke made-to-measure tailoring directly via our WhatsApp concierge.",
 
   // 6. Pakistan Trust Bar
   showTrustBar: true,
   trustPerk1Title: "Nationwide Delivery",
-  trustPerk1Desc: "TCS, Trax & Leopards to 250+ cities in Pakistan",
-  trustPerk2Title: "Cash On Delivery",
-  trustPerk2Desc: "Pay cash upon parcel receipt or direct Bank Transfer",
-  trustPerk3Title: "7-Day Return Policy",
-  trustPerk3Desc: "Customer-first replacement or exchange policy",
+  trustPerk1Desc: "Karachi 1-2 days • Major cities 4-5 days • Regional 5-7 days",
+  trustPerk2Title: "Cash On Delivery & Advance Pay",
+  trustPerk2Desc: "Pay COD or save 5% on Advance Bank Transfer / Wallet",
+  trustPerk3Title: "7-Day Exchange Policy",
+  trustPerk3Desc: "Hassle-free 7-day exchange (No returns accepted)",
   trustPerk4Title: "100% Authentic Fabric",
-  trustPerk4Desc: "Pure Swiss lawn, genuine chiffon and master tailoring",
+  trustPerk4Desc: "Pure Swiss lawn, genuine chiffon and luxury unstitched",
 
   // 7. Contact, Concierge & Physical Studio
   contactWhatsApp: "0340 0262732",
@@ -189,7 +189,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   contactPhone: "0340 0262732",
   contactEmail: "care@tauheedtextile.com",
   contactAddress: "Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan",
-  operatingHours: "Monday - Saturday: 10:00 AM - 9:00 PM PKT",
+  operatingHours: "Monday - Saturday: 1:00 PM - 9:00 PM PKT",
 
   // 8. Social Media Channels
   socialInstagram: "https://instagram.com/tauheedtextile",

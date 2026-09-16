@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShieldCheck, Truck, RotateCcw, Ruler, Scissors } from "lucide-react";
+import { ShieldCheck, Truck, RotateCcw, Clock, Scissors, CheckCircle2 } from "lucide-react";
 
 export default function PolicyPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -9,88 +9,104 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
   const policies: Record<string, { title: string; subtitle: string; content: React.ReactNode }> = {
     shipping: {
       title: "Shipping & Nationwide Delivery Policy",
-      subtitle: "Fast, reliable courier delivery across all 4 provinces and AJK",
+      subtitle: "Fast, reliable courier fulfillment across Karachi and all nationwide cities",
       content: (
-        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
           <p>
-            At <strong>Tauheed Textile</strong>, we partner with premier courier networks including <strong>TCS Express, Trax Logistics, and Leopards Courier</strong> to ensure seamless nationwide fulfillment.
+            At <strong>Tauheed Textile</strong>, every ensemble is packed with bespoke luxury care to ensure pristine doorstep delivery across Pakistan.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">1. Delivery Timeline</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Free Shipping Threshold</h3>
+          <p>
+            We offer <strong>FREE Nationwide Delivery</strong> on all orders totaling <strong>Rs. 10,000 or more</strong>. No shipping charges apply to qualifying orders.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. Weight-Based Shipping Rates (Orders under Rs. 10,000)</h3>
+          <div className="overflow-x-auto border border-[#E7E1D8] rounded-xl bg-white">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-[#F8F5F0] text-[#171717] uppercase font-bold">
+                <tr>
+                  <th className="p-3">Destination</th>
+                  <th className="p-3">Parcel Weight</th>
+                  <th className="p-3">Delivery Rate</th>
+                  <th className="p-3">Estimated Timeline</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E7E1D8]">
+                <tr>
+                  <td className="p-3 font-semibold text-[#171717]">Karachi (Local)</td>
+                  <td className="p-3">All Weights</td>
+                  <td className="p-3 font-bold text-[#171717]">Flat Rs. 350</td>
+                  <td className="p-3">Same-Day to 1-2 Working Days</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-semibold text-[#171717]">Nationwide (Major Cities)</td>
+                  <td className="p-3">Up to 1.0 kg</td>
+                  <td className="p-3 font-bold text-[#171717]">Rs. 350</td>
+                  <td className="p-3">4-5 Working Days</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-semibold text-[#171717]">Nationwide (Major Cities)</td>
+                  <td className="p-3">2.0 – 3.0 kg</td>
+                  <td className="p-3 font-bold text-[#171717]">Rs. 450</td>
+                  <td className="p-3">4-5 Working Days</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-semibold text-[#171717]">Nationwide (Major Cities)</td>
+                  <td className="p-3">4.0 – 5.0 kg</td>
+                  <td className="p-3 font-bold text-[#171717]">Rs. 550</td>
+                  <td className="p-3">4-5 Working Days</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-semibold text-[#171717]">Regional & Rural Areas</td>
+                  <td className="p-3">Above 5.0 kg</td>
+                  <td className="p-3 font-bold text-[#171717]">Rs. 550 + Rs. 100/kg</td>
+                  <td className="p-3">5-7 Working Days</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Payment Surcharge & Advance Payment Perks</h3>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Lahore Metropolitan:</strong> 24 to 48 hours (Same-Day / Next-Day dispatch available).</li>
-            <li><strong>Major Cities (Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Sialkot, Peshawar):</strong> 2 to 3 Business Days via TCS Express.</li>
-            <li><strong>Regional Towns & Rural Areas:</strong> 3 to 5 Business Days via Trax / Leopards.</li>
+            <li>
+              <strong>Cash on Delivery (COD):</strong> A standard 4% courier collection handling fee is automatically calculated and added to COD orders at checkout.
+            </li>
+            <li>
+              <strong>Advance Payment (Bank Transfer / JazzCash / EasyPaisa):</strong> The 4% COD fee is completely waived, AND an instant <strong>Flat 5% OFF</strong> is applied to your order subtotal!
+            </li>
           </ul>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">2. Shipping Charges & Free Delivery</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Dispatch & Tracking</h3>
           <p>
-            We offer <strong>FREE Nationwide Delivery</strong> on all orders totaling <strong>Rs. 9,999 or more</strong>. For orders below this threshold, a standard flat courier charge of <strong>Rs. 250</strong> applies anywhere in Pakistan. Customers who pay via advance payment methods (Bank Transfer, JazzCash, EasyPaisa) automatically receive a <strong>Flat 5% Discount</strong> on their order.
-          </p>
-
-          <h3 className="font-serif font-bold text-sm text-brand-950">3. Cash On Delivery (COD) Verification</h3>
-          <p>
-            First-time COD orders may receive a brief WhatsApp or telephone confirmation call from our verification team prior to warehouse packing to prevent courier returns.
+            Once dispatched, you will receive an SMS and tracking consignment number. You can monitor your shipment milestones anytime on our <Link href="/track-order" className="text-[#7A6652] font-bold underline">Track Order</Link> page.
           </p>
         </div>
       ),
     },
     returns: {
-      title: "7-Day Hassle-Free Returns & Exchanges",
-      subtitle: "Customer satisfaction and peace of mind guaranteed",
+      title: "7-Day Exchange Policy (No Returns)",
+      subtitle: "Customer satisfaction and quality assurance commitment",
       content: (
-        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
           <p>
-            Tauheed Textile takes pride in the flawless quality of our fabrics and tailoring. If you receive an article that is damaged, misprinted, or incorrectly sized, you may request an exchange or store credit within <strong>7 days</strong> of delivery.
+            Tauheed Textile guarantees the finest craftsmanship and pure authentic fabrics. To maintain luxury hygiene and fair pricing, we operate under a strict <strong>7-Day Exchange Policy</strong>.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">Eligibility Guidelines</h3>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Unstitched items must be uncut, unwashed, and in their original packaging with designer tags intact.</li>
-            <li>Stitched pret articles must remain unworn, with all swing tags attached.</li>
-            <li>Custom made-to-measure bridal or bespoke stitching can only be altered or exchanged for workmanship flaws.</li>
-          </ul>
-
-          <h3 className="font-serif font-bold text-sm text-brand-950">How to Initiate a Return</h3>
-          <p>
-            Simply visit our <Link href="/account" className="text-gold-700 font-bold underline">Customer Portal</Link> or send a photo of the parcel and your order number to our WhatsApp concierge at <strong>0340 0262732</strong>. Our team will schedule reverse pickup or direct replacement.
-          </p>
-        </div>
-      ),
-    },
-    "size-guide": {
-      title: "Women's Pret & Stitched Size Guide",
-      subtitle: "Accurate Pakistani garment measurements in inches",
-      content: (
-        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
-          <p>
-            Our pret collections are tailored to comfortable Pakistani women's silhouettes. Please consult the standard measurement table below before placing your order:
-          </p>
-
-          <div className="overflow-x-auto border border-sand-200 rounded-xl">
-            <table className="w-full text-xs text-left">
-              <thead className="bg-sand-100 text-brand-900 uppercase">
-                <tr>
-                  <th className="p-3">Size Tag</th>
-                  <th className="p-3">Chest</th>
-                  <th className="p-3">Waist</th>
-                  <th className="p-3">Hips</th>
-                  <th className="p-3">Kurta Length</th>
-                  <th className="p-3">Trouser Length</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-sand-200">
-                <tr><td className="p-3 font-bold">Extra Small (XS)</td><td className="p-3">36"</td><td className="p-3">32"</td><td className="p-3">38"</td><td className="p-3">40"</td><td className="p-3">37"</td></tr>
-                <tr><td className="p-3 font-bold">Small (S)</td><td className="p-3">38"</td><td className="p-3">34"</td><td className="p-3">40"</td><td className="p-3">42"</td><td className="p-3">38"</td></tr>
-                <tr><td className="p-3 font-bold">Medium (M)</td><td className="p-3">40"</td><td className="p-3">36"</td><td className="p-3">42"</td><td className="p-3">44"</td><td className="p-3">38"</td></tr>
-                <tr><td className="p-3 font-bold">Large (L)</td><td className="p-3">44"</td><td className="p-3">40"</td><td className="p-3">46"</td><td className="p-3">45"</td><td className="p-3">39"</td></tr>
-                <tr><td className="p-3 font-bold">Extra Large (XL)</td><td className="p-3">48"</td><td className="p-3">44"</td><td className="p-3">50"</td><td className="p-3">46"</td><td className="p-3">40"</td></tr>
-              </tbody>
-            </table>
+          <div className="p-4 rounded-xl bg-[#FDF2F2] border border-[#F2BDBD] text-[#9B3D3D] font-medium">
+            <strong>Important:</strong> We offer exchanges only. Cash returns and refunds are not accepted.
           </div>
 
-          <p className="italic text-sand-500">
-            * All measurements are garment dimensions. For custom bridal sizing or bespoke sleeves, please contact us on WhatsApp.
+          <h3 className="font-serif font-bold text-sm text-[#171717]">Exchange Eligibility Guidelines</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Articles must be unwashed, uncut, and in their original packaging with all designer seal tags intact.</li>
+            <li>Exchange requests must be submitted within <strong>7 calendar days</strong> from the parcel delivery date.</li>
+            <li>Items purchased on seasonal clearance or final sale are eligible for exchange only in the case of manufacturing or fabric defects.</li>
+          </ul>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">How to Initiate an Exchange</h3>
+          <p>
+            Contact our customer care concierge via WhatsApp at <strong>0340 0262732</strong> (Mon–Sat 1:00 PM – 9:00 PM PKT). Please provide your order number (e.g. TT-2026-1001) along with photos of the article. Our support team will assist you with the exchange process.
           </p>
         </div>
       ),
@@ -99,52 +115,57 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
       title: "Luxury Fabric & Needlework Care Instructions",
       subtitle: "Preserving the beauty, colors, and zari sheen of your Tauheed creations",
       content: (
-        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
-          <h3 className="font-serif font-bold text-sm text-brand-950">1. Swiss Lawn & Voile Dupattas</h3>
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Swiss Lawn & Cotton Dupattas</h3>
           <p>
-            Gentle hand-wash in cold water using a mild silk/wool detergent. Do not wring or spin-dry. Always dry in indirect shade to protect botanical and pastel dye brilliance.
+            Gentle hand-wash in cold water using a mild fabric liquid. Do not wring or spin-dry. Always dry in indirect shade to protect pastel dye brilliance.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">2. Pure Chiffon, Organza & Zari Work</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. Pure Chiffon, Organza, Net & Zari Work</h3>
           <p>
-            <strong>Dry clean only.</strong> Never spray alcohol-based perfumes or deodorants directly onto zari, dabka, or silver tilla embellishments, as it can cause oxidation.
+            <strong>Dry clean only.</strong> Never spray alcohol-based perfumes directly onto tilla, sequins, or hand-embellishments. Iron on reverse side with mild steam.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">3. Storage & Muslin Cloth Wrap</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Storage Guidelines</h3>
           <p>
-            Store festive velvet and embroidered kalidars folded in breathable cotton or muslin bags. Avoid plastic wraps that trap moisture.
+            Store festive velvet, raw silk, and embroidered ensembles folded in breathable cotton bags. Keep in a cool, dry place.
           </p>
         </div>
       ),
     },
     faq: {
       title: "Frequently Asked Questions (FAQ)",
-      subtitle: "Everything you need to know about ordering, delivery, and fabric care",
+      subtitle: "Everything you need to know about ordering, delivery, and custom stitching",
       content: (
-        <div className="space-y-6 text-xs text-brand-700 leading-relaxed">
-          <h3 className="font-serif font-bold text-sm text-brand-950">1. How do I place an order?</h3>
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. How do I place an order?</h3>
           <p>
-            You can place an order directly on our website by adding items to your bag and choosing Cash On Delivery at checkout, or tap the green <strong>"Order on WhatsApp"</strong> button on any product page to chat directly with our sales team.
+            You can order directly through our website checkout or tap <strong>"Order Instant via WhatsApp"</strong> on any article page to order directly with our sales team.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">2. Is Cash On Delivery (COD) available in my city?</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. Can I get custom tailor stitching?</h3>
           <p>
-            Yes! We offer COD across 250+ cities, towns, and tehsils in Pakistan via TCS, Trax, and Leopards courier.
+            Yes! While all articles are sold as authentic unstitched collections, we provide custom made-to-measure tailor stitching upon request. Simply tap <strong>"Need Custom Stitching? Order via WhatsApp"</strong> on the dress page.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">3. How long will delivery take?</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. What are the delivery times?</h3>
           <p>
-            Orders in Lahore are delivered in 1-2 days. Major cities (Karachi, Islamabad, Rawalpindi, Faisalabad) receive parcels in 2-3 business days. Other regions take 3-5 days.
+            Karachi deliveries arrive within Same-Day to 1-2 working days. Major cities nationwide take 4-5 working days. Regional and rural areas take 5-7 working days.
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">4. Can I exchange an item if the size does not fit?</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Is Cash on Delivery (COD) available?</h3>
           <p>
-            Yes, we provide a 7-day hassle-free exchange window. Simply contact us via WhatsApp at <strong>0340 0262732</strong> with your order number.
+            Yes, COD is available across Pakistan. A 4% handling fee applies to COD parcels, or you can pay via Bank Transfer / JazzCash / EasyPaisa to waive this fee and receive Flat 5% OFF!
           </p>
 
-          <h3 className="font-serif font-bold text-sm text-brand-950">5. Are all fabrics 100% authentic?</h3>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">5. What is your exchange policy?</h3>
           <p>
-            Tauheed Textile guarantees 100% original, pure natural fibers, authentic Swiss lawns, and handcrafted zari embroidery.
+            We offer a 7-day exchange window for unstitched garments in original condition. We do not accept cash returns or refunds.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">6. What are your customer support hours?</h3>
+          <p>
+            Our support desk is open <strong>Monday to Saturday from 1:00 PM to 9:00 PM PKT</strong>.
           </p>
         </div>
       ),
@@ -159,24 +180,60 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-      <div className="bg-white rounded-3xl border border-sand-200 shadow-xl p-8 sm:p-12 space-y-8">
-        <div className="border-b border-sand-200 pb-6">
-          <span className="text-xs font-bold tracking-widest uppercase text-gold-700">Official Brand Guidelines</span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-950 mt-1">
-            {currentPolicy.title}
-          </h1>
-          <p className="text-xs sm:text-sm text-brand-600 mt-1">
-            {currentPolicy.subtitle}
-          </p>
-        </div>
+      {/* Header */}
+      <div className="border-b border-[#E7E1D8] pb-8 mb-8 text-center sm:text-left">
+        <span className="text-xs font-bold uppercase tracking-widest text-[#7A6652]">
+          Tauheed Textile Policies
+        </span>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mt-1">
+          {currentPolicy.title}
+        </h1>
+        <p className="text-xs text-[#6B6259] mt-2">{currentPolicy.subtitle}</p>
+      </div>
 
+      {/* Main Content Card */}
+      <div className="bg-white p-6 sm:p-10 rounded-3xl border border-[#E7E1D8] shadow-sm mb-12">
         {currentPolicy.content}
+      </div>
 
-        <div className="pt-8 border-t border-sand-200 flex items-center justify-between text-xs">
-          <span className="text-brand-500">Tauheed Textile Client Protection & Care</span>
-          <Link href="/shop" className="text-gold-700 hover:text-gold-800 font-bold uppercase tracking-wider">
-            Shop Catalog ?
-          </Link>
+      {/* Related Policies Strip */}
+      <div className="border-t border-[#E7E1D8] pt-8">
+        <h4 className="font-serif font-bold text-sm text-[#171717] mb-4 text-center sm:text-left">
+          Explore Other Policies
+        </h4>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {slug !== "shipping" && (
+            <Link
+              href="/policies/shipping"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <Truck className="w-4 h-4 text-[#7A6652]" /> Shipping Policy
+            </Link>
+          )}
+          {slug !== "returns" && (
+            <Link
+              href="/policies/returns"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <RotateCcw className="w-4 h-4 text-[#7A6652]" /> 7-Day Exchange
+            </Link>
+          )}
+          {slug !== "fabric-care" && (
+            <Link
+              href="/policies/fabric-care"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <Scissors className="w-4 h-4 text-[#7A6652]" /> Fabric Care
+            </Link>
+          )}
+          {slug !== "faq" && (
+            <Link
+              href="/policies/faq"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4 text-[#7A6652]" /> FAQ
+            </Link>
+          )}
         </div>
       </div>
     </div>
