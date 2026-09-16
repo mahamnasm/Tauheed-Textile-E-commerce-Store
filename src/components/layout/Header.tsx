@@ -247,11 +247,11 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </div>
                 {/* Unified Brand Typography: Same Text Color & Alignment */}
                 <div className="flex flex-col justify-center text-left">
-                  <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.16em] text-white leading-none">
-                    TAUHEED
+                  <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.14em] text-white leading-none select-none">
+                    Tᗩᑌᕼᗴᗴᗪ
                   </span>
-                  <span className="font-serif text-[11px] sm:text-xs tracking-[0.38em] text-white font-semibold mt-1 uppercase leading-none">
-                    TEXTILE
+                  <span className="font-serif text-[11px] sm:text-xs tracking-[0.32em] text-white font-semibold mt-1 uppercase leading-none select-none">
+                    Tᗴ᙭TIᒪᗴ
                   </span>
                 </div>
               </Link>
@@ -401,11 +401,11 @@ export default function Header({ initialSettings }: HeaderProps) {
                   />
                 </div>
                 <div className="flex flex-col justify-center text-left">
-                  <span className="font-serif font-bold text-lg text-white tracking-[0.16em] leading-none">
-                    TAUHEED
+                  <span className="font-serif font-bold text-lg text-white tracking-[0.14em] leading-none select-none">
+                    Tᗩᑌᕼᗴᗴᗪ
                   </span>
-                  <span className="font-serif text-[9px] text-white font-medium tracking-[0.35em] uppercase leading-none mt-1">
-                    TEXTILE
+                  <span className="font-serif text-[9px] text-white font-medium tracking-[0.30em] uppercase leading-none mt-1 select-none">
+                    Tᗴ᙭TIᒪᗴ
                   </span>
                 </div>
               </Link>

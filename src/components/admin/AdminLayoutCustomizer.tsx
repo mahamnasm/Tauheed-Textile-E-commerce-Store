@@ -1917,7 +1917,7 @@ export default function AdminLayoutCustomizer({
             <div className="bg-black text-sand-50 px-4 py-3 flex items-center justify-between border-b border-sand-900">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-8 bg-gold-500/30 rounded flex items-center justify-center text-[10px] text-gold-400 font-serif">TT</div>
-                <span className="font-serif font-bold text-sm tracking-widest text-sand-50">TAUHEED</span>
+                <span className="font-serif font-bold text-sm tracking-widest text-sand-50 select-none">Tᗩᑌᕼᗴᗴᗪ</span>
               </div>
               <span className="text-[10px] text-gold-400 font-mono">WhatsApp: {settings.contactWhatsApp}</span>
             </div>

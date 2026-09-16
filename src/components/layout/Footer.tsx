@@ -54,11 +54,11 @@ export default function Footer({ initialSettings }: FooterProps) {
               />
             </div>
             <div className="flex flex-col justify-center text-left">
-              <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.16em] text-[#171717] leading-none">
-                TAUHEED
+              <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.14em] text-[#171717] leading-none select-none">
+                Tᗩᑌᕼᗴᗴᗪ
               </span>
-              <span className="font-serif text-[11px] sm:text-xs tracking-[0.38em] text-[#171717] font-semibold mt-1 uppercase leading-none">
-                TEXTILE
+              <span className="font-serif text-[11px] sm:text-xs tracking-[0.32em] text-[#171717] font-semibold mt-1 uppercase leading-none select-none">
+                Tᗴ᙭TIᒪᗴ
               </span>
             </div>
           </Link>

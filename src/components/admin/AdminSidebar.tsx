@@ -160,8 +160,8 @@ export default function AdminSidebar() {
             />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-xs text-sand-50 tracking-wider flex items-center gap-1.5 group-hover:text-gold-300 transition-colors">
-              TAUHEED
+            <h2 className="font-serif font-bold text-xs text-sand-50 tracking-wider flex items-center gap-1.5 group-hover:text-gold-300 transition-colors select-none">
+              Tᗩᑌᕼᗴᗴᗪ
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </h2>
             <span className="text-[9px] text-gold-400 uppercase tracking-widest font-semibold block">
@@ -296,8 +296,8 @@ export default function AdminSidebar() {
                     />
                   </div>
                   <div>
-                    <h2 className="font-serif font-bold text-sm text-sand-50 tracking-wider">
-                      TAUHEED
+                    <h2 className="font-serif font-bold text-sm text-sand-50 tracking-wider select-none">
+                      Tᗩᑌᕼᗴᗴᗪ
                     </h2>
                     <span className="text-[9px] text-gold-400 uppercase tracking-widest font-semibold block">
                       Admin Portal
@@ -381,8 +381,8 @@ export default function AdminSidebar() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h2 className="font-serif font-bold text-sm text-sand-50 tracking-wider group-hover:text-gold-300 transition-colors">
-                    TAUHEED
+                  <h2 className="font-serif font-bold text-sm text-sand-50 tracking-wider group-hover:text-gold-300 transition-colors select-none">
+                    Tᗩᑌᕼᗴᗴᗪ
                   </h2>
                 </div>
                 <span className="text-[9px] text-gold-400 font-sans uppercase tracking-widest font-semibold block">
