@@ -38,11 +38,13 @@ import {
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { SiteLayoutSettings } from "@/lib/settings";
+import DestinationLinkSelector from "@/components/admin/DestinationLinkSelector";
 
 interface AdminLayoutCustomizerProps {
   initialSettings: SiteLayoutSettings;
   initialVideos: any[];
   products: any[];
+  categories?: any[];
 }
 
 const HERO_MEDIA_PRESETS = [
@@ -59,6 +61,7 @@ export default function AdminLayoutCustomizer({
   initialSettings,
   initialVideos,
   products,
+  categories = [],
 }: AdminLayoutCustomizerProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
@@ -597,7 +600,7 @@ export default function AdminLayoutCustomizer({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] font-bold text-brand-900">Button Text</label>
                     <input
@@ -608,16 +611,13 @@ export default function AdminLayoutCustomizer({
                       className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
                     />
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
-                    <input
-                      type="text"
-                      value={settings.banner1Link}
-                      onChange={(e) => updateField("banner1Link", e.target.value)}
-                      placeholder="/shop?category=sale"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
-                    />
-                  </div>
+                  <DestinationLinkSelector
+                    label="Banner 1 Landing Destination (Click to Choose)"
+                    value={settings.banner1Link}
+                    onChange={(v) => updateField("banner1Link", v)}
+                    products={products}
+                    categories={categories}
+                  />
                 </div>
               </div>
 
@@ -712,7 +712,7 @@ export default function AdminLayoutCustomizer({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] font-bold text-brand-900">Button Text</label>
                     <input
@@ -723,16 +723,13 @@ export default function AdminLayoutCustomizer({
                       className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
                     />
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
-                    <input
-                      type="text"
-                      value={settings.banner2Link}
-                      onChange={(e) => updateField("banner2Link", e.target.value)}
-                      placeholder="/shop?category=lawn-summer"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
-                    />
-                  </div>
+                  <DestinationLinkSelector
+                    label="Banner 2 Landing Destination (Click to Choose)"
+                    value={settings.banner2Link}
+                    onChange={(v) => updateField("banner2Link", v)}
+                    products={products}
+                    categories={categories}
+                  />
                 </div>
               </div>
 
@@ -827,7 +824,7 @@ export default function AdminLayoutCustomizer({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] font-bold text-brand-900">Button Text</label>
                     <input
@@ -838,16 +835,13 @@ export default function AdminLayoutCustomizer({
                       className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
                     />
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
-                    <input
-                      type="text"
-                      value={settings.banner3Link}
-                      onChange={(e) => updateField("banner3Link", e.target.value)}
-                      placeholder="/shop?category=chiffon-formal"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
-                    />
-                  </div>
+                  <DestinationLinkSelector
+                    label="Banner 3 Landing Destination (Click to Choose)"
+                    value={settings.banner3Link}
+                    onChange={(v) => updateField("banner3Link", v)}
+                    products={products}
+                    categories={categories}
+                  />
                 </div>
               </div>
 
@@ -942,7 +936,7 @@ export default function AdminLayoutCustomizer({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
                   <div>
                     <label className="text-[11px] font-bold text-brand-900">Button Text</label>
                     <input
@@ -953,16 +947,13 @@ export default function AdminLayoutCustomizer({
                       className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-bold"
                     />
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-brand-900">Destination Link</label>
-                    <input
-                      type="text"
-                      value={settings.banner4Link}
-                      onChange={(e) => updateField("banner4Link", e.target.value)}
-                      placeholder="/shop?category=silk"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
-                    />
-                  </div>
+                  <DestinationLinkSelector
+                    label="Banner 4 Landing Destination (Click to Choose)"
+                    value={settings.banner4Link}
+                    onChange={(v) => updateField("banner4Link", v)}
+                    products={products}
+                    categories={categories}
+                  />
                 </div>
               </div>
             </div>
@@ -1019,16 +1010,13 @@ export default function AdminLayoutCustomizer({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-brand-900">Primary Button Destination Link</label>
-              <input
-                type="text"
-                value={settings.heroPrimaryBtnLink}
-                onChange={(e) => updateField("heroPrimaryBtnLink", e.target.value)}
-                placeholder="/shop?category=lawn-summer"
-                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
-              />
-            </div>
+            <DestinationLinkSelector
+              label="Primary Button Destination Landing Page (Click to Choose)"
+              value={settings.heroPrimaryBtnLink}
+              onChange={(v) => updateField("heroPrimaryBtnLink", v)}
+              products={products}
+              categories={categories}
+            />
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-brand-900">Secondary Button Label</label>
@@ -1041,16 +1029,13 @@ export default function AdminLayoutCustomizer({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-brand-900">Secondary Button Destination Link</label>
-              <input
-                type="text"
-                value={settings.heroSecondaryBtnLink}
-                onChange={(e) => updateField("heroSecondaryBtnLink", e.target.value)}
-                placeholder="/shop?category=net-formals"
-                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
-              />
-            </div>
+            <DestinationLinkSelector
+              label="Secondary Button Destination Landing Page (Click to Choose)"
+              value={settings.heroSecondaryBtnLink}
+              onChange={(v) => updateField("heroSecondaryBtnLink", v)}
+              products={products}
+              categories={categories}
+            />
 
             {/* 3 Trust Badges */}
             <div className="space-y-2">

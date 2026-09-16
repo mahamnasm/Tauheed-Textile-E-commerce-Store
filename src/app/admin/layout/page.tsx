@@ -7,15 +7,23 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminLayoutPage() {
-  const [settings, videos, products] = await Promise.all([
+  const [settings, videos, products, categories] = await Promise.all([
     getSiteSettings(),
     prisma.watchBuyVideo.findMany({
       include: { product: true },
       orderBy: { displayOrder: "asc" },
     }),
     prisma.product.findMany({
-      select: { id: true, title: true, sku: true, basePrice: true, videoUrl: true },
+      select: { id: true, title: true, slug: true, sku: true, basePrice: true, videoUrl: true },
       orderBy: { title: "asc" },
+    }),
+    prisma.category.findMany({
+      include: {
+        subcategories: {
+          orderBy: { displayOrder: "asc" },
+        },
+      },
+      orderBy: { name: "asc" },
     }),
   ]);
 
@@ -24,6 +32,7 @@ export default async function AdminLayoutPage() {
       initialSettings={settings}
       initialVideos={videos}
       products={products}
+      categories={categories}
     />
   );
 }
