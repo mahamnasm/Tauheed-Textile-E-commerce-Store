@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, MessageCircle, Flame } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 export default function CartDrawer() {
@@ -190,6 +190,12 @@ export default function CartDrawer() {
               </div>
             </div>
 
+            {/* Urgency Notification */}
+            <div className="flex items-center gap-1.5 text-[11px] text-[#9B3D3D] bg-[#FEF2F2] p-2 rounded-lg border border-[#F2BDBD]">
+              <Flame className="w-3.5 h-3.5 shrink-0 fill-current" />
+              <span>High demand — Cart reserved for 15 minutes</span>
+            </div>
+
             <div className="space-y-2">
               <Link
                 href="/checkout"
@@ -198,10 +204,22 @@ export default function CartDrawer() {
               >
                 Proceed to Checkout <ArrowRight className="w-4 h-4" />
               </Link>
+              <a
+                href={`https://wa.me/923400262732?text=${encodeURIComponent(
+                  `Salam Tauheed Textile, I've saved these items in my bag:\n${cart.map((i) => `• ${i.productTitle} (Qty: ${i.quantity}) - Rs. ${(i.price * i.quantity).toLocaleString()}`).join("\n")}\n\nTotal: Rs. ${cartSubtotal.toLocaleString()}\n\nPlease reserve these pieces for me.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={closeCart}
+                className="w-full py-2.5 bg-[#128C7E] hover:bg-[#075E54] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Save Bag to WhatsApp</span>
+              </a>
               <Link
                 href="/cart"
                 onClick={closeCart}
-                className="w-full py-2.5 bg-white border border-[#E7E1D8] hover:bg-[#F8F5F0] text-[#6B6259] rounded-xl text-xs font-semibold tracking-wider flex items-center justify-center transition-all"
+                className="w-full py-2 bg-white border border-[#E7E1D8] hover:bg-[#F8F5F0] text-[#6B6259] rounded-xl text-xs font-semibold tracking-wider flex items-center justify-center transition-all"
               >
                 View Full Bag & Special Notes
               </Link>

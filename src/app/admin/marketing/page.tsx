@@ -1,23 +1,30 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
-import { Megaphone, Film, Tag, Star } from "lucide-react";
+import { Megaphone, Film, Tag, Star, ShoppingBag } from "lucide-react";
+import AdminAbandonedCartManager from "@/components/admin/AdminAbandonedCartManager";
 
 export const revalidate = 0;
 
 export default async function AdminMarketingPage() {
-  const [coupons, videos, heroBanners] = await Promise.all([
+  const [coupons, videos, heroBanners, abandonedCarts] = await Promise.all([
     prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.watchBuyVideo.findMany({ include: { product: true } }),
     prisma.heroBanner.findMany(),
+    prisma.abandonedCart.findMany({ orderBy: { lastActiveAt: "desc" }, take: 50 }),
   ]);
 
   return (
     <div className="space-y-8">
       <div className="border-b border-sand-300 pb-6">
-        <span className="text-xs font-bold tracking-widest uppercase text-gold-700">Campaigns & Social</span>
-        <h1 className="font-serif text-3xl font-bold text-brand-950 mt-1">Marketing, Reels & Promo Coupons</h1>
-        <p className="text-xs text-brand-600 mt-1">Manage promotional discount codes, hero banners, and shoppable video reels</p>
+        <span className="text-xs font-bold tracking-widest uppercase text-gold-700">Campaigns & Retention</span>
+        <h1 className="font-serif text-3xl font-bold text-brand-950 mt-1">Marketing, Retention & Coupons</h1>
+        <p className="text-xs text-brand-600 mt-1">
+          Recover abandoned carts via WhatsApp, manage promotional discount codes, and curate shoppable video reels
+        </p>
       </div>
+
+      {/* Cart Abandonment Recovery */}
+      <AdminAbandonedCartManager initialCarts={abandonedCarts} />
 
       {/* Coupons */}
       <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-4">
