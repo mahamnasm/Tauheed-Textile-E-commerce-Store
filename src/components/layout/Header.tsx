@@ -308,9 +308,9 @@ export default function Header({ initialSettings }: HeaderProps) {
           navVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        {/* ── SCROLLING MARQUEE ANNOUNCEMENT BAR ── */}
+        {/* ── SCROLLING MARQUEE ANNOUNCEMENT BAR (FROSTED GLASS) ── */}
         {initialSettings?.announcementEnabled !== false && (
-          <div className="bg-[#0F0F0F] text-[#C8C2BB] text-[11px] py-2 overflow-hidden relative">
+          <div className="bg-black/75 backdrop-blur-md text-[#C8C2BB] text-[11px] py-1.5 overflow-hidden relative border-b border-white/5">
             <div className="flex animate-marquee whitespace-nowrap">
               {allItems.map((item, i) => (
                 <div
@@ -325,8 +325,8 @@ export default function Header({ initialSettings }: HeaderProps) {
           </div>
         )}
 
-        {/* ── MAIN NAVIGATION BAR ── */}
-        <div className="bg-[#171717] border-b border-[#2A2626]">
+        {/* ── MAIN NAVIGATION BAR (LUXURY FROSTED GLASS BAR) ── */}
+        <div className="bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-lg transition-all">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -341,7 +341,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </button>
               </div>
 
-              {/* Logo (Centered, responsive, guaranteed single-line without overflowing) */}
+              {/* Logo (Left/Center, responsive, guaranteed single-line without overflowing) */}
               <div className="flex items-center justify-center flex-1 min-w-0 px-1 sm:px-2 lg:flex-none">
                 <Link
                   href="/"
@@ -349,7 +349,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     e.preventDefault();
                     window.location.href = "/admin";
                   }}
-                  className="flex items-center gap-1.5 sm:gap-3 group py-1 select-none max-w-full"
+                  className="flex items-center gap-2 sm:gap-3 group py-1 select-none max-w-full"
                   title="Tauheed Textile (Double-click for Staff Portal)"
                 >
                   <div className="relative h-9 w-7 min-[380px]:h-10 min-[380px]:w-8 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
@@ -367,52 +367,50 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </Link>
               </div>
 
-              {/* Desktop Nav Links */}
-              <nav className="hidden lg:flex items-center justify-center flex-1 space-x-5 xl:space-x-7">
+              {/* Desktop Nav Links (Clean, Uncluttered, Spaced Luxury Bar) */}
+              <nav className="hidden lg:flex items-center justify-center flex-1 space-x-6 xl:space-x-8">
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs uppercase tracking-wider font-semibold border border-white/15 transition-all shadow-xs"
+                >
+                  <Menu className="w-3.5 h-3.5" />
+                  <span>All Collections</span>
+                </button>
+
                 <Link
                   href="/shop?isNewArrival=true"
                   className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
                 >
-                  NEW IN
+                  New In '26
                 </Link>
-                {desktopNavItems.map((cat) => {
-                  const isOpen = activeDropdown === cat.name;
-                  return (
-                    <div
-                      key={cat.name}
-                      className="relative group py-6"
-                      onMouseEnter={() => setActiveDropdown(cat.name)}
-                      onMouseLeave={() => setActiveDropdown(null)}
-                    >
-                      <Link
-                        href={cat.href}
-                        className={`flex items-center gap-1 text-xs uppercase tracking-wider font-semibold transition-colors ${
-                          cat.isSale
-                            ? "text-[#E87070] hover:text-[#F08080]"
-                            : "text-[#D4CFC9] hover:text-white"
-                        }`}
-                      >
-                        {cat.name}
-                        {cat.children && (
-                          <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                        )}
-                      </Link>
-                      {cat.children && isOpen && (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 bg-[#171717] border border-[#2A2626] shadow-2xl py-2 min-w-[210px] rounded-b-lg z-50">
-                          {cat.children.map((child) => (
-                            <Link
-                              key={child.name}
-                              href={child.href}
-                              className="block px-5 py-2.5 text-xs uppercase tracking-wide text-[#D4CFC9] hover:text-white hover:bg-[#2A2626] transition-colors"
-                            >
-                              {child.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+
+                <Link
+                  href="/shop?isBestSeller=true"
+                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                >
+                  Best Sellers
+                </Link>
+
+                <Link
+                  href="/shop?category=pret-ready-to-wear"
+                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                >
+                  Ready to Wear
+                </Link>
+
+                <Link
+                  href="/shop?category=unstitched"
+                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                >
+                  Unstitched
+                </Link>
+
+                <Link
+                  href="/shop?category=sale"
+                  className="text-xs uppercase tracking-wider font-bold text-[#E87070] hover:text-[#F08080] transition-colors"
+                >
+                  Sale %
+                </Link>
               </nav>
 
               {/* Right Action Icons (Guaranteed shrink-0 so cart is ALWAYS visible and unhidable) */}

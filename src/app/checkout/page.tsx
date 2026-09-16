@@ -14,7 +14,15 @@ import {
   Package,
   Clock,
   Sparkles,
-  Info
+  Info,
+  UploadCloud,
+  FileCheck,
+  AlertCircle,
+  Eye,
+  Trash2,
+  Copy,
+  Check,
+  Camera
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { PAKISTAN_CITIES } from "@/lib/pakistan-data";
@@ -34,9 +42,14 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "BANK_TRANSFER" | "JAZZCASH" | "EASYPAISA">("COD");
 
-  // Bank Proof state
-  const [bankName, setBankName] = useState("Meezan Bank");
+  // Advance Payment Proof state
+  const [bankName, setBankName] = useState("Meezan Bank Ltd");
   const [transactionRef, setTransactionRef] = useState("");
+  const [receiptUrl, setReceiptUrl] = useState("");
+  const [receiptFileName, setReceiptFileName] = useState("");
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+  const [receiptError, setReceiptError] = useState("");
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // Coupon code
   const [couponCode, setCouponCode] = useState("");
@@ -119,6 +132,51 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 12 * 1024 * 1024) {
+      setReceiptError("Screenshot is larger than 12MB. Please choose a smaller photo.");
+      return;
+    }
+
+    setIsUploadingReceipt(true);
+    setReceiptError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/orders/upload-receipt", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to upload receipt screenshot");
+      }
+
+      setReceiptUrl(data.url);
+      setReceiptFileName(file.name);
+      setErrorMessage("");
+    } catch (err: any) {
+      console.error("Receipt upload error:", err);
+      setReceiptError(err.message || "Failed to upload receipt screenshot.");
+    } finally {
+      setIsUploadingReceipt(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, field: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -132,6 +190,17 @@ export default function CheckoutPage() {
 
     if (!shippingAddress.trim()) {
       setErrorMessage("Please enter complete street address");
+      return;
+    }
+
+    // MANDATORY VALIDATION: For Advance Payment, receipt/screenshot MUST be provided
+    const isAdvancePayment = ["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(paymentMethod);
+    if (isAdvancePayment && !receiptUrl) {
+      setErrorMessage("Please attach or upload your payment receipt / transfer screenshot before confirming your order.");
+      const el = document.getElementById("receipt-upload-section");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
@@ -154,12 +223,12 @@ export default function CheckoutPage() {
         total: grandTotal,
         notes: `${notes || ""}${codTax > 0 ? ` [Includes 4% COD Tax: Rs. ${codTax}]` : ""} [Parcel Weight: ${totalWeight.toFixed(1)}kg]`.trim(),
         items: cart,
-        ...(paymentMethod === "BANK_TRANSFER"
+        ...(isAdvancePayment
           ? {
               bankTransferDetails: {
-                bankName,
-                transactionRef: transactionRef || "FT-ONLINE-PENDING",
-                proofImage: "/assets/1.png",
+                bankName: paymentMethod === "BANK_TRANSFER" ? bankName : `${paymentMethod} Mobile Wallet`,
+                transactionRef: transactionRef.trim() || "RECEIPT_ATTACHED",
+                proofImage: receiptUrl,
               },
             }
           : {}),
@@ -426,26 +495,142 @@ export default function CheckoutPage() {
                   </p>
 
                   {paymentMethod === "BANK_TRANSFER" && (
-                    <div className="mt-3 p-3.5 bg-white rounded-lg border border-[#E7E1D8] text-xs space-y-2">
-                      <div className="text-[11px] font-semibold text-[#171717] border-b border-[#E7E1D8] pb-1">
-                        Tauheed Textile Official Bank Details:
+                    <div id="receipt-upload-section" className="mt-3 p-4 bg-white rounded-xl border border-[#E7E1D8] text-xs space-y-3 shadow-xs">
+                      <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-2">
+                        <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider">
+                          Official Corporate Bank Details
+                        </span>
+                        <span className="text-[10px] text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2 py-0.5 rounded">
+                          Pay: Rs. {grandTotal.toLocaleString()}
+                        </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-[#6B6259]">
-                        <p><span className="font-semibold text-[#171717]">Bank:</span> Meezan Bank Ltd</p>
-                        <p><span className="font-semibold text-[#171717]">Title:</span> Tauheed Textile</p>
-                        <p><span className="font-semibold text-[#171717]">Account #:</span> 02020108920192</p>
-                        <p><span className="font-semibold text-[#171717]">IBAN:</span> PK45MEZN0002020108920192</p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px] text-[#6B6259]">
+                        <div className="p-2 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8]">
+                          <p className="text-[10px] uppercase text-[#7A6652] font-semibold">Bank Name</p>
+                          <p className="font-bold text-[#171717] text-xs mt-0.5">Meezan Bank Ltd</p>
+                        </div>
+                        <div className="p-2 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8]">
+                          <p className="text-[10px] uppercase text-[#7A6652] font-semibold">Account Title</p>
+                          <p className="font-bold text-[#171717] text-xs mt-0.5">Tauheed Textile</p>
+                        </div>
+                        <div className="p-2 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8] flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] uppercase text-[#7A6652] font-semibold">Account Number</p>
+                            <p className="font-mono font-bold text-[#171717] text-xs mt-0.5">02020108920192</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              copyToClipboard("02020108920192", "bank_acc");
+                            }}
+                            className="p-1.5 rounded bg-white hover:bg-sand-200 border border-sand-300 text-brand-900 transition-colors"
+                            title="Copy Account Number"
+                          >
+                            {copiedField === "bank_acc" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                        <div className="p-2 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8] flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] uppercase text-[#7A6652] font-semibold">IBAN Number</p>
+                            <p className="font-mono font-bold text-[#171717] text-[10px] mt-0.5">PK45MEZN0002020108920192</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              copyToClipboard("PK45MEZN0002020108920192", "bank_iban");
+                            }}
+                            className="p-1.5 rounded bg-white hover:bg-sand-200 border border-sand-300 text-brand-900 transition-colors"
+                            title="Copy IBAN"
+                          >
+                            {copiedField === "bank_iban" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Mandatory Receipt Upload Box */}
+                      <div className="pt-2 border-t border-[#E7E1D8] space-y-2">
+                        <label className="block text-[11px] font-bold text-[#171717]">
+                          Attach Payment Receipt or Transfer Screenshot <span className="text-[#9B3D3D] font-bold">* (Required)</span>
+                        </label>
+                        <p className="text-[10px] text-[#6B6259]">
+                          Please provide a screenshot from your banking app or ATM slip showing the successful transfer before checkout confirmation.
+                        </p>
+
+                        {receiptUrl ? (
+                          <div className="p-3 bg-[#E8F5E9] border border-[#A5D6A7] rounded-xl flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#A5D6A7] bg-white shrink-0">
+                                <Image src={receiptUrl} alt="Payment Receipt" fill className="object-cover" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-[#1A6B3C] flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                  Receipt Uploaded Successfully
+                                </p>
+                                <p className="text-[10px] text-[#2E7D32] truncate font-mono mt-0.5">
+                                  {receiptFileName || "payment-receipt.jpg"}
+                                </p>
+                              </div>
+                            </div>
+                            <label className="shrink-0 text-[11px] font-bold text-brand-900 bg-white hover:bg-sand-100 border border-sand-300 px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-2xs">
+                              Change
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleReceiptUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#C4A882] rounded-xl bg-[#F8F5F0] hover:bg-[#F0EBE3] cursor-pointer transition-all">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleReceiptUpload}
+                              className="hidden"
+                              disabled={isUploadingReceipt}
+                            />
+                            {isUploadingReceipt ? (
+                              <div className="flex items-center gap-2 text-xs font-bold text-[#7A6652]">
+                                <span className="w-4 h-4 border-2 border-[#7A6652] border-t-transparent rounded-full animate-spin" />
+                                Uploading payment receipt...
+                              </div>
+                            ) : (
+                              <div className="text-center space-y-1">
+                                <Camera className="w-6 h-6 text-[#7A6652] mx-auto" />
+                                <p className="text-xs font-bold text-[#171717]">
+                                  Tap here to upload receipt photo or screenshot
+                                </p>
+                                <p className="text-[10px] text-[#6B6259]">
+                                  PNG, JPG, JPEG, or WEBP up to 12MB
+                                </p>
+                              </div>
+                            )}
+                          </label>
+                        )}
+
+                        {receiptError && (
+                          <p className="text-[11px] font-semibold text-[#9B3D3D] flex items-center gap-1 mt-1">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            {receiptError}
+                          </p>
+                        )}
+                      </div>
+
                       <div className="pt-2">
                         <label className="block text-[11px] font-bold text-[#171717] mb-1">
-                          Transfer Reference / Transaction ID *
+                          Transfer Reference / Transaction ID (Optional if screenshot attached)
                         </label>
                         <input
                           type="text"
                           value={transactionRef}
                           onChange={(e) => setTransactionRef(e.target.value)}
                           placeholder="e.g. FT2609068892"
-                          className="w-full text-xs p-2 border border-[#E7E1D8] rounded bg-[#F8F5F0]"
+                          className="w-full text-xs p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
                         />
                       </div>
                     </div>
@@ -471,7 +656,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <span className="text-xs font-bold text-[#171717] flex items-center gap-2">
                       <Smartphone className="w-4 h-4 text-[#1A6B3C]" />
-                      JazzCash / EasyPaisa Wallet
+                      JazzCash / EasyPaisa Mobile Wallet
                     </span>
                     <span className="text-[11px] font-bold text-[#1A6B3C] bg-[#E8F5E9] border border-[#A5D6A7] px-2 py-0.5 rounded">
                       FLAT 5% OFF + 0% COD TAX
@@ -480,6 +665,127 @@ export default function CheckoutPage() {
                   <p className="text-[11px] text-[#6B6259] mt-1">
                     Send to our registered mobile account <span className="font-bold text-[#171717]">0340 0262732</span>. Enjoy <strong className="text-[#1A6B3C]">Flat 5% discount</strong> and zero COD tax!
                   </p>
+
+                  {(paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA") && (
+                    <div id="receipt-upload-section" className="mt-3 p-4 bg-white rounded-xl border border-[#E7E1D8] text-xs space-y-3 shadow-xs">
+                      <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-2">
+                        <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider">
+                          Official Wallet Account Details
+                        </span>
+                        <span className="text-[10px] text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2 py-0.5 rounded">
+                          Pay: Rs. {grandTotal.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px] text-[#6B6259]">
+                        <div className="p-2.5 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8] flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] uppercase text-[#7A6652] font-semibold">Account Number</p>
+                            <p className="font-mono font-bold text-[#171717] text-sm mt-0.5">0340 0262732</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              copyToClipboard("03400262732", "wallet_acc");
+                            }}
+                            className="p-1.5 rounded bg-white hover:bg-sand-200 border border-sand-300 text-brand-900 transition-colors"
+                            title="Copy Wallet Number"
+                          >
+                            {copiedField === "wallet_acc" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                        <div className="p-2.5 bg-[#F8F5F0] rounded-lg border border-[#E7E1D8]">
+                          <p className="text-[10px] uppercase text-[#7A6652] font-semibold">Account Title</p>
+                          <p className="font-bold text-[#171717] text-sm mt-0.5">Tauheed Textile</p>
+                        </div>
+                      </div>
+
+                      {/* Mandatory Receipt Upload Box */}
+                      <div className="pt-2 border-t border-[#E7E1D8] space-y-2">
+                        <label className="block text-[11px] font-bold text-[#171717]">
+                          Attach EasyPaisa / JazzCash Payment Screenshot <span className="text-[#9B3D3D] font-bold">* (Required)</span>
+                        </label>
+                        <p className="text-[10px] text-[#6B6259]">
+                          Take a screenshot of the successful transaction confirmation screen from your JazzCash or EasyPaisa app and attach it below.
+                        </p>
+
+                        {receiptUrl ? (
+                          <div className="p-3 bg-[#E8F5E9] border border-[#A5D6A7] rounded-xl flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#A5D6A7] bg-white shrink-0">
+                                <Image src={receiptUrl} alt="Payment Screenshot" fill className="object-cover" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-[#1A6B3C] flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                  Screenshot Uploaded Successfully
+                                </p>
+                                <p className="text-[10px] text-[#2E7D32] truncate font-mono mt-0.5">
+                                  {receiptFileName || "wallet-screenshot.jpg"}
+                                </p>
+                              </div>
+                            </div>
+                            <label className="shrink-0 text-[11px] font-bold text-brand-900 bg-white hover:bg-sand-100 border border-sand-300 px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-2xs">
+                              Change
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleReceiptUpload}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#C4A882] rounded-xl bg-[#F8F5F0] hover:bg-[#F0EBE3] cursor-pointer transition-all">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleReceiptUpload}
+                              className="hidden"
+                              disabled={isUploadingReceipt}
+                            />
+                            {isUploadingReceipt ? (
+                              <div className="flex items-center gap-2 text-xs font-bold text-[#7A6652]">
+                                <span className="w-4 h-4 border-2 border-[#7A6652] border-t-transparent rounded-full animate-spin" />
+                                Uploading payment screenshot...
+                              </div>
+                            ) : (
+                              <div className="text-center space-y-1">
+                                <Camera className="w-6 h-6 text-[#7A6652] mx-auto" />
+                                <p className="text-xs font-bold text-[#171717]">
+                                  Tap here to upload transaction screenshot
+                                </p>
+                                <p className="text-[10px] text-[#6B6259]">
+                                  PNG, JPG, JPEG, or WEBP up to 12MB
+                                </p>
+                              </div>
+                            )}
+                          </label>
+                        )}
+
+                        {receiptError && (
+                          <p className="text-[11px] font-semibold text-[#9B3D3D] flex items-center gap-1 mt-1">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            {receiptError}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="pt-2">
+                        <label className="block text-[11px] font-bold text-[#171717] mb-1">
+                          TID (Transaction ID) Number (Optional if screenshot attached)
+                        </label>
+                        <input
+                          type="text"
+                          value={transactionRef}
+                          onChange={(e) => setTransactionRef(e.target.value)}
+                          placeholder="e.g. 19283746102"
+                          className="w-full text-xs p-2.5 border border-[#E7E1D8] rounded-xl bg-[#F8F5F0]"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </label>
             </div>

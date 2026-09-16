@@ -1,7 +1,8 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { CheckCircle, Truck, Package, Phone, ArrowRight, ShieldCheck, MapPin } from "lucide-react";
+import { CheckCircle, Truck, Package, Phone, ArrowRight, ShieldCheck, MapPin, ExternalLink, FileCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 0;
@@ -132,6 +133,47 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
                   Total Payable: <span className="text-gold-700">Rs. {order.total.toLocaleString()}</span>
                 </p>
               </div>
+
+              {order.bankTransferProof && (
+                <div className="mt-3 p-3.5 bg-sand-50 rounded-xl border border-sand-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-brand-950 text-xs flex items-center gap-1.5">
+                      <FileCheck className="w-4 h-4 text-emerald-600" />
+                      Payment Receipt Attached
+                    </span>
+                    {order.bankTransferProof.transactionRef && (
+                      <span className="text-brand-600 font-mono text-[10px] bg-white px-2 py-0.5 rounded border border-sand-200">
+                        {order.bankTransferProof.transactionRef}
+                      </span>
+                    )}
+                  </div>
+
+                  {order.bankTransferProof.proofImage && (
+                    <div className="relative aspect-[16/9] w-full rounded-lg overflow-hidden border border-sand-200 bg-white">
+                      <Image
+                        src={order.bankTransferProof.proofImage}
+                        alt="Payment Receipt"
+                        fill
+                        className="object-contain p-1"
+                      />
+                      <a
+                        href={order.bankTransferProof.proofImage}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute bottom-2 right-2 bg-brand-950/80 hover:bg-black text-white text-[10px] px-2 py-1 rounded-md flex items-center gap-1 backdrop-blur-xs shadow-sm"
+                      >
+                        <span>View Full Image</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-emerald-800 font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Receipt received. Our accounts team will verify and confirm within 15-30 mins.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

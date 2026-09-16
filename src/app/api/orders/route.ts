@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
         province: province || "Punjab",
         postalCode: postalCode || null,
         paymentMethod: paymentMethod || "COD",
-        paymentStatus: paymentMethod === "BANK_TRANSFER" ? "VERIFICATION_PENDING" : "PENDING",
+        paymentStatus: ["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(paymentMethod)
+          ? "VERIFICATION_PENDING"
+          : "PENDING",
         orderStatus: "PENDING",
         subtotal: parseFloat(subtotal),
         shippingFee: parseFloat(shippingFee || 0),
@@ -70,14 +72,14 @@ export async function POST(req: NextRequest) {
         items: {
           create: orderItemsData,
         },
-        ...(paymentMethod === "BANK_TRANSFER" && bankTransferDetails
+        ...((["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(paymentMethod) && bankTransferDetails)
           ? {
               bankTransferProof: {
                 create: {
                   transactionRef: bankTransferDetails.transactionRef || "PENDING_PROOF",
-                  proofImage: bankTransferDetails.proofImage || "/assets/1.png",
+                  proofImage: bankTransferDetails.proofImage || "",
                   status: "PENDING",
-                  adminNotes: `Bank: ${bankTransferDetails.bankName || "Direct Transfer"}`,
+                  adminNotes: `Method: ${paymentMethod} | Channel: ${bankTransferDetails.bankName || paymentMethod}`,
                 },
               },
             }
