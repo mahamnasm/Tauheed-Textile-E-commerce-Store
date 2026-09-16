@@ -4,6 +4,7 @@ import { CartProvider } from "@/context/CartContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import CartFloat from "@/components/layout/CartFloat";
 import CartDrawer from "@/components/cart/CartDrawer";
 import AbandonedCartRetention from "@/components/cart/AbandonedCartRetention";
 import AIStylistModal from "@/components/ai/AIStylistModal";
@@ -65,6 +66,7 @@ export default async function RootLayout({
           <CartDrawer />
           <AbandonedCartRetention />
           <WhatsAppFloat initialSettings={settings} />
+          <CartFloat />
           <main className="flex-1 pt-[88px] lg:pt-[108px]">{children}</main>
           <Footer initialSettings={settings} />
         </CartProvider>

@@ -331,28 +331,28 @@ export default function Header({ initialSettings }: HeaderProps) {
             <div className="flex items-center justify-between h-16 lg:h-20">
 
               {/* Mobile: Hamburger Button (Left) */}
-              <div className="flex items-center flex-1 lg:hidden">
+              <div className="flex items-center shrink-0 lg:hidden w-10">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="p-2 -ml-2 text-[#C8C2BB] hover:text-white focus:outline-none transition-colors"
+                  className="p-2 -ml-2 text-[#C8C2BB] hover:text-white focus:outline-none transition-colors shrink-0"
                   aria-label="Open sidebar menu"
                 >
                   <Menu className="w-6 h-6" />
                 </button>
               </div>
 
-              {/* Logo */}
-              <div className="flex items-center justify-center flex-1 lg:flex-none">
+              {/* Logo (Centered, responsive, guaranteed single-line without overflowing) */}
+              <div className="flex items-center justify-center flex-1 min-w-0 px-1 sm:px-2 lg:flex-none">
                 <Link
                   href="/"
                   onDoubleClick={(e) => {
                     e.preventDefault();
                     window.location.href = "/admin";
                   }}
-                  className="flex items-center gap-2.5 sm:gap-3.5 group py-1 select-none"
+                  className="flex items-center gap-1.5 sm:gap-3 group py-1 select-none max-w-full"
                   title="Tauheed Textile (Double-click for Staff Portal)"
                 >
-                  <div className="relative h-11 w-9 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
+                  <div className="relative h-9 w-7 min-[380px]:h-10 min-[380px]:w-8 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
                     <Image
                       src="/logo-calligraphy.png"
                       alt="Tauheed Textile Calligraphy Logo"
@@ -361,8 +361,8 @@ export default function Header({ initialSettings }: HeaderProps) {
                       priority
                     />
                   </div>
-                  <span className="font-serif text-lg sm:text-2xl lg:text-3xl font-bold tracking-[0.10em] sm:tracking-[0.14em] text-white whitespace-nowrap select-none">
-                    Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+                  <span className="font-serif text-base min-[380px]:text-lg sm:text-2xl lg:text-3xl font-bold text-white whitespace-nowrap select-none leading-none tracking-normal">
+                    𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
                   </span>
                 </Link>
               </div>
@@ -415,30 +415,30 @@ export default function Header({ initialSettings }: HeaderProps) {
                 })}
               </nav>
 
-              {/* Right Action Icons */}
-              <div className="flex items-center justify-end flex-1 lg:flex-none space-x-3">
+              {/* Right Action Icons (Guaranteed shrink-0 so cart is ALWAYS visible and unhidable) */}
+              <div className="flex items-center justify-end shrink-0 space-x-1 sm:space-x-3">
                 <button
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className="p-2 text-[#C8C2BB] hover:text-white transition-colors"
+                  className="p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0"
                   aria-label="Search"
                 >
                   <Search className="w-5 h-5" />
                 </button>
                 <Link
                   href="/account"
-                  className="hidden sm:block p-2 text-[#C8C2BB] hover:text-white transition-colors"
+                  className="hidden sm:block p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0"
                   aria-label="My Account"
                 >
                   <User className="w-5 h-5" />
                 </Link>
                 <button
                   onClick={openCart}
-                  className="relative p-2 text-[#C8C2BB] hover:text-white transition-colors"
+                  className="relative p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0 focus:outline-none"
                   aria-label="Open Shopping Bag"
                 >
-                  <ShoppingBag className="w-5 h-5" />
+                  <ShoppingBag className="w-5 h-5 text-white" />
                   {mounted && cartCount > 0 && (
-                    <span className="absolute top-0 right-0 w-4 h-4 rounded-full bg-[#7A6652] text-white text-[10px] font-bold flex items-center justify-center">
+                    <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#7A6652] text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#171717] shadow">
                       {cartCount}
                     </span>
                   )}
@@ -515,8 +515,8 @@ export default function Header({ initialSettings }: HeaderProps) {
                     className="object-contain"
                   />
                 </div>
-                <span className="font-serif font-bold text-base sm:text-lg text-white tracking-[0.10em] whitespace-nowrap select-none">
-                  Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+                <span className="font-serif font-bold text-lg sm:text-xl text-white whitespace-nowrap select-none">
+                  𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
                 </span>
               </Link>
               <button
@@ -766,7 +766,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 <User className="w-4 h-4 text-gold-400" />
                 <span>My Account / Orders</span>
               </Link>
-              <span className="text-[10px] text-[#6B6259] font-mono">Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ</span>
+              <span className="text-xs text-[#6B6259]">𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆</span>
             </div>
           </aside>
         </div>

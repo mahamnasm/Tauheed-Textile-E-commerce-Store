@@ -53,8 +53,8 @@ export default function Footer({ initialSettings }: FooterProps) {
                 className="object-contain"
               />
             </div>
-            <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.10em] sm:tracking-[0.14em] text-[#171717] whitespace-nowrap leading-none select-none">
-              Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+            <span className="font-serif text-2xl sm:text-3xl font-bold text-[#171717] whitespace-nowrap leading-none select-none">
+              𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
             </span>
           </Link>
           <p className="text-sm font-medium text-[#6B6259]">
