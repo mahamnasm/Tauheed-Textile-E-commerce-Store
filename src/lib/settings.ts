@@ -231,7 +231,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   banner4Title: "EVERYDAY ELEGANCE",
   banner4Subtitle: "Timeless ivory & antique gold ensembles for weddings and soirees",
   banner4BtnText: "SHOP COLLECTION",
-  banner4Link: "/shop?category=pret-ready-to-wear",
+  banner4Link: "/shop?category=silk",
 };
 
 export async function getSiteSettings(): Promise<SiteLayoutSettings> {

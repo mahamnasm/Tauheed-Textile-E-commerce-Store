@@ -67,7 +67,7 @@ export default function HeroBannerSlider({ settings }: HeroBannerSliderProps) {
       title: settings?.banner4Title || "EVERYDAY ELEGANCE",
       subtitle: settings?.banner4Subtitle || "Timeless ivory & antique gold ensembles for weddings and soirees",
       btnText: settings?.banner4BtnText || "SHOP COLLECTION",
-      link: settings?.banner4Link || "/shop?category=pret-ready-to-wear",
+      link: settings?.banner4Link || "/shop?category=silk",
       alignment: "left",
     },
   ];

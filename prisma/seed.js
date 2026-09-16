@@ -31,11 +31,15 @@ async function seed() {
 
   const categories = [
     { name: 'Lawn & Summer', slug: 'lawn-summer', description: 'Breathable luxury lawn with intricate threadwork and chiffon dupattas', image: '/assets/cat-lawn-summer.jpg', displayOrder: 1 },
-    { name: 'Chiffon & Formal', slug: 'chiffon-formal', description: 'Flowing sheer chiffon adorned with sequins, tilla and adda work', image: '/assets/cat-chiffon-formal.jpg', displayOrder: 2 },
-    { name: 'Pret / Ready to Wear', slug: 'pret-ready-to-wear', description: 'Impeccably tailored Pakistani kurtas, co-ords and statement suits', image: '/assets/cat-pret-readytowear.jpg', displayOrder: 3 },
-    { name: 'Wedding & Luxury Pret', slug: 'wedding-luxury-pret', description: 'Opulent festive ensembles crafted for weddings, nikah and celebratory soirees', image: '/assets/cat-wedding-luxury.jpg', displayOrder: 4 },
-    { name: 'Unstitched', slug: 'unstitched', description: 'Premium 3-piece and 2-piece unstitched fabrics ready for bespoke tailoring', image: '/assets/cat-unstitched.jpg', displayOrder: 5 },
-    { name: 'Sale', slug: 'sale', description: 'Exclusive seasonal markdowns on authentic designer creations', image: '/assets/banners/banner-sale.jpg', displayOrder: 6 }
+    { name: 'Lawn Formals', slug: 'lawn-formals', description: 'Festive jacquard and heavy embroidered unstitched formal lawn ensembles', image: '/assets/cat-lawn-summer.jpg', displayOrder: 2 },
+    { name: 'Chiffon & Formal', slug: 'chiffon-formal', description: 'Flowing sheer chiffon adorned with sequins, tilla and adda work', image: '/assets/cat-chiffon-formal.jpg', displayOrder: 3 },
+    { name: 'Silk', slug: 'silk', description: 'Pure raw silk, shamooz, and medium silk unstitched ensembles and saries', image: '/assets/cat-pret-readytowear.jpg', displayOrder: 4 },
+    { name: 'Net Formals', slug: 'net-formals', description: 'Intricately embroidered luxury net suits, maxies, and festive dupattas', image: '/assets/cat-wedding-luxury.jpg', displayOrder: 5 },
+    { name: 'Organza Formals', slug: 'organza-formals', description: 'Crisp woven organza ensembles with handcrafted zardozi and floral embellishments', image: '/assets/cat-chiffon-formal.jpg', displayOrder: 6 },
+    { name: 'Bridal Maxies', slug: 'bridal-maxies', description: 'Regal bridal maxies and heavily embellished kalidars for wedding festivities', image: '/assets/cat-wedding-luxury.jpg', displayOrder: 7 },
+    { name: 'Saries', slug: 'saries', description: 'Graceful 6-yard unstitched and semi-stitched saries in chiffon, silk, and organza', image: '/assets/cat-chiffon-formal.jpg', displayOrder: 8 },
+    { name: 'Winter Collection', slug: 'winter-collection', description: 'Warm velvet, marina, karandi, and wool pashmina shawl unstitched suits', image: '/assets/cat-lawn-summer.jpg', displayOrder: 9 },
+    { name: 'Sale', slug: 'sale', description: 'Exclusive seasonal markdowns on authentic designer creations', image: '/assets/banners/banner-sale.jpg', displayOrder: 10 }
   ];
 
   const catMap = {};

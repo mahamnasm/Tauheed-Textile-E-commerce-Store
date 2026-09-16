@@ -257,7 +257,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     isSale: false,
     isPreOrder: false,
     categoryId: "cat-3",
-    category: { id: "cat-3", name: "Pret / Ready to Wear", slug: "pret-ready-to-wear" },
+    category: { id: "cat-3", name: "Silk", slug: "silk" },
     images: [
       { id: "img-mc-1", url: "/assets/products/prod-meher-coord.jpg", displayOrder: 0, alt: "Meher Raw Silk Co-ord" }
     ],
@@ -288,7 +288,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     isSale: true,
     isPreOrder: false,
     categoryId: "cat-4",
-    category: { id: "cat-4", name: "Wedding & Luxury Pret", slug: "wedding-luxury-pret" },
+    category: { id: "cat-4", name: "Net Formals", slug: "net-formals" },
     images: [
       { id: "img-nb-1", url: "/assets/products/prod-noor-bridal.jpg", displayOrder: 0, alt: "Noor-e-Jahan Bridal Kalidar" }
     ],

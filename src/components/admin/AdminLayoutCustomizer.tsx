@@ -959,7 +959,7 @@ export default function AdminLayoutCustomizer({
                       type="text"
                       value={settings.banner4Link}
                       onChange={(e) => updateField("banner4Link", e.target.value)}
-                      placeholder="/shop?category=pret-ready-to-wear"
+                      placeholder="/shop?category=silk"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-sand-300 font-mono"
                     />
                   </div>
@@ -1047,7 +1047,7 @@ export default function AdminLayoutCustomizer({
                 type="text"
                 value={settings.heroSecondaryBtnLink}
                 onChange={(e) => updateField("heroSecondaryBtnLink", e.target.value)}
-                placeholder="/shop?category=wedding-luxury-pret"
+                placeholder="/shop?category=net-formals"
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
               />
             </div>

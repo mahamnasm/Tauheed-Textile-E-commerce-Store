@@ -129,13 +129,13 @@ function fallbackStylistEngine(query: string, catalog: any[]): StylistRecommenda
 
   if (q.includes("wedding") || q.includes("barat") || q.includes("bridal") || q.includes("dulhan") || q.includes("valima") || q.includes("walima") || q.includes("shaadi")) {
     matchedOccasion = "Royal Wedding & Barat Celebrations";
-    matchedCategory = "Wedding & Luxury Pret";
+    matchedCategory = "Net Formals";
     stylingTips = [
       "Pair with antique polki or kundan choker sets to accentuate the heavy zardozi neckline.",
       "Opt for traditional khussas or metallic block heels with deep gold embroidery.",
       "Drape the pure veil over the head or pleat the heavy pallu over one shoulder for regal elegance."
     ];
-    matchingProducts = catalog.filter(p => p.category?.slug === "wedding-luxury-pret" || p.workType.toLowerCase().includes("zardozi") || p.workType.toLowerCase().includes("zari"));
+    matchingProducts = catalog.filter(p => p.category?.slug === "net-formals" || p.category?.slug === "bridal-maxies" || p.workType.toLowerCase().includes("zardozi") || p.workType.toLowerCase().includes("zari"));
   } else if (q.includes("summer") || q.includes("lawn") || q.includes("casual") || q.includes("daily") || q.includes("daytime") || q.includes("cotton") || q.includes("brunch")) {
     matchedOccasion = "Summer Daytime Soirées & High Tea";
     matchedCategory = "Lawn & Summer";
@@ -144,7 +144,7 @@ function fallbackStylistEngine(query: string, catalog: any[]): StylistRecommenda
       "Pair with pure raw silk cropped cigarette pants or tailored culottes.",
       "Keep hair in soft natural waves with dewy, sun-kissed makeup."
     ];
-    matchingProducts = catalog.filter(p => p.category?.slug === "lawn-summer" || p.category?.slug === "unstitched" || p.fabric.toLowerCase().includes("lawn"));
+    matchingProducts = catalog.filter(p => p.category?.slug === "lawn-summer" || p.category?.slug === "lawn-formals" || p.fabric.toLowerCase().includes("lawn"));
   } else if (q.includes("formal") || q.includes("chiffon") || q.includes("evening") || q.includes("dinner") || q.includes("reception") || q.includes("party")) {
     matchedOccasion = "Regal Evening Reception & Gala";
     matchedCategory = "Chiffon & Formal";
@@ -153,16 +153,16 @@ function fallbackStylistEngine(query: string, catalog: any[]): StylistRecommenda
       "Let the sheer organza dupatta drape gracefully across both arms to showcase the adda work.",
       "A sleek chignon or half-up twisted hairstyle complements the detailed back neckline."
     ];
-    matchingProducts = catalog.filter(p => p.category?.slug === "chiffon-formal" || p.fabric.toLowerCase().includes("chiffon") || p.fabric.toLowerCase().includes("organza"));
-  } else if (q.includes("pret") || q.includes("ready to wear") || q.includes("co-ord") || q.includes("work") || q.includes("office") || q.includes("modern")) {
-    matchedOccasion = "Contemporary Pret & Editorial Chic";
-    matchedCategory = "Pret / Ready to Wear";
+    matchingProducts = catalog.filter(p => p.category?.slug === "chiffon-formal" || p.category?.slug === "organza-formals" || p.fabric.toLowerCase().includes("chiffon") || p.fabric.toLowerCase().includes("organza"));
+  } else if (q.includes("silk") || q.includes("pret") || q.includes("co-ord") || q.includes("work") || q.includes("office") || q.includes("modern")) {
+    matchedOccasion = "Pure Silk & Handcrafted Luxury";
+    matchedCategory = "Silk Collection";
     stylingTips = [
       "Style with pointed nude pumps and structured leather bag for sophisticated polish.",
       "The tailored placket pairs beautifully with understated diamond or gold ear cuffs.",
       "Add a silk pocket square or belt for an avant-garde editorial silhouette."
     ];
-    matchingProducts = catalog.filter(p => p.category?.slug === "pret-ready-to-wear" || p.fabric.toLowerCase().includes("silk") || p.fabric.toLowerCase().includes("linen"));
+    matchingProducts = catalog.filter(p => p.category?.slug === "silk" || p.fabric.toLowerCase().includes("silk") || p.fabric.toLowerCase().includes("linen"));
   } else if (q.includes("velvet") || q.includes("shawl") || q.includes("winter") || q.includes("cold") || q.includes("archive") || q.includes("sale")) {
     matchedOccasion = "Festive Winter Royalty & Archive Ensembles";
     matchedCategory = "Velvet Shawls & Archive";
