@@ -132,22 +132,22 @@ export default function Footer({ initialSettings }: FooterProps) {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/track-order" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Track Your Order (TCS • Leopards • Trax)
+                  Track Order
                 </Link>
               </li>
               <li>
                 <Link href="/policies/shipping" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Shipping Info (Rates & Weight)
+                  Shipping Info
                 </Link>
               </li>
               <li>
                 <Link href="/policies/returns" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  7-Day Exchange Policy (No Returns)
+                  Exchange Policy
                 </Link>
               </li>
               <li>
                 <Link href="/policies/faq" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
-                  Frequently Asked Questions
+                  FAQs
                 </Link>
               </li>
             </ul>
@@ -175,7 +175,7 @@ export default function Footer({ initialSettings }: FooterProps) {
               </li>
               <li>
                 <span className="text-xs text-[#6B6259] block pt-2">
-                  Need Custom Stitching? Order unstitched & request tailor fitting via WhatsApp!
+                  Custom stitching available via WhatsApp.
                 </span>
               </li>
             </ul>

@@ -663,7 +663,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                   >
                     <span className="flex items-center gap-2 font-medium">
                       <Truck className="w-3.5 h-3.5 text-gold-400" />
-                      Track Order (TCS • Leopards • Trax)
+                      Track Order
                     </span>
                   </Link>
 
@@ -689,7 +689,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                   >
                     <span className="flex items-center gap-2 font-medium">
                       <RotateCcw className="w-3.5 h-3.5 text-gold-400" />
-                      7-Day Exchange (No Returns)
+                      Exchange Policy
                     </span>
                   </Link>
 
@@ -698,7 +698,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                     className="text-[#E8E3DC] hover:text-white py-1 border-b border-[#2A2626]/50 block font-medium"
                   >
-                    Shipping Rates (5–7 Working Days)
+                    Shipping Info
                   </Link>
 
                   <div className="text-[11px] text-[#9B8C7E] pt-1">
