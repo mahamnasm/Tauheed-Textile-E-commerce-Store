@@ -115,7 +115,7 @@ export default function CheckoutPage() {
       setDiscountAmount(500);
       setCouponApplied(true);
     } else {
-      alert("Invalid coupon code. Try TAUHEED10 or EIDGIFT500");
+      alert("Invalid discount code. Please check and try again.");
     }
   };
 
@@ -524,7 +524,7 @@ export default function CheckoutPage() {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Promo Code (TAUHEED10)"
+                  placeholder="Enter your discount code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   className="flex-1 text-xs p-2.5 border border-[#E7E1D8] rounded-lg uppercase bg-[#F8F5F0]"
