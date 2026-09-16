@@ -18,8 +18,13 @@ export default async function HomePage() {
   let categories: any[] = [
     { id: "1", name: "Lawn & Summer", slug: "lawn-summer", image: "/assets/cat-lawn-summer.jpg" },
     { id: "2", name: "Chiffon & Formal", slug: "chiffon-formal", image: "/assets/cat-chiffon-formal.jpg" },
-    { id: "3", name: "Pret / Ready to Wear", slug: "pret-ready-to-wear", image: "/assets/cat-pret-readytowear.jpg" },
-    { id: "4", name: "Wedding & Luxury Pret", slug: "wedding-luxury-pret", image: "/assets/cat-wedding-luxury.jpg" },
+    { id: "3", name: "Silk", slug: "silk", image: "/assets/cat-pret-readytowear.jpg" },
+    { id: "4", name: "Net Formals", slug: "net-formals", image: "/assets/cat-wedding-luxury.jpg" },
+    { id: "5", name: "Organza Formals", slug: "organza-formals", image: "/assets/cat-chiffon-formal.jpg" },
+    { id: "6", name: "Bridal Maxies", slug: "bridal-maxies", image: "/assets/cat-wedding-luxury.jpg" },
+    { id: "7", name: "Saries", slug: "saries", image: "/assets/cat-chiffon-formal.jpg" },
+    { id: "8", name: "Lawn Formals", slug: "lawn-formals", image: "/assets/cat-lawn-summer.jpg" },
+    { id: "9", name: "Winter Collection", slug: "winter-collection", image: "/assets/cat-lawn-summer.jpg" },
   ];
   let featuredProducts: any[] = [];
   let newArrivals: any[] = [];
