@@ -10,6 +10,7 @@ export const revalidate = 0;
 interface ShopPageProps {
   searchParams: {
     category?: string;
+    subcategory?: string;
     search?: string;
     sort?: string;
     minPrice?: string;
@@ -19,7 +20,7 @@ interface ShopPageProps {
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const { category, search, sort, minPrice, maxPrice, stitched } = searchParams;
+  const { category, subcategory, search, sort, minPrice, maxPrice, stitched } = searchParams;
 
   const whereClause: any = {
     inStock: true,
@@ -29,13 +30,29 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     whereClause.category = { slug: category };
   }
 
-  if (search) {
+  if (subcategory) {
+    const subClean = subcategory.replace(/-/g, " ");
     whereClause.OR = [
-      { title: { contains: search } },
-      { description: { contains: search } },
-      { fabric: { contains: search } },
-      { sku: { contains: search } },
+      { subcategory: { slug: subcategory } },
+      { title: { contains: subClean, mode: "insensitive" } },
+      { description: { contains: subClean, mode: "insensitive" } },
+      { fabric: { contains: subClean, mode: "insensitive" } },
     ];
+  }
+
+  if (search) {
+    const searchConditions = [
+      { title: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+      { fabric: { contains: search, mode: "insensitive" } },
+      { sku: { contains: search, mode: "insensitive" } },
+    ];
+    if (whereClause.OR) {
+      whereClause.AND = [{ OR: whereClause.OR }, { OR: searchConditions }];
+      delete whereClause.OR;
+    } else {
+      whereClause.OR = searchConditions;
+    }
   }
 
   if (minPrice || maxPrice) {
@@ -60,11 +77,17 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           images: { orderBy: { displayOrder: "asc" } },
           variants: true,
           category: true,
+          subcategory: true,
         },
         orderBy,
       }),
       prisma.category.findMany({
         orderBy: { displayOrder: "asc" },
+        include: {
+          subcategories: {
+            orderBy: { displayOrder: "asc" },
+          },
+        },
       }),
     ]);
     products = dbProducts;
@@ -77,6 +100,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     let filtered = [...FALLBACK_PRODUCTS];
     if (category) {
       filtered = filtered.filter(p => p.category?.slug === category || (category === "sale" && p.isSale));
+    }
+    if (subcategory) {
+      const subClean = subcategory.toLowerCase().replace(/-/g, " ");
+      filtered = filtered.filter(p => 
+        p.subcategory?.slug === subcategory || 
+        p.title.toLowerCase().includes(subClean) || 
+        p.fabric.toLowerCase().includes(subClean)
+      );
     }
     if (search) {
       const s = search.toLowerCase();
@@ -95,6 +126,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         initialProducts={products}
         categories={categories}
         currentCategory={category}
+        currentSubcategory={subcategory}
         currentSearch={search}
         currentSort={sort}
       />

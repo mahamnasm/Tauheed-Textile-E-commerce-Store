@@ -139,10 +139,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Pure Cotton",
       children: [
         { name: "All Lawn & Summer", href: "/shop?category=lawn-summer" },
-        { name: "2 Piece Suits", href: "/shop?category=lawn-summer&subcategory=2-piece" },
-        { name: "3 Piece Suits", href: "/shop?category=lawn-summer&subcategory=3-piece" },
-        { name: "Printed Lawn", href: "/shop?category=lawn-summer&subcategory=printed" },
-        { name: "Embroidered Lawn", href: "/shop?category=lawn-summer&subcategory=embroidered" },
+        { name: "3 Piece Suits", href: "/shop?category=lawn-summer&subcategory=lawn-3-piece" },
+        { name: "2 Piece Suits", href: "/shop?category=lawn-summer&subcategory=lawn-2-piece" },
+        { name: "Embroidered Lawn", href: "/shop?category=lawn-summer&subcategory=lawn-embroidered" },
+        { name: "Printed Daily", href: "/shop?category=lawn-summer&subcategory=lawn-printed" },
       ],
     },
     {
@@ -151,10 +151,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Festive",
       children: [
         { name: "All Lawn Formals", href: "/shop?category=lawn-formals" },
-        { name: "2 Piece Formals", href: "/shop?category=lawn-formals&subcategory=2-piece" },
-        { name: "3 Piece Formals", href: "/shop?category=lawn-formals&subcategory=3-piece" },
-        { name: "Heavy Embroidered", href: "/shop?category=lawn-formals&subcategory=heavy-embroidered" },
-        { name: "Jacquard Formals", href: "/shop?category=lawn-formals&subcategory=jacquard" },
+        { name: "Heavy Embroidered", href: "/shop?category=lawn-formals&subcategory=lawn-formals-heavy-emb" },
+        { name: "Schiffli & Adda", href: "/shop?category=lawn-formals&subcategory=lawn-formals-schiffli" },
+        { name: "Jacquard Formals", href: "/shop?category=lawn-formals&subcategory=lawn-formals-jacquard" },
+        { name: "Organza Dupatta", href: "/shop?category=lawn-formals&subcategory=lawn-formals-organza" },
       ],
     },
     {
@@ -163,9 +163,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Handwork",
       children: [
         { name: "All Chiffon Formals", href: "/shop?category=chiffon-formal" },
-        { name: "Chiffon Suits", href: "/shop?category=chiffon-formal&subcategory=suit" },
-        { name: "Chiffon Maxies", href: "/shop?category=chiffon-formal&subcategory=maxi" },
-        { name: "Chiffon Saries", href: "/shop?category=chiffon-formal&subcategory=sari" },
+        { name: "Festive 3-Piece", href: "/shop?category=chiffon-formal&subcategory=chiffon-festive-3pc" },
+        { name: "Adda & Handwork", href: "/shop?category=chiffon-formal&subcategory=chiffon-adda-handwork" },
+        { name: "Chiffon Maxies", href: "/shop?category=chiffon-formal&subcategory=chiffon-maxies" },
+        { name: "Party Wear", href: "/shop?category=chiffon-formal&subcategory=chiffon-party-wear" },
       ],
     },
     {
@@ -174,9 +175,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Pure Silk",
       children: [
         { name: "All Silk Collection", href: "/shop?category=silk" },
-        { name: "Silk Suits", href: "/shop?category=silk&subcategory=suit" },
-        { name: "Silk Saries", href: "/shop?category=silk&subcategory=sari" },
-        { name: "Silk Tunics & Co-ords", href: "/shop?category=silk&subcategory=tunic" },
+        { name: "Raw Silk Suits", href: "/shop?category=silk&subcategory=silk-raw-silk" },
+        { name: "Printed Satin Silk", href: "/shop?category=silk&subcategory=silk-printed-satin" },
+        { name: "Embroidered Silk 3pc", href: "/shop?category=silk&subcategory=silk-embroidered-3pc" },
+        { name: "Tunics & Co-ords", href: "/shop?category=silk&subcategory=silk-tunics-coords" },
       ],
     },
     {
@@ -185,9 +187,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Couture",
       children: [
         { name: "All Net Formals", href: "/shop?category=net-formals" },
-        { name: "Embroidered Net Suits", href: "/shop?category=net-formals&subcategory=suit" },
-        { name: "Net Maxies & Gowns", href: "/shop?category=net-formals&subcategory=maxi" },
-        { name: "Net Dupattas", href: "/shop?category=net-formals&subcategory=dupatta" },
+        { name: "Embroidered Net", href: "/shop?category=net-formals&subcategory=net-embroidered-suits" },
+        { name: "Net Maxies & Gowns", href: "/shop?category=net-formals&subcategory=net-maxies-gowns" },
+        { name: "Zari & Mirror Net", href: "/shop?category=net-formals&subcategory=net-zari-mirror" },
+        { name: "Net Dupattas", href: "/shop?category=net-formals&subcategory=net-bridal-dupattas" },
       ],
     },
     {
@@ -196,9 +199,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Embellished",
       children: [
         { name: "All Organza Formals", href: "/shop?category=organza-formals" },
-        { name: "Organza Suits", href: "/shop?category=organza-formals&subcategory=suit" },
-        { name: "Embroidered Organza", href: "/shop?category=organza-formals&subcategory=embroidered" },
-        { name: "Festive Organza Edit", href: "/shop?category=organza-formals&subcategory=festive" },
+        { name: "Laser Cut Organza", href: "/shop?category=organza-formals&subcategory=organza-laser-cut" },
+        { name: "Embroidered Organza", href: "/shop?category=organza-formals&subcategory=organza-embroidered" },
+        { name: "Organza Suits 3pc", href: "/shop?category=organza-formals&subcategory=organza-suits-3pc" },
+        { name: "Festive Organza Edit", href: "/shop?category=organza-formals&subcategory=organza-festive-edit" },
       ],
     },
     {
@@ -207,9 +211,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Bridal",
       children: [
         { name: "All Bridal Maxies", href: "/shop?category=bridal-maxies" },
-        { name: "Royal Bridal Maxies", href: "/shop?category=bridal-maxies&subcategory=royal" },
-        { name: "Heavy Tilla & Dabka", href: "/shop?category=bridal-maxies&subcategory=tilla" },
-        { name: "Wedding Formals", href: "/shop?category=bridal-maxies&subcategory=wedding" },
+        { name: "Royal Barat Maxies", href: "/shop?category=bridal-maxies&subcategory=bridal-royal-barat" },
+        { name: "Pastel Walima Gowns", href: "/shop?category=bridal-maxies&subcategory=bridal-pastel-walima" },
+        { name: "Mehndi & Mayun Edit", href: "/shop?category=bridal-maxies&subcategory=bridal-mehndi-mayun" },
+        { name: "Heavy Tilla & Dabka", href: "/shop?category=bridal-maxies&subcategory=bridal-tilla-dabka" },
       ],
     },
     {
@@ -218,10 +223,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Drapes",
       children: [
         { name: "All Saries", href: "/shop?category=saries" },
-        { name: "Chiffon Saries", href: "/shop?category=saries&subcategory=chiffon" },
-        { name: "Silk Saries", href: "/shop?category=saries&subcategory=silk" },
-        { name: "Organza Saries", href: "/shop?category=saries&subcategory=organza" },
-        { name: "Banarsi Saries", href: "/shop?category=saries&subcategory=banarsi" },
+        { name: "Chiffon Saries", href: "/shop?category=saries&subcategory=saries-chiffon" },
+        { name: "Silk Saries", href: "/shop?category=saries&subcategory=saries-silk" },
+        { name: "Organza Saries", href: "/shop?category=saries&subcategory=saries-organza" },
+        { name: "Banarsi Saries", href: "/shop?category=saries&subcategory=saries-banarsi" },
       ],
     },
     {
@@ -230,9 +235,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Warm",
       children: [
         { name: "All Winter Collection", href: "/shop?category=winter-collection" },
-        { name: "Velvet Ensembles", href: "/shop?category=winter-collection&subcategory=velvet" },
-        { name: "Marina & Karandi", href: "/shop?category=winter-collection&subcategory=marina" },
-        { name: "Pashmina Shawl Suits", href: "/shop?category=winter-collection&subcategory=shawl-suits" },
+        { name: "Velvet Ensembles", href: "/shop?category=winter-collection&subcategory=winter-velvet-ensembles" },
+        { name: "Marina & Karandi", href: "/shop?category=winter-collection&subcategory=winter-marina-karandi" },
+        { name: "Pashmina Shawl Suits", href: "/shop?category=winter-collection&subcategory=winter-pashmina-shawls" },
+        { name: "Linen Printed", href: "/shop?category=winter-collection&subcategory=winter-linen-printed" },
       ],
     },
     {
@@ -242,9 +248,10 @@ export default function Header({ initialSettings }: HeaderProps) {
       badge: "Up to 50% Off",
       children: [
         { name: "All Sale Items", href: "/shop?category=sale" },
-        { name: "Flat 20% Off", href: "/shop?category=sale&subcategory=flat-20" },
-        { name: "Flat 30% Off", href: "/shop?category=sale&subcategory=flat-30" },
-        { name: "Flat 50% Off", href: "/shop?category=sale&subcategory=flat-50" },
+        { name: "Flat 20% Off", href: "/shop?category=sale&subcategory=sale-flat-20" },
+        { name: "Flat 30% Off", href: "/shop?category=sale&subcategory=sale-flat-30" },
+        { name: "Flat 50% Off", href: "/shop?category=sale&subcategory=sale-flat-50" },
+        { name: "Under Rs. 2,999", href: "/shop?category=sale&subcategory=sale-under-2999" },
       ],
     },
   ];

@@ -51,6 +51,7 @@ model Subcategory {
   id           String     @id @default(uuid())
   name         String
   slug         String     @unique
+  image        String?
   categoryId   String
   category     Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products     Product[]
