@@ -149,147 +149,111 @@ export default function AdminDashboardClientView({
         </div>
       </div>
 
-      {/* 3. Core Action Buttons (Simple, Large, Easy to Click) */}
-      <div className="space-y-3">
+      {/* 3. Quick Shortcuts (Short, Simple & Clean) */}
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-serif font-bold text-brand-950">
-            Main Operations (Easy 1-Click Access)
+          <h2 className="text-xs font-bold uppercase tracking-wider text-brand-700">
+            Quick Shortcuts
           </h2>
-          <span className="text-xs text-brand-500">
-            All other tools are available in the left sidebar
+          <span className="text-[11px] text-brand-400">
+            All tools also in left menu
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {/* Action 1: Runway Reels & Videos (Manual Upload) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* 1: Runway Reels */}
           <Link
             href="/admin/reels"
-            className="group p-5 rounded-3xl bg-gradient-to-br from-brand-950 to-brand-900 text-sand-50 border border-gold-500/30 shadow-md hover:shadow-xl hover:border-gold-400 transition-all flex flex-col justify-between"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-400 group-hover:scale-110 transition-transform">
-                <Video className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-sand-50 group-hover:text-gold-300 transition-colors">
-                🎥 Runway Reels & Videos
-              </h3>
-              <p className="text-xs text-sand-400 leading-relaxed">
-                Upload authentic MP4 runway reels from your phone or PC directly to any dress.
-              </p>
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-gold-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Video className="w-4 h-4" />
             </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-gold-400 group-hover:translate-x-1 transition-transform">
-              <span>Upload & Manage Reels</span>
-              <ChevronRight className="w-4 h-4" />
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Runway Reels
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Videos</p>
             </div>
           </Link>
 
-          {/* Action 2: Make Cover Photos */}
-          <Link
-            href="/admin/nano-banana"
-            className="group p-5 rounded-3xl bg-gradient-to-br from-brand-950 to-brand-900 text-sand-50 border border-gold-500/30 shadow-md hover:shadow-xl hover:border-gold-400 transition-all flex flex-col justify-between"
-          >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 group-hover:scale-110 transition-transform">
-                <Camera className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-sand-50 group-hover:text-gold-300 transition-colors">
-                📸 Make Cover Photos
-              </h3>
-              <p className="text-xs text-sand-400 leading-relaxed">
-                Make beautiful front catalog photos that get customers to click and buy.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-gold-400 group-hover:translate-x-1 transition-transform">
-              <span>Open Photo Studio</span>
-              <ChevronRight className="w-4 h-4" />
-            </div>
-          </Link>
-
-          {/* Action 3: Dresses & Catalog */}
+          {/* 2: Dresses & Catalog */}
           <Link
             href="/admin/products"
-            className="group p-5 rounded-3xl bg-white text-brand-950 border border-sand-200 shadow-sm hover:shadow-md hover:border-sand-400 transition-all flex flex-col justify-between"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-sand-100 border border-sand-300 flex items-center justify-center text-brand-950 group-hover:scale-110 transition-transform">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-brand-950 group-hover:text-gold-700 transition-colors">
-                👗 Dresses & Catalog
-              </h3>
-              <p className="text-xs text-brand-600 leading-relaxed">
-                Add new suits, edit prices, update fabrics, and upload dress pictures.
-              </p>
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-gold-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <ShoppingBag className="w-4 h-4" />
             </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-brand-900 group-hover:translate-x-1 transition-transform">
-              <span>Manage Dresses</span>
-              <ChevronRight className="w-4 h-4" />
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Dresses
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Suits & Catalog</p>
             </div>
           </Link>
 
-          {/* Action 4: Customer Orders */}
+          {/* 3: Customer Orders */}
           <Link
             href="/admin/orders"
-            className="group p-5 rounded-3xl bg-white text-brand-950 border border-sand-200 shadow-sm hover:shadow-md hover:border-sand-400 transition-all flex flex-col justify-between"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-sand-100 border border-sand-300 flex items-center justify-center text-brand-950 group-hover:scale-110 transition-transform">
-                <Receipt className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-brand-950 group-hover:text-gold-700 transition-colors">
-                📦 Customer Orders
-              </h3>
-              <p className="text-xs text-brand-600 leading-relaxed">
-                View orders, confirm Cash on Delivery, print invoices, and dispatch parcels.
-              </p>
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-gold-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Receipt className="w-4 h-4" />
             </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-brand-900 group-hover:translate-x-1 transition-transform">
-              <span>View All Orders</span>
-              <ChevronRight className="w-4 h-4" />
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Orders
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Dispatch & COD</p>
             </div>
           </Link>
 
-          {/* Action 5: Security & Lockdown */}
+          {/* 4: Cover Photos */}
           <Link
-            href="/admin/security"
-            className="group p-5 rounded-3xl bg-white text-brand-950 border border-sand-200 shadow-sm hover:shadow-md hover:border-sand-400 transition-all flex flex-col justify-between"
+            href="/admin/nano-banana"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-brand-950 group-hover:text-emerald-800 transition-colors">
-                🛡️ Security & Lockdown
-              </h3>
-              <p className="text-xs text-brand-600 leading-relaxed">
-                Master 2FA PIN, anti-hacking lockouts, and emergency lockdown switch.
-              </p>
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Camera className="w-4 h-4" />
             </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-emerald-800 group-hover:translate-x-1 transition-transform">
-              <span>Security Center</span>
-              <ChevronRight className="w-4 h-4" />
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Cover Studio
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Dress Photos</p>
             </div>
           </Link>
 
-          {/* Action 6: Website Health & Optimizer */}
+          {/* 5: Website Customizer */}
           <Link
-            href="/admin/health"
-            className="group p-5 rounded-3xl bg-gradient-to-br from-emerald-950 to-emerald-900 text-emerald-50 border border-emerald-500/30 shadow-md hover:shadow-xl hover:border-emerald-400 transition-all flex flex-col justify-between"
+            href="/admin/layout"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                <Activity className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif font-bold text-base text-emerald-50 group-hover:text-emerald-300 transition-colors">
-                ⚡ Health & Optimizer
-              </h3>
-              <p className="text-xs text-emerald-200/80 leading-relaxed">
-                Live speed metrics, database indexes, memory purge, and 1-click speed booster.
-              </p>
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-gold-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Sliders className="w-4 h-4" />
             </div>
-            <div className="pt-4 flex items-center gap-1 text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition-transform">
-              <span>Check & Boost Speed</span>
-              <ChevronRight className="w-4 h-4" />
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Website
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Banners & Hero</p>
+            </div>
+          </Link>
+
+          {/* 6: Bank Slips & Profits */}
+          <Link
+            href="/admin/payments"
+            className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-brand-950 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
+                Bank Slips
+              </p>
+              <p className="text-[10px] text-brand-500 truncate">Verify Receipts</p>
             </div>
           </Link>
         </div>
