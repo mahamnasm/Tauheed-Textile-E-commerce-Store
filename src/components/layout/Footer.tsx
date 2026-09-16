@@ -23,21 +23,36 @@ export default function Footer({ initialSettings }: FooterProps) {
 
   return (
     <footer className="w-full bg-[#F0EBE3] border-t border-[#E7E1D8]">
-      {/* Trust Bar */}
-      <div className="bg-[#E7E1D8] py-3">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center sm:justify-between items-center text-xs text-[#6B6259] gap-4">
-          <div className="flex items-center gap-2">
-            <span>🚚</span> Free Delivery Over Rs. 10,000
-          </div>
-          <div className="flex items-center gap-2">
-            <span>🏷️</span> Flat 5% Off: Bank &amp; EasyPaisa
-          </div>
-          <div className="flex items-center gap-2">
-            <span>🔄</span> 7-Day Exchange Only
-          </div>
-          <div className="flex items-center gap-2">
-            <span>🇵🇰</span> Nationwide 5–7 Working Days
-          </div>
+      {/* Continuous Automatic Sliding Trust Bar */}
+      <div className="w-full bg-[#E7E1D8] border-b border-[#DDD6CB] overflow-hidden py-3 select-none relative">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
+          {[0, 1, 2, 3].map((loopIdx) => (
+            <div key={loopIdx} className="flex items-center shrink-0">
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A4036] px-6 whitespace-nowrap">
+                <span className="text-sm shrink-0">🚚</span>
+                <span>Free Delivery Over Rs. 10,000</span>
+              </div>
+              <span className="text-[#C4B8A8] text-xs shrink-0 select-none">•</span>
+
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A4036] px-6 whitespace-nowrap">
+                <span className="text-sm shrink-0">🏷️</span>
+                <span>Flat 5% Off: Bank &amp; EasyPaisa</span>
+              </div>
+              <span className="text-[#C4B8A8] text-xs shrink-0 select-none">•</span>
+
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A4036] px-6 whitespace-nowrap">
+                <span className="text-sm shrink-0">🔄</span>
+                <span>7-Day Exchange Only</span>
+              </div>
+              <span className="text-[#C4B8A8] text-xs shrink-0 select-none">•</span>
+
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A4036] px-6 whitespace-nowrap">
+                <span className="text-sm shrink-0">🇵🇰</span>
+                <span>Nationwide 5–7 Working Days</span>
+              </div>
+              <span className="text-[#C4B8A8] text-xs shrink-0 select-none">•</span>
+            </div>
+          ))}
         </div>
       </div>
 
