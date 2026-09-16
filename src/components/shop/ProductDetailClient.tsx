@@ -299,7 +299,7 @@ export default function ProductDetailClient({
           )}
 
           {/* Thumbnails */}
-          {images.length > 1 && (
+          {(images.length > 1 || product.videoUrl) && (
             <div className="space-y-1">
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {images.map((img: any, idx: number) => (
@@ -318,6 +318,27 @@ export default function ProductDetailClient({
                     <Image src={img.url} alt={`View ${idx + 1}`} fill className="object-cover" />
                   </button>
                 ))}
+
+                {/* Video Reel Thumbnail in Slider */}
+                {product.videoUrl && (
+                  <button
+                    onClick={() => setMediaMode("VIDEO")}
+                    className={`relative w-16 sm:w-20 h-20 sm:h-24 rounded-lg overflow-hidden border-2 transition-all shrink-0 bg-black flex flex-col items-center justify-center text-white ${
+                      mediaMode === "VIDEO"
+                        ? "border-[#7A6652] ring-1 ring-[#7A6652]/30 scale-105"
+                        : "border-transparent opacity-75 hover:opacity-100"
+                    }`}
+                    title="Watch Runway Reel"
+                  >
+                    <Image src={currentImage.url} alt="Video Thumbnail" fill className="object-cover opacity-50" />
+                    <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-1 z-10">
+                      <div className="w-7 h-7 rounded-full bg-white/90 text-[#171717] flex items-center justify-center shadow">
+                        <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                      </div>
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-white">Reel</span>
+                    </div>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -352,17 +373,7 @@ export default function ProductDetailClient({
             </div>
           </div>
 
-          {/* Runway Video Reel Callout Button (if video exists) */}
-          {product.videoUrl && (
-            <button
-              type="button"
-              onClick={() => setMediaMode(mediaMode === "VIDEO" ? "PHOTO" : "VIDEO")}
-              className="w-full p-3 rounded-xl bg-[#171717] text-white border border-[#2A2626] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md font-serif hover:bg-black"
-            >
-              <Play className="w-4 h-4 fill-current text-[#C4A882]" />
-              {mediaMode === "VIDEO" ? "Switch to Photo Gallery" : "Watch Runway Reel in Motion"}
-            </button>
-          )}
+
 
           {/* Pre-Order Banner */}
           {product.isPreOrder && (
