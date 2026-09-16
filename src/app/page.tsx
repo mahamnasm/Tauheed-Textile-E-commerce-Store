@@ -151,13 +151,13 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-col items-center">
               <RotateCcw className="w-8 h-8 text-[#7A6652] mb-3" />
-              <h4 className="font-semibold text-sm text-[#171717]">7-Day Exchange Only</h4>
-              <p className="text-xs text-[#6B6259] mt-1">Hassle-free exchange (No returns)</p>
+              <h4 className="font-semibold text-sm text-[#171717]">7-Day Exchange</h4>
+              <p className="text-xs text-[#6B6259] mt-1">Hassle-Free Exchange</p>
             </div>
             <div className="flex flex-col items-center">
               <ShieldCheck className="w-8 h-8 text-[#7A6652] mb-3" />
-              <h4 className="font-semibold text-sm text-[#171717]">Pure Unstitched Luxury</h4>
-              <p className="text-xs text-[#6B6259] mt-1">Custom stitching via WhatsApp</p>
+              <h4 className="font-semibold text-sm text-[#171717]">Authentic Fabric</h4>
+              <p className="text-xs text-[#6B6259] mt-1">100% Premium Quality</p>
             </div>
           </div>
         </div>

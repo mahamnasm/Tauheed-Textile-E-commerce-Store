@@ -113,21 +113,19 @@ export default function Header({ initialSettings }: HeaderProps) {
     },
     {
       icon: <span className="text-xs shrink-0">🏷️</span>,
-      text: "Flat 5% Off on Advance Payment Orders",
+      text: "Flat 5% Off: Bank & EasyPaisa",
     },
     {
       icon: <RotateCcw className="w-3.5 h-3.5 shrink-0 text-white" />,
-      text: "7-Day Easy Exchange Policy",
+      text: "7-Day Easy Exchange",
     },
     {
       icon: <Phone className="w-3.5 h-3.5 shrink-0 text-white" />,
-      text: `WhatsApp Us: ${initialSettings?.contactWhatsApp || "0340 0262732"}`,
+      text: `WhatsApp Orders: ${initialSettings?.contactWhatsApp || "0340 0262732"}`,
     },
     {
       icon: <span className="text-xs shrink-0">✨</span>,
-      text: initialSettings?.announcementSubtext && !initialSettings.announcementSubtext.includes("4,999")
-        ? initialSettings.announcementSubtext
-        : "New Festive Collection 2026 — Live Now",
+      text: "New Festive Collection 2026 — Live Now",
     },
   ];
 
