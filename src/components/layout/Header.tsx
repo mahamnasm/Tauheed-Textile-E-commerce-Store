@@ -79,24 +79,28 @@ export default function Header({ initialSettings }: HeaderProps) {
   // ── Marquee items (3 minimum) ─────────────────────────────────────────
   const marqueeItems = [
     {
-      icon: <Truck className="w-3.5 h-3.5 shrink-0" />,
-      text: initialSettings?.announcementText || "Free Delivery on Orders Above Rs. 4,999",
+      icon: <Truck className="w-3.5 h-3.5 shrink-0 text-white" />,
+      text: initialSettings?.announcementText && !initialSettings.announcementText.includes("4,999")
+        ? initialSettings.announcementText
+        : "Free Delivery Above Rs. 9,999",
     },
     {
-      icon: <span className="text-sm shrink-0">💳</span>,
-      text: "Cash On Delivery Available Nationwide",
+      icon: <span className="text-xs shrink-0">🏷️</span>,
+      text: "Flat 5% Off on Advance Payment Orders",
     },
     {
-      icon: <RotateCcw className="w-3.5 h-3.5 shrink-0" />,
+      icon: <RotateCcw className="w-3.5 h-3.5 shrink-0 text-white" />,
       text: "7-Day Easy Exchange Policy",
     },
     {
-      icon: <Phone className="w-3.5 h-3.5 shrink-0" />,
+      icon: <Phone className="w-3.5 h-3.5 shrink-0 text-white" />,
       text: `WhatsApp Us: ${initialSettings?.contactWhatsApp || "0340 0262732"}`,
     },
     {
-      icon: <span className="text-sm shrink-0">✨</span>,
-      text: initialSettings?.announcementSubtext || "New Festive Collection 2026 — Live Now",
+      icon: <span className="text-xs shrink-0">✨</span>,
+      text: initialSettings?.announcementSubtext && !initialSettings.announcementSubtext.includes("4,999")
+        ? initialSettings.announcementSubtext
+        : "New Festive Collection 2026 — Live Now",
     },
   ];
 
@@ -137,7 +141,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 key={i}
                 className="inline-flex items-center gap-1.5 mx-8 shrink-0"
               >
-                <span className="text-[#9B8C7E] flex items-center">{item.icon}</span>
+                <span className="text-white flex items-center">{item.icon}</span>
                 <span>{item.text}</span>
                 <span className="ml-8 text-[#3A3530]">•</span>
               </div>
@@ -170,23 +174,25 @@ export default function Header({ initialSettings }: HeaderProps) {
                   e.preventDefault();
                   window.location.href = "/admin";
                 }}
-                className="flex items-center gap-3 group py-1 select-none"
+                className="flex items-center gap-3.5 group py-1 select-none"
                 title="Tauheed Textile (Double-click for Admin)"
               >
-                <div className="relative h-10 w-8 sm:h-12 sm:w-9 transition-transform duration-300 group-hover:scale-105 shrink-0">
+                {/* Big Calligraphy Emblem */}
+                <div className="relative h-12 w-10 sm:h-14 sm:w-11 lg:h-16 lg:w-13 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
                   <Image
                     src="/logo-calligraphy.png"
-                    alt="Tauheed Calligraphy Logo"
+                    alt="Tauheed Textile Calligraphy Logo"
                     fill
                     className="object-contain"
                     priority
                   />
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-serif text-xl sm:text-2xl font-bold tracking-[0.18em] text-white leading-none">
+                {/* Unified Brand Typography: Same Text Color & Alignment */}
+                <div className="flex flex-col justify-center text-left">
+                  <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.16em] text-white leading-none">
                     TAUHEED
                   </span>
-                  <span className="text-[9px] font-sans font-semibold tracking-[0.35em] text-[#9B8C7E] mt-0.5 uppercase leading-none">
+                  <span className="font-serif text-[11px] sm:text-xs tracking-[0.38em] text-white font-semibold mt-1 uppercase leading-none">
                     TEXTILE
                   </span>
                 </div>
@@ -329,7 +335,24 @@ export default function Header({ initialSettings }: HeaderProps) {
           />
           <div className="fixed inset-y-0 left-0 max-w-[280px] w-full bg-[#141414] shadow-2xl flex flex-col z-10">
             <div className="flex items-center justify-between p-5 border-b border-[#2A2626]">
-              <span className="font-serif font-bold text-lg text-white tracking-wider">TAUHEED</span>
+              <div className="flex items-center gap-3 select-none">
+                <div className="relative h-10 w-8 shrink-0">
+                  <Image
+                    src="/logo-calligraphy.png"
+                    alt="Tauheed Textile Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex flex-col justify-center text-left">
+                  <span className="font-serif font-bold text-lg text-white tracking-[0.16em] leading-none">
+                    TAUHEED
+                  </span>
+                  <span className="font-serif text-[9px] text-white font-medium tracking-[0.35em] uppercase leading-none mt-1">
+                    TEXTILE
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 -mr-2 text-[#C8C2BB] hover:text-white"

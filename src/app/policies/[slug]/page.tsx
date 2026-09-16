@@ -25,7 +25,7 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
 
           <h3 className="font-serif font-bold text-sm text-brand-950">2. Shipping Charges & Free Delivery</h3>
           <p>
-            We offer <strong>FREE Nationwide Delivery</strong> on all orders totaling <strong>Rs. 4,999 or more</strong>. For orders below this threshold, a standard flat courier charge of <strong>Rs. 250</strong> applies anywhere in Pakistan.
+            We offer <strong>FREE Nationwide Delivery</strong> on all orders totaling <strong>Rs. 9,999 or more</strong>. For orders below this threshold, a standard flat courier charge of <strong>Rs. 250</strong> applies anywhere in Pakistan. Customers who pay via advance payment methods (Bank Transfer, JazzCash, EasyPaisa) automatically receive a <strong>Flat 5% Discount</strong> on their order.
           </p>
 
           <h3 className="font-serif font-bold text-sm text-brand-950">3. Cash On Delivery (COD) Verification</h3>

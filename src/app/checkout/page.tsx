@@ -46,9 +46,12 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const FREE_SHIPPING_THRESHOLD = 4999;
+  const FREE_SHIPPING_THRESHOLD = 9999;
+  const isAdvancePayment = paymentMethod === "BANK_TRANSFER" || paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA";
+  const advanceDiscount = isAdvancePayment ? Math.round(cartSubtotal * 0.05) : 0;
   const shippingFee = cartSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 250;
-  const grandTotal = Math.max(0, cartSubtotal + shippingFee - discountAmount);
+  const totalDiscount = discountAmount + advanceDiscount;
+  const grandTotal = Math.max(0, cartSubtotal + shippingFee - totalDiscount);
 
   // Handle City Change and auto-set Province
   const handleCityChange = (cityName: string) => {
@@ -104,7 +107,7 @@ export default function CheckoutPage() {
         paymentMethod,
         subtotal: cartSubtotal,
         shippingFee,
-        discount: discountAmount,
+        discount: totalDiscount,
         total: grandTotal,
         notes,
         items: cart,
@@ -368,12 +371,12 @@ export default function CheckoutPage() {
                       <Building2 className="w-4 h-4 text-gold-700" />
                       Direct Bank Transfer (Meezan / HBL / Faysal)
                     </span>
-                    <span className="text-[11px] font-semibold text-gold-800 bg-gold-50 px-2 py-0.5 rounded">
-                      Instant Verification
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                      FLAT 5% OFF
                     </span>
                   </div>
                   <p className="text-[11px] text-brand-600 mt-1">
-                    Transfer directly to our official corporate account and provide transaction ID.
+                    Transfer directly to our corporate account and get <strong className="text-emerald-700">Flat 5% Discount</strong> instantly applied!
                   </p>
 
                   {paymentMethod === "BANK_TRANSFER" && (
@@ -424,12 +427,12 @@ export default function CheckoutPage() {
                       <Smartphone className="w-4 h-4 text-maroon-700" />
                       JazzCash / EasyPaisa Wallet
                     </span>
-                    <span className="text-[11px] font-semibold text-brand-700 bg-sand-100 px-2 py-0.5 rounded">
-                      0340 0262732
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                      FLAT 5% OFF
                     </span>
                   </div>
                   <p className="text-[11px] text-brand-600 mt-1">
-                    Send to our registered business mobile till and reply to our SMS confirmation.
+                    Send to our registered mobile till <span className="font-bold text-brand-900">0340 0262732</span> and save <strong className="text-emerald-700">Flat 5%</strong>!
                   </p>
                 </div>
               </label>
@@ -503,8 +506,16 @@ export default function CheckoutPage() {
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-emerald-700 font-semibold">
-                  <span>Discount</span>
+                  <span>Promo Discount</span>
                   <span>-Rs. {discountAmount.toLocaleString()}</span>
+                </div>
+              )}
+              {advanceDiscount > 0 && (
+                <div className="flex justify-between text-emerald-700 font-semibold bg-emerald-50 px-2 py-1 rounded">
+                  <span className="flex items-center gap-1">
+                    <span>🏷️</span> Flat 5% Advance Payment Discount
+                  </span>
+                  <span>-Rs. {advanceDiscount.toLocaleString()}</span>
                 </div>
               )}
               <div className="pt-3 border-t border-sand-200 flex justify-between items-baseline font-serif font-bold text-lg text-brand-950">

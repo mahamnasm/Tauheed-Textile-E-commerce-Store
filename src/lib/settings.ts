@@ -119,16 +119,16 @@ export interface SiteLayoutSettings {
 
 export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 1. Announcement Ribbon
-  announcementText: "Festive Luxury Collection 2026 Live Now",
-  announcementSubtext: "Free nationwide courier delivery on orders above Rs. 4,999",
+  announcementText: "Free Delivery Above Rs. 9,999",
+  announcementSubtext: "Flat 5% Off on Advance Payment Orders",
   announcementEnabled: true,
   announcementLink: "/shop?category=sale",
   announcementTheme: "midnight",
-  freeShippingThreshold: 4999,
+  freeShippingThreshold: 9999,
 
   // 2. Festive Marquee Ticker
   marqueeEnabled: true,
-  marqueeText: "⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY • EXPRESS 2-4 DAY COURIER DISPATCH",
+  marqueeText: "⚡ FREE DELIVERY ABOVE RS. 9,999 • FLAT 5% OFF ON ADVANCE PAYMENT ORDERS • 7-DAY EASY EXCHANGE • EXPRESS 2-4 DAY DISPATCH",
   marqueeLink: "/shop",
 
   // 3. Hero Showcase

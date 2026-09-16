@@ -529,7 +529,7 @@ export default function ProductDetailClient({
             </div>
             <p className="text-sm text-[#6B6259]">
               Estimated delivery to <span className="font-bold">{selectedCity}</span>: {getCityDeliveryEstimate(selectedCity)}. 
-              Cash on delivery available. Free delivery on orders over Rs. 4,999.
+              Free delivery on orders over Rs. 9,999. Flat 5% off on advance payment orders.
             </p>
           </div>
 

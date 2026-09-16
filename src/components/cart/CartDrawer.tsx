@@ -19,7 +19,7 @@ export default function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const FREE_SHIPPING_THRESHOLD = 4999;
+  const FREE_SHIPPING_THRESHOLD = 9999;
   const progress = Math.min(100, Math.round((cartSubtotal / FREE_SHIPPING_THRESHOLD) * 100));
   const diffToFree = FREE_SHIPPING_THRESHOLD - cartSubtotal;
 
@@ -63,11 +63,15 @@ export default function CartDrawer() {
             </span>
             <span className="text-[11px] font-semibold text-[#171717]">{progress}%</span>
           </div>
-          <div className="w-full bg-[#E7E1D8] h-2 rounded-full overflow-hidden">
+          <div className="w-full bg-[#E7E1D8] h-1.5 rounded-full overflow-hidden">
             <div 
-              className="bg-gold-500 h-full rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className="bg-emerald-600 h-full transition-all duration-300 rounded-full" 
+              style={{ width: `${progress}%` }} 
             />
+          </div>
+          <div className="text-[11px] text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1.5 mt-2 font-medium">
+            <span>🏷️</span>
+            <span>Advance Payment: Get <strong>Flat 5% OFF</strong> via Bank Transfer or Wallet!</span>
           </div>
         </div>
 

@@ -332,7 +332,7 @@ export default function AdminLayoutCustomizer({
                 type="text"
                 value={settings.announcementSubtext}
                 onChange={(e) => updateField("announcementSubtext", e.target.value)}
-                placeholder="e.g. Free nationwide courier delivery on orders above Rs. 4,999"
+                placeholder="e.g. Flat 5% Off on Advance Payment Orders"
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-medium"
               />
               <p className="text-[11px] text-brand-500">Shown next to the main announcement.</p>

@@ -10,7 +10,7 @@ export default function CartPage() {
   const { cart, updateQuantity, removeFromCart, cartSubtotal, clearCart } = useCart();
   const [specialInstructions, setSpecialInstructions] = useState("");
 
-  const FREE_SHIPPING_THRESHOLD = 4999;
+  const FREE_SHIPPING_THRESHOLD = 9999;
   const progress = Math.min(100, Math.round((cartSubtotal / FREE_SHIPPING_THRESHOLD) * 100));
   const diffToFree = FREE_SHIPPING_THRESHOLD - cartSubtotal;
 
@@ -22,7 +22,7 @@ export default function CartPage() {
         </div>
         <h1 className="font-serif text-3xl font-bold text-brand-950">Your Shopping Bag is Empty</h1>
         <p className="text-sm text-brand-600 max-w-md mx-auto">
-          Explore our signature luxury lawn, festive chiffons, and pr?t collections to find your perfect Pakistani ensemble.
+          Explore our signature luxury lawn, festive chiffons, and prêt collections to find your perfect Pakistani ensemble.
         </p>
         <div>
           <Link
@@ -67,6 +67,10 @@ export default function CartPage() {
         </div>
         <div className="w-full bg-sand-300 h-2.5 rounded-full overflow-hidden">
           <div className="bg-gold-500 h-full rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+        </div>
+        <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+          <span>🏷️</span>
+          <span><strong>Advance Payment Perk:</strong> Get <strong>Flat 5% OFF</strong> on all orders paid via Bank Transfer, JazzCash, or EasyPaisa at checkout!</span>
         </div>
       </div>
 

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SiteLayoutSettings } from "@/lib/settings";
 
@@ -26,10 +27,10 @@ export default function Footer({ initialSettings }: FooterProps) {
       <div className="bg-[#E7E1D8] py-3">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center sm:justify-between items-center text-xs text-[#6B6259] gap-4">
           <div className="flex items-center gap-2">
-            <span>🚚</span> Cash on Delivery
+            <span>🚚</span> Free Delivery Above Rs. 9,999
           </div>
           <div className="flex items-center gap-2">
-            <span>🇵🇰</span> Nationwide Delivery
+            <span>🏷️</span> Flat 5% Off on Advance Payments
           </div>
           <div className="flex items-center gap-2">
             <span>🔄</span> Easy Exchange
@@ -41,11 +42,26 @@ export default function Footer({ initialSettings }: FooterProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Logo and Tagline */}
+        {/* Unified Logo and Tagline */}
         <div className="mb-10 text-center sm:text-left">
-          <h2 className="text-2xl md:text-3xl font-serif tracking-wide text-[#171717] mb-2" style={{ fontFamily: '"Playfair Display", serif' }}>
-            TAUHEED TEXTILE
-          </h2>
+          <div className="flex items-center justify-center sm:justify-start gap-3.5 mb-2 select-none">
+            <div className="relative h-13 w-10 sm:h-14 sm:w-11 shrink-0">
+              <Image
+                src="/logo-calligraphy.png"
+                alt="Tauheed Textile Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col justify-center text-left">
+              <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.16em] text-[#171717] leading-none">
+                TAUHEED
+              </span>
+              <span className="font-serif text-[11px] sm:text-xs tracking-[0.38em] text-[#171717] font-semibold mt-1 uppercase leading-none">
+                TEXTILE
+              </span>
+            </div>
+          </div>
           <p className="text-sm text-[#6B6259]">
             Crafting elegance and tradition for the modern era.
           </p>
