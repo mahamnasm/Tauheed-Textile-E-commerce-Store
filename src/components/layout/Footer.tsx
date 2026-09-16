@@ -44,8 +44,8 @@ export default function Footer({ initialSettings }: FooterProps) {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Unified Logo and Tagline */}
         <div className="mb-10 text-center sm:text-left">
-          <Link href="/" className="inline-flex items-center justify-center sm:justify-start gap-3.5 mb-2 select-none group">
-            <div className="relative h-13 w-10 sm:h-14 sm:w-11 shrink-0 transition-transform duration-200 group-hover:scale-105">
+          <Link href="/" className="inline-flex items-center justify-center sm:justify-start gap-3 mb-2 select-none group">
+            <div className="relative h-12 w-9 sm:h-14 sm:w-11 shrink-0 transition-transform duration-200 group-hover:scale-105">
               <Image
                 src="/logo-calligraphy.png"
                 alt="Tauheed Textile Logo"
@@ -53,14 +53,9 @@ export default function Footer({ initialSettings }: FooterProps) {
                 className="object-contain"
               />
             </div>
-            <div className="flex flex-col justify-center text-left">
-              <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.14em] text-[#171717] leading-none select-none">
-                Tᗩᑌᕼᗴᗴᗪ
-              </span>
-              <span className="font-serif text-[11px] sm:text-xs tracking-[0.32em] text-[#171717] font-semibold mt-1 uppercase leading-none select-none">
-                Tᗴ᙭TIᒪᗴ
-              </span>
-            </div>
+            <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.10em] sm:tracking-[0.14em] text-[#171717] whitespace-nowrap leading-none select-none">
+              Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+            </span>
           </Link>
           <p className="text-sm font-medium text-[#6B6259]">
             Premium Quality at Best Price

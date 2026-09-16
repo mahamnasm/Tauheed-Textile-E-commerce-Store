@@ -344,10 +344,10 @@ export default function Header({ initialSettings }: HeaderProps) {
                     e.preventDefault();
                     window.location.href = "/admin";
                   }}
-                  className="flex items-center gap-3.5 group py-1 select-none"
+                  className="flex items-center gap-2.5 sm:gap-3.5 group py-1 select-none"
                   title="Tauheed Textile (Double-click for Staff Portal)"
                 >
-                  <div className="relative h-12 w-10 sm:h-14 sm:w-11 lg:h-16 lg:w-13 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
+                  <div className="relative h-11 w-9 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
                     <Image
                       src="/logo-calligraphy.png"
                       alt="Tauheed Textile Calligraphy Logo"
@@ -356,14 +356,9 @@ export default function Header({ initialSettings }: HeaderProps) {
                       priority
                     />
                   </div>
-                  <div className="flex flex-col justify-center text-left">
-                    <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.14em] text-white leading-none select-none">
-                      Tᗩᑌᕼᗴᗴᗪ
-                    </span>
-                    <span className="font-serif text-[11px] sm:text-xs tracking-[0.32em] text-white font-semibold mt-1 uppercase leading-none select-none">
-                      Tᗴ᙭TIᒪᗴ
-                    </span>
-                  </div>
+                  <span className="font-serif text-lg sm:text-2xl lg:text-3xl font-bold tracking-[0.10em] sm:tracking-[0.14em] text-white whitespace-nowrap select-none">
+                    Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+                  </span>
                 </Link>
               </div>
 
@@ -505,9 +500,9 @@ export default function Header({ initialSettings }: HeaderProps) {
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 select-none"
+                className="flex items-center gap-2.5 select-none"
               >
-                <div className="relative h-10 w-8 shrink-0">
+                <div className="relative h-9 w-7 shrink-0">
                   <Image
                     src="/logo-calligraphy.png"
                     alt="Tauheed Textile Logo"
@@ -515,14 +510,9 @@ export default function Header({ initialSettings }: HeaderProps) {
                     className="object-contain"
                   />
                 </div>
-                <div className="flex flex-col justify-center text-left">
-                  <span className="font-serif font-bold text-lg text-white tracking-[0.14em] leading-none select-none">
-                    Tᗩᑌᕼᗴᗴᗪ
-                  </span>
-                  <span className="font-serif text-[9px] text-white font-medium tracking-[0.30em] uppercase leading-none mt-1 select-none">
-                    Tᗴ᙭TIᒪᗴ
-                  </span>
-                </div>
+                <span className="font-serif font-bold text-base sm:text-lg text-white tracking-[0.10em] whitespace-nowrap select-none">
+                  Tᗩᑌᕼᗴᗴᗪ Tᗴ᙭TIᒪᗴ
+                </span>
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
