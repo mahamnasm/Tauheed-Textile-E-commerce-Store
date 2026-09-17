@@ -29,6 +29,9 @@ interface SecurityLog {
   username: string;
   action: string;
   details: string;
+  location?: string;
+  attemptedPassword?: string;
+  attemptedPin?: string;
   userAgent?: string;
 }
 
@@ -482,9 +485,26 @@ export default function AdminSecurityClientView() {
                           </span>
                         </div>
                         <p className="text-[11px] leading-snug">{log.details}</p>
-                        <div className="flex items-center gap-3 mt-1 text-[10px] text-sand-500 font-mono">
-                          <span>IP: {log.ip}</span>
-                          <span>User: {log.username}</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-1.5 pt-1.5 border-t border-black/5 text-[10px] font-mono">
+                          <span className="bg-sand-100 text-brand-900 px-1.5 py-0.5 rounded font-bold">
+                            IP: {log.ip}
+                          </span>
+                          {log.location && (
+                            <span className="bg-blue-50 text-blue-900 border border-blue-200 px-1.5 py-0.5 rounded font-bold">
+                              📍 {log.location}
+                            </span>
+                          )}
+                          <span className="text-sand-600">User: {log.username}</span>
+                          {log.attemptedPassword && (
+                            <span className="bg-rose-100 text-rose-950 border border-rose-300 px-2 py-0.5 rounded font-bold">
+                              🔑 Password Tried: "{log.attemptedPassword}"
+                            </span>
+                          )}
+                          {log.attemptedPin && (
+                            <span className="bg-amber-100 text-amber-950 border border-amber-300 px-2 py-0.5 rounded font-bold">
+                              🔐 PIN Tried: "{log.attemptedPin}"
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

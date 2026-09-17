@@ -24,46 +24,8 @@ export default async function AdminMarketingPage() {
       {/* Cart Abandonment Recovery */}
       <AdminAbandonedCartManager initialCarts={abandonedCarts} />
 
-      {/* Coupons */}
-      <div className="bg-white rounded-2xl border border-sand-200 shadow-sm p-6 space-y-4">
-        <h3 className="font-serif font-bold text-base text-brand-950 flex items-center gap-2">
-          <Tag className="w-4 h-4 text-gold-700" />
-          Active Promo Coupons
-        </h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-sand-50 text-brand-800 uppercase">
-              <tr>
-                <th className="p-3">Coupon Code</th>
-                <th className="p-3">Discount Type</th>
-                <th className="p-3">Value</th>
-                <th className="p-3">Min Order</th>
-                <th className="p-3">Usage Limit</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-sand-100">
-              {coupons.map((c) => (
-                <tr key={c.id} className="hover:bg-sand-50/60">
-                  <td className="p-3 font-mono font-bold text-brand-950">{c.code}</td>
-                  <td className="p-3 text-brand-700">{c.discountType}</td>
-                  <td className="p-3 font-bold text-emerald-700">
-                    {c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `Rs. ${c.discountValue}`}
-                  </td>
-                  <td className="p-3 text-brand-700">Rs. {c.minOrderValue.toLocaleString()}</td>
-                  <td className="p-3 text-brand-600">{c.usedCount} / {c.usageLimit || "Unlimited"}</td>
-                  <td className="p-3">
-                    <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">
-                      ACTIVE
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Interactive Editable Coupons Manager with User Limits */}
+      <AdminCouponManager initialCoupons={coupons as any} />
     </div>
   );
 }

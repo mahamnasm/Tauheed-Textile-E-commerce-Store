@@ -80,6 +80,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const isApprovedByAdmin = Boolean(body.isAdmin) || Boolean(body.isApproved);
+
     const review = await prisma.review.create({
       data: {
         productId: targetProductId,
@@ -89,14 +91,16 @@ export async function POST(req: NextRequest) {
         title: title?.trim() || "Verified Buyer Review",
         comment: comment.trim(),
         imageUrl: imageUrl || null,
-        isApproved: true, // Visible immediately
-        isFeatured: false,
+        isApproved: isApprovedByAdmin, // Requires admin approval before appearing on website
+        isFeatured: Boolean(body.isFeatured),
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Review submitted successfully!",
+      message: isApprovedByAdmin
+        ? "Review published successfully!"
+        : "Thank you! Your review has been submitted for approval and will appear on the website shortly.",
       review,
     });
   } catch (error: any) {

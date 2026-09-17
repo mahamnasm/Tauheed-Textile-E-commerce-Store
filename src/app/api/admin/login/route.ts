@@ -24,8 +24,31 @@ function getClientIp(request: NextRequest): string {
   return "127.0.0.1";
 }
 
+function getClientLocation(request: NextRequest, ip: string): string {
+  const city = request.headers.get("x-vercel-ip-city") || request.headers.get("cf-ipcity");
+  const country = request.headers.get("x-vercel-ip-country-region") || request.headers.get("cf-ipcountry");
+
+  if (city && country) {
+    return `${city}, ${country}`;
+  }
+  if (country) {
+    return country === "PK" ? "Pakistan" : country;
+  }
+  if (
+    ip === "127.0.0.1" ||
+    ip === "::1" ||
+    ip.startsWith("192.168.") ||
+    ip.startsWith("10.") ||
+    ip.startsWith("172.")
+  ) {
+    return "Local Wi-Fi / LAN (Lahore/Karachi)";
+  }
+  return "Pakistan";
+}
+
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
+  const location = getClientLocation(request, ip);
   const userAgent = request.headers.get("user-agent") || undefined;
 
   try {
@@ -37,7 +60,7 @@ export async function POST(request: NextRequest) {
         "unknown",
         "IP_LOCKED_OUT",
         `Rejected attempt from locked IP. ${lockoutStatus.minutesRemaining}m remaining.`,
-        userAgent
+        { userAgent, location }
       );
       return NextResponse.json(
         {
@@ -72,7 +95,7 @@ export async function POST(request: NextRequest) {
           username,
           "EMERGENCY_LOCKDOWN_REJECT",
           "Login attempt rejected due to active Executive Master Lockdown.",
-          userAgent
+          { userAgent, location }
         );
         return NextResponse.json(
           {
@@ -88,16 +111,26 @@ export async function POST(request: NextRequest) {
           ip,
           username,
           "FAILED_PIN",
-          `Invalid Master Security PIN attempted. Remaining: ${failState.remainingAttempts}`,
-          userAgent
+          `Invalid Master Security PIN attempted: "${pin}". Remaining: ${failState.remainingAttempts}`,
+          {
+            userAgent,
+            location,
+            attemptedPassword: password,
+            attemptedPin: pin,
+          }
         );
       } else {
         await logSecurityEvent(
           ip,
           username,
           "FAILED_CREDENTIALS",
-          `Invalid username or password. Remaining: ${failState.remainingAttempts}`,
-          userAgent
+          `Invalid credentials attempted. User: "${username}", Pass: "${password}". Remaining: ${failState.remainingAttempts}`,
+          {
+            userAgent,
+            location,
+            attemptedPassword: password,
+            attemptedPin: pin,
+          }
         );
       }
 
@@ -128,7 +161,10 @@ export async function POST(request: NextRequest) {
       username,
       "LOGIN_SUCCESS",
       "Executive Super Admin access granted with 2FA Master PIN.",
-      userAgent
+      {
+        userAgent,
+        location,
+      }
     );
 
     // Generate signed token

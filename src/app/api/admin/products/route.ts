@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       isPreOrder,
       preOrderDate,
       initialStock,
+      weight,
     } = body;
 
     if (!title || !sku || !basePrice || !fabric) {
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
         fabric,
         workType: workType || "Handcrafted Embroidery",
         pieceCount: parseInt(pieceCount || "3", 10),
+        weight: weight ? parseFloat(weight) : (parseInt(pieceCount || "3", 10) === 2 ? 0.8 : (parseInt(pieceCount || "3", 10) === 1 ? 0.5 : 1.0)),
         basePrice: parseFloat(basePrice),
         comparePrice: comparePrice ? parseFloat(comparePrice) : null,
         costPrice: costPrice ? parseFloat(costPrice) : 0,

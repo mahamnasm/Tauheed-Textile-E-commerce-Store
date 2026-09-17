@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus, Download, X, Check, ShoppingBag, Eye, Trash2, Star, Sparkles, Image as ImageIcon, Video, Tag, Layers, ArrowUp, Calendar, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { parseVideoUrl } from "@/lib/videoUtils";
 
 interface AdminProductsClientViewProps {
   products: any[];
@@ -46,6 +47,7 @@ export default function AdminProductsClientView({
   const [fabric, setFabric] = useState("Luxury Lawn & Pure Silk");
   const [workType, setWorkType] = useState("Resham & Tilla Embroidery");
   const [pieceCount, setPieceCount] = useState("3");
+  const [weight, setWeight] = useState("1.0");
   const [basePrice, setBasePrice] = useState("");
   const [comparePrice, setComparePrice] = useState("");
   const [costPrice, setCostPrice] = useState("");
@@ -62,18 +64,11 @@ export default function AdminProductsClientView({
   const [isPreOrder, setIsPreOrder] = useState(false);
   const [preOrderDate, setPreOrderDate] = useState("");
 
-  // Multi-Image State: supports > 5 images dynamically
-  const [images, setImages] = useState<string[]>([
-    "/assets/prod-nafasat.jpg",
-    "/assets/prod-armani.jpg",
-    "/assets/prod-trendz.jpg",
-    "/assets/prod-shrenz.jpg",
-    "/assets/prod-alhassan.jpg",
-    "/assets/prod-designsnow.jpg",
-  ]);
+  // Multi-Image State: starts EMPTY so admin uploads their own chosen pictures
+  const [images, setImages] = useState<string[]>([]);
 
   const handleAddImageSlot = () => {
-    setImages((prev) => [...prev, "/assets/hero-model.jpg"]);
+    setImages((prev) => [...prev, ""]);
   };
 
   const handleUpdateImage = (index: number, newUrl: string) => {
@@ -85,10 +80,6 @@ export default function AdminProductsClientView({
   };
 
   const handleRemoveImage = (index: number) => {
-    if (images.length <= 1) {
-      alert("At least 1 product image is required.");
-      return;
-    }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -100,10 +91,6 @@ export default function AdminProductsClientView({
       copy.unshift(chosen);
       return copy;
     });
-  };
-
-  const handleQuickAddPreset = (url: string) => {
-    setImages((prev) => [...prev, url]);
   };
 
   const [uploadingPC, setUploadingPC] = useState(false);
@@ -236,6 +223,7 @@ export default function AdminProductsClientView({
           fabric,
           workType,
           pieceCount,
+          weight: parseFloat(weight) || 1.0,
           basePrice,
           comparePrice: comparePrice || null,
           costPrice: costPrice || null,
@@ -555,6 +543,44 @@ export default function AdminProductsClientView({
                       <option value="4">4 Piece (Includes Inner Lining Slip)</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">
+                      Parcel Weight (KG) <span className="text-[10px] text-brand-500">(Auto-calculates Delivery)</span>
+                    </label>
+                    <div className="space-y-1.5">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0.1"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        placeholder="1.0"
+                        className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950 font-mono"
+                      />
+                      <div className="flex flex-wrap gap-1 text-[10px]">
+                        {[
+                          { label: "0.5kg (Silk)", val: "0.5" },
+                          { label: "0.8kg (2-pc)", val: "0.8" },
+                          { label: "1.0kg (3-pc Lawn)", val: "1.0" },
+                          { label: "1.5kg (Bridal)", val: "1.5" },
+                        ].map((p) => (
+                          <button
+                            key={p.val}
+                            type="button"
+                            onClick={() => setWeight(p.val)}
+                            className={`px-2 py-0.5 rounded border transition-colors ${
+                              weight === p.val
+                                ? "bg-brand-950 text-white border-brand-950 font-bold"
+                                : "bg-white text-brand-700 border-sand-300 hover:bg-sand-100"
+                            }`}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -672,116 +698,126 @@ export default function AdminProductsClientView({
                   </div>
                 )}
 
-                {/* Quick Add Preset Buttons from Brand Library */}
-                <div>
-                  <span className="text-[11px] font-bold text-brand-800 block mb-1.5">
-                    Quick-Add From Luxury Model Studio Library:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {LUXURY_ASSET_PRESETS.map((p) => (
-                      <button
-                        key={p.label}
-                        type="button"
-                        onClick={() => handleQuickAddPreset(p.url)}
-                        className="px-2.5 py-1 rounded-md bg-white hover:bg-sand-100 border border-sand-300 text-brand-900 text-[11px] font-medium transition-colors flex items-center gap-1"
-                      >
-                        <Plus className="w-2.5 h-2.5 text-gold-600" /> {p.label}
-                      </button>
-                    ))}
+                {/* Image Thumbnails Strip or Clean Empty State */}
+                {images.length === 0 ? (
+                  <div className="p-6 border-2 border-dashed border-sand-300 rounded-2xl text-center bg-sand-50/60 flex flex-col items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-sand-200 text-brand-600 flex items-center justify-center mb-2">
+                      <ImageIcon className="w-5 h-5" />
+                    </div>
+                    <p className="font-bold text-xs text-brand-950">No dress photos added yet</p>
+                    <p className="text-[11px] text-brand-500 mt-0.5 max-w-sm">
+                      Upload your own pictures from your PC / Phone above, or click "+ Add Image Link" below to paste a photo link.
+                    </p>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2">
+                    {images.map((imgUrl, idx) => (
+                      <div
+                        key={idx}
+                        className={`relative rounded-xl overflow-hidden border-2 p-1 bg-white shadow-sm flex flex-col justify-between group ${
+                          idx === 0 ? "border-gold-600 ring-2 ring-gold-600/30" : "border-sand-200"
+                        }`}
+                      >
+                        <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-sand-100">
+                          {imgUrl ? (
+                            <Image
+                              src={imgUrl}
+                              alt={`Product view ${idx + 1}`}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-sand-400 text-[10px]">
+                              Empty Link
+                            </div>
+                          )}
+                          <span className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            idx === 0 ? "bg-gold-600 text-white" : "bg-brand-950/70 text-sand-100"
+                          }`}>
+                            {idx === 0 ? "Main Cover" : `#${idx + 1}`}
+                          </span>
 
-                {/* Image Thumbnails Strip */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2">
-                  {images.map((imgUrl, idx) => (
-                    <div
-                      key={idx}
-                      className={`relative rounded-xl overflow-hidden border-2 p-1 bg-white shadow-sm flex flex-col justify-between group ${
-                        idx === 0 ? "border-gold-600 ring-2 ring-gold-600/30" : "border-sand-200"
-                      }`}
-                    >
-                      <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-sand-100">
-                        <Image
-                          src={imgUrl || "/assets/hero-model.jpg"}
-                          alt={`Product view ${idx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                        <span className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                          idx === 0 ? "bg-gold-600 text-white" : "bg-brand-950/70 text-sand-100"
-                        }`}>
-                          {idx === 0 ? "Main Cover" : `#${idx + 1}`}
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="absolute top-1 right-1 p-1 rounded bg-maroon-600 text-white opacity-80 hover:opacity-100 transition-opacity"
-                          title="Remove image"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      <div className="pt-1.5 flex items-center justify-between gap-1">
-                        {idx !== 0 ? (
                           <button
                             type="button"
-                            onClick={() => handleSetAsCover(idx)}
-                            className="text-[10px] text-gold-700 hover:text-gold-900 font-bold flex items-center gap-0.5"
+                            onClick={() => handleRemoveImage(idx)}
+                            className="absolute top-1 right-1 p-1 rounded bg-maroon-600 text-white opacity-80 hover:opacity-100 transition-opacity"
+                            title="Remove image"
                           >
-                            <ArrowUp className="w-2.5 h-2.5" /> Make Cover
+                            <Trash2 className="w-3 h-3" />
                           </button>
-                        ) : (
-                          <span className="text-[10px] text-emerald-700 font-bold">Primary</span>
-                        )}
-                        <span className="text-[10px] text-brand-400 font-mono">#{idx + 1}</span>
+                        </div>
+
+                        <div className="pt-1.5 flex items-center justify-between gap-1">
+                          {idx !== 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => handleSetAsCover(idx)}
+                              className="text-[10px] text-gold-700 hover:text-gold-900 font-bold flex items-center gap-0.5"
+                            >
+                              <ArrowUp className="w-2.5 h-2.5" /> Make Cover
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-emerald-700 font-bold">Primary</span>
+                          )}
+                          <span className="text-[10px] text-brand-400 font-mono">#{idx + 1}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Editable URL Fields List for Custom Links */}
                 <div className="space-y-2 pt-2 border-t border-sand-200">
-                  <label className="block text-[11px] font-bold text-brand-900">
-                    Edit / Paste Custom Image Paths (Internal or External URLs):
-                  </label>
-                  <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
-                    {images.map((imgUrl, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <span className="w-16 text-[11px] font-semibold text-brand-700 shrink-0">
-                          {idx === 0 ? "Cover (1):" : `Photo ${idx + 1}:`}
-                        </span>
-                        <input
-                          type="text"
-                          value={imgUrl}
-                          onChange={(e) => handleUpdateImage(idx, e.target.value)}
-                          placeholder="/assets/prod-nafasat.jpg or https://..."
-                          className="flex-1 p-2 border border-sand-300 rounded-lg bg-white text-xs text-brand-900 font-mono"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(idx)}
-                          className="p-2 text-maroon-600 hover:bg-maroon-50 rounded-lg shrink-0"
-                          title="Delete photo"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[11px] font-bold text-brand-900">
+                      Paste Custom Image Paths (or click Add Image Link):
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddImageSlot}
+                      className="px-2.5 py-1 rounded-md bg-sand-100 hover:bg-sand-200 text-brand-900 text-[11px] font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <Plus className="w-3 h-3 text-gold-700" /> Add Image Link
+                    </button>
                   </div>
+                  {images.length > 0 && (
+                    <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
+                      {images.map((imgUrl, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="w-16 text-[11px] font-semibold text-brand-700 shrink-0">
+                            {idx === 0 ? "Cover (1):" : `Photo ${idx + 1}:`}
+                          </span>
+                          <input
+                            type="text"
+                            value={imgUrl}
+                            onChange={(e) => handleUpdateImage(idx, e.target.value)}
+                            placeholder="/assets/prod-nafasat.jpg or https://..."
+                            className="flex-1 p-2 border border-sand-300 rounded-lg bg-white text-xs text-brand-900 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(idx)}
+                            className="p-2 text-maroon-600 hover:bg-maroon-50 rounded-lg shrink-0"
+                            title="Delete photo"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* DRESS RUNWAY VIDEO (MANUAL MP4 UPLOAD) */}
+              {/* DRESS RUNWAY VIDEO (YOUTUBE, INSTAGRAM REEL, OR MP4) */}
               <div className="space-y-3 p-4 rounded-2xl bg-sand-50/80 border border-sand-200">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-sand-200 pb-2">
                   <div>
                     <h4 className="font-serif font-bold text-sm text-brand-950 flex items-center gap-2">
-                      <Video className="w-4 h-4 text-gold-600" /> Dress Runway Video (MP4)
+                      <Video className="w-4 h-4 text-gold-600" /> Dress Runway Video (YouTube, Instagram Reel, or MP4)
                     </h4>
                     <p className="text-[11px] text-brand-600 mt-0.5">
-                      Upload an authentic runway walk / reel from your mobile phone or PC for this dress.
+                      Paste a YouTube Link (youtu.be / shorts), Instagram Reel URL, Direct MP4, or upload from your device.
                     </p>
                   </div>
 
@@ -797,35 +833,71 @@ export default function AdminProductsClientView({
                   </label>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                  <div className="sm:col-span-8">
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
-                      placeholder="Paste video URL (e.g. /assets/runway-walk-1.mp4 or /uploads/...)"
+                      placeholder="Paste YouTube Link (youtu.be / shorts), Instagram Reel URL, or MP4..."
                       value={videoUrl}
                       onChange={(e) => setVideoUrl(e.target.value)}
-                      className="w-full p-2.5 border border-sand-300 rounded-xl bg-white text-xs font-mono text-brand-950"
+                      className="flex-1 p-2.5 border border-sand-300 rounded-xl bg-white text-xs font-mono text-brand-950"
                     />
-                  </div>
-
-                  <div className="sm:col-span-4 flex items-center gap-2">
-                    {videoUrl ? (
-                      <div className="flex items-center gap-2 w-full">
-                        <div className="relative w-12 h-10 rounded-lg bg-black overflow-hidden border border-sand-300 shrink-0">
-                          <video src={videoUrl} className="w-full h-full object-cover" muted />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setVideoUrl("")}
-                          className="text-[11px] text-rose-600 hover:underline font-bold"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-[11px] text-sand-500 italic">No video attached</span>
+                    {videoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setVideoUrl("")}
+                        className="px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-xl transition-colors shrink-0"
+                      >
+                        Clear Video
+                      </button>
                     )}
                   </div>
+
+                  {/* Video Type Detection & Live Preview */}
+                  {videoUrl ? (() => {
+                    const parsed = parseVideoUrl(videoUrl);
+                    return (
+                      <div className="p-3 bg-white border border-sand-200 rounded-xl flex items-center gap-3">
+                        <div className="w-20 h-14 rounded-lg bg-black overflow-hidden relative shrink-0 border border-sand-300">
+                          {parsed.type === "youtube" ? (
+                            <iframe
+                              src={parsed.embedUrl}
+                              title="YouTube Preview"
+                              className="w-full h-full border-0 pointer-events-none"
+                            />
+                          ) : parsed.type === "instagram" ? (
+                            <iframe
+                              src={parsed.embedUrl}
+                              title="Instagram Preview"
+                              className="w-full h-full border-0 pointer-events-none"
+                            />
+                          ) : (
+                            <video src={videoUrl} className="w-full h-full object-cover" muted />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              parsed.type === "youtube"
+                                ? "bg-red-100 text-red-700"
+                                : parsed.type === "instagram"
+                                ? "bg-purple-100 text-purple-700"
+                                : "bg-emerald-100 text-emerald-700"
+                            }`}>
+                              {parsed.type === "youtube" ? "▶️ YouTube Video / Short" : parsed.type === "instagram" ? "📸 Instagram Reel" : "🎥 MP4 Video"}
+                            </span>
+                            <span className="text-[11px] font-semibold text-brand-900">Plays directly on main website</span>
+                          </div>
+                          <p className="text-[10px] font-mono text-brand-500 truncate mt-0.5">
+                            {videoUrl}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })() : (
+                    <span className="text-[11px] text-sand-500 italic block">No video attached (supports YouTube Shorts/Videos, Instagram Reels, and direct MP4)</span>
+                  )}
                 </div>
               </div>
 

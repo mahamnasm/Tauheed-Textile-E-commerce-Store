@@ -14,7 +14,10 @@ import {
   X, 
   Check, 
   ShoppingBag,
-  ExternalLink
+  ExternalLink,
+  Upload,
+  Camera,
+  Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -53,6 +56,31 @@ export default function CategoriesClientView({
   const [catDesc, setCatDesc] = useState("");
   const [catImage, setCatImage] = useState("");
   const [savingCat, setSavingCat] = useState(false);
+  const [uploadingCatImg, setUploadingCatImg] = useState(false);
+
+  const handleUploadCatImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCatImg(true);
+    const formData = new FormData();
+    formData.append("files", file);
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const json = await res.json();
+      if (res.ok && json.success && (json.url || json.urls?.[0])) {
+        const url = json.url || json.urls[0];
+        setCatImage(url);
+        toast.success("Category photo uploaded from gallery!");
+      } else {
+        toast.error(json.error || "Failed to upload image");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Upload error");
+    } finally {
+      setUploadingCatImg(false);
+      e.target.value = "";
+    }
+  };
 
   // Subcategory Modal
   const [showSubModal, setShowSubModal] = useState(false);
@@ -497,15 +525,50 @@ export default function CategoriesClientView({
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-brand-900 mb-1">Image URL</label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-brand-900">Category Cover Photo</label>
+                  <label className="cursor-pointer px-3 py-1.5 bg-brand-900 hover:bg-black text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
+                    <Upload className="w-3.5 h-3.5 text-gold-400" />
+                    <span>{uploadingCatImg ? "Uploading..." : "Upload from Gallery / PC"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploadingCatImg}
+                      onChange={handleUploadCatImage}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
                 <input
                   type="text"
-                  placeholder="/assets/banners/banner-lawn.jpg"
+                  placeholder="Or paste image URL (e.g. /assets/banners/... or https://...)"
                   value={catImage}
                   onChange={(e) => setCatImage(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 font-mono text-xs focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
+
+                {/* Auto-Resized 4:5 Storefront Card Live Preview */}
+                {catImage && (
+                  <div className="pt-2 p-3 bg-sand-50 border border-sand-200 rounded-xl text-center">
+                    <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider block mb-1.5">
+                      Storefront Live Preview (Shop by Category 4:5 Ratio):
+                    </span>
+                    <div className="relative aspect-[4/5] max-w-[170px] rounded-xl overflow-hidden bg-sand-200 border border-sand-300 shadow-md mx-auto">
+                      <Image
+                        src={catImage}
+                        alt="Category preview"
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-3">
+                        <p className="font-serif font-bold text-white text-xs leading-tight drop-shadow">
+                          {catName || "Category Title"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

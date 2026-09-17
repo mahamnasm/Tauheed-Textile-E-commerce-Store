@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { SiteLayoutSettings } from "@/lib/settings";
 import DestinationLinkSelector from "@/components/admin/DestinationLinkSelector";
+import UniversalVideoPlayer from "@/components/common/UniversalVideoPlayer";
 
 interface AdminLayoutCustomizerProps {
   initialSettings: SiteLayoutSettings;
@@ -493,6 +494,35 @@ export default function AdminLayoutCustomizer({
                 <p className="text-xs text-brand-600 mt-1">
                   Upload high-resolution model photos directly from your PC or enter URLs. Customize titles, subtitles, tags, and button links.
                 </p>
+              </div>
+            </div>
+
+            {/* Banner Size Guide for Mobile & Desktop */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-amber-800" />
+                  <span className="font-serif font-bold text-xs sm:text-sm text-brand-950">
+                    Recommended Model Banner Dimensions
+                  </span>
+                  <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full">
+                    Mobile First
+                  </span>
+                </div>
+                <p className="text-[11px] text-brand-700 leading-relaxed max-w-xl">
+                  To ensure dresses and models look stunning on iPhone &amp; Android without cropping the embroidery or head:
+                </p>
+                <div className="flex flex-wrap gap-2 pt-1 font-mono text-[10px]">
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-300 text-amber-950 font-bold shadow-xs">
+                    📱 Mobile: 1080 × 1350 px (4:5 Ratio) or 1080 × 1920 px (9:16)
+                  </span>
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-300 text-amber-950 font-bold shadow-xs">
+                    💻 Desktop: 1920 × 850 px
+                  </span>
+                  <span className="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-300 text-emerald-950 font-bold">
+                    ✓ Keep model centered for auto-crop
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -1577,6 +1607,25 @@ export default function AdminLayoutCustomizer({
               <p className="text-[11px] text-brand-500">Auto-filled in customer's WhatsApp when they tap chat.</p>
             </div>
 
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-brand-900">WhatsApp VIP Community Link</label>
+                <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded">
+                  VIP Channel
+                </span>
+              </div>
+              <input
+                type="url"
+                value={settings.whatsappCommunityLink || ""}
+                onChange={(e) => updateField("whatsappCommunityLink", e.target.value)}
+                placeholder="https://chat.whatsapp.com/TauheedVIP"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+              />
+              <p className="text-[11px] text-brand-500">
+                Direct invite link to your VIP customer channel or broadcast group. Displayed in footer &amp; quick access.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <label className="text-xs font-bold text-brand-900">Customer Support Phone Hotline</label>
               <input
@@ -1828,7 +1877,7 @@ export default function AdminLayoutCustomizer({
                 {videos.map((v) => (
                   <div key={v.id} className="p-4 rounded-2xl border border-sand-200 bg-white shadow-sm flex flex-col justify-between space-y-3">
                     <div className="relative aspect-[9/14] rounded-xl overflow-hidden bg-black">
-                      <video src={v.videoUrl} controls preload="metadata" className="w-full h-full object-cover" />
+                      <UniversalVideoPlayer src={v.videoUrl} controls className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-brand-950 truncate">{v.title}</h4>

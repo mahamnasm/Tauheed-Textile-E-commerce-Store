@@ -55,6 +55,8 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
   const [couponApplied, setCouponApplied] = useState(false);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [isVerifyingCoupon, setIsVerifyingCoupon] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -69,24 +71,33 @@ export default function CheckoutPage() {
   const isFreeShipping = cartSubtotal >= FREE_SHIPPING_THRESHOLD;
 
   // Weight-based shipping rules:
-  // Free over Rs. 10,000.
-  // Karachi: Flat Rs. 350 for all weights.
-  // Outside Karachi: 1kg = 350, 2-3kg = 450, 4-5kg = 550, >5kg = 550 + 100/kg.
+  // If order >= 10k: Free delivery (0)
+  // If order < 10k: Gross delivery depends on weight, minus maximum Rs. 200 delivery subsidy discount!
+  let grossShippingFee = 0;
+  let deliveryDiscount = 0;
   let shippingFee = 0;
+
   if (isFreeShipping) {
+    grossShippingFee = 0;
+    deliveryDiscount = 0;
     shippingFee = 0;
-  } else if (city.toLowerCase() === "karachi") {
-    shippingFee = 350;
   } else {
-    if (totalWeight <= 1.0) {
-      shippingFee = 350;
-    } else if (totalWeight <= 3.0) {
-      shippingFee = 450;
-    } else if (totalWeight <= 5.0) {
-      shippingFee = 550;
+    if (city.toLowerCase() === "karachi") {
+      grossShippingFee = 350;
     } else {
-      shippingFee = 550 + Math.ceil(totalWeight - 5.0) * 100;
+      if (totalWeight <= 1.0) {
+        grossShippingFee = 350;
+      } else if (totalWeight <= 3.0) {
+        grossShippingFee = 450;
+      } else if (totalWeight <= 5.0) {
+        grossShippingFee = 550;
+      } else {
+        grossShippingFee = 550 + Math.ceil(totalWeight - 5.0) * 100;
+      }
     }
+    // Maximum Rs. 200 discount on delivery (subsidized for customers)
+    deliveryDiscount = Math.min(200, grossShippingFee);
+    shippingFee = Math.max(0, grossShippingFee - deliveryDiscount);
   }
 
   // Payment method calculations:
@@ -118,17 +129,32 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (couponCode.toUpperCase() === "TAUHEED10") {
-      const discount = Math.round(cartSubtotal * 0.1);
-      setDiscountAmount(discount);
+    if (!couponCode.trim()) return;
+
+    setIsVerifyingCoupon(true);
+    setCouponMessage("");
+    try {
+      const res = await fetch("/api/coupons/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, subtotal: cartSubtotal }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setDiscountAmount(0);
+        setCouponApplied(false);
+        alert(data.error || "Invalid discount code.");
+        return;
+      }
+      setDiscountAmount(data.discountAmount);
       setCouponApplied(true);
-    } else if (couponCode.toUpperCase() === "EIDGIFT500") {
-      setDiscountAmount(500);
-      setCouponApplied(true);
-    } else {
-      alert("Invalid discount code. Please check and try again.");
+      setCouponMessage(data.message || "Coupon applied successfully!");
+    } catch {
+      alert("Failed to verify discount code. Please check your connection.");
+    } finally {
+      setIsVerifyingCoupon(false);
     }
   };
 
@@ -221,6 +247,7 @@ export default function CheckoutPage() {
         shippingFee: shippingFee + codTax,
         discount: totalDiscount,
         total: grandTotal,
+        couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         notes: `${notes || ""}${codTax > 0 ? ` [Includes 4% COD Tax: Rs. ${codTax}]` : ""} [Parcel Weight: ${totalWeight.toFixed(1)}kg]`.trim(),
         items: cart,
         ...(isAdvancePayment
@@ -859,16 +886,30 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between">
                 <span>
-                  Shipping ({city === "Karachi" ? "Karachi Flat" : `${totalWeight.toFixed(1)}kg Nationwide`})
+                  Delivery Charges ({city === "Karachi" ? "Karachi Flat" : `${totalWeight.toFixed(1)}kg Weight`})
                 </span>
                 <span className="font-bold text-[#171717]">
                   {shippingFee === 0 ? (
-                    <span className="text-[#1A6B3C] font-bold">FREE (Orders &ge; 10k)</span>
+                    <span className="text-[#1A6B3C] font-bold">FREE (Orders &ge; 10k) 🎉</span>
                   ) : (
-                    `Rs. ${shippingFee}`
+                    `Rs. ${grossShippingFee}`
                   )}
                 </span>
               </div>
+
+              {deliveryDiscount > 0 && shippingFee > 0 && (
+                <div className="flex justify-between text-[#1A6B3C] text-[11px] font-semibold bg-[#E8F5E9] px-2 py-1 rounded">
+                  <span>Delivery Subsidy Discount (Max Rs. 200)</span>
+                  <span>-Rs. {deliveryDiscount}</span>
+                </div>
+              )}
+
+              {shippingFee > 0 && deliveryDiscount > 0 && (
+                <div className="flex justify-between text-[11px] text-brand-700 font-bold border-b border-dashed border-[#E7E1D8] pb-1">
+                  <span>Net Delivery Payable</span>
+                  <span>Rs. {shippingFee}</span>
+                </div>
+              )}
 
               {/* COD 4% Tax vs Advance Discount */}
               {codTax > 0 && (
@@ -900,6 +941,19 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Advance Payment Receipt Required Notice */}
+            {paymentMethod !== "COD" && !receiptUrl && (
+              <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl text-xs text-amber-950 flex items-start gap-2.5 shadow-xs">
+                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <p className="font-bold">Payment Receipt Screenshot Required</p>
+                  <p className="text-[11px] text-amber-800 leading-snug">
+                    Please attach your bank transfer or wallet payment receipt slip above before confirming this order.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Place Order CTA */}
             <button
               type="submit"
@@ -907,14 +961,20 @@ export default function CheckoutPage() {
               className={`w-full py-4 text-white rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all ${
                 isSubmitting
                   ? "bg-[#6B6259] cursor-not-allowed"
+                  : paymentMethod !== "COD" && !receiptUrl
+                  ? "bg-[#9B3D3D] hover:bg-[#802B2B]"
                   : "bg-[#171717] hover:bg-black"
               }`}
             >
               {isSubmitting ? (
                 "Processing Secure Order..."
+              ) : paymentMethod !== "COD" && !receiptUrl ? (
+                <>
+                  <Upload className="w-4 h-4 text-white" /> Attach Receipt Screenshot to Confirm
+                </>
               ) : (
                 <>
-                  <Lock className="w-4 h-4 text-[#C4A882]" /> Confirm Order & Dispatch
+                  <Lock className="w-4 h-4 text-[#C4A882]" /> Confirm Order &amp; Dispatch
                 </>
               )}
             </button>

@@ -18,6 +18,8 @@ import {
   Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
+import UniversalVideoPlayer from "@/components/common/UniversalVideoPlayer";
+import { parseVideoUrl } from "@/lib/videoUtils";
 
 interface ProductOption {
   id: string;
@@ -330,7 +332,7 @@ export default function AdminReelsClientView({
               {/* 3. Or Paste Video URL */}
               <div>
                 <label className="block text-xs font-bold text-brand-900 mb-1">
-                  Or Paste Video URL (Optional)
+                  Or Paste Video URL (YouTube, Instagram Reel, or MP4)
                 </label>
                 <input
                   type="text"
@@ -339,7 +341,7 @@ export default function AdminReelsClientView({
                     setVideoUrl(e.target.value);
                     if (e.target.value) setActivePreviewVideo(e.target.value);
                   }}
-                  placeholder="e.g. /assets/runway-walk-1.mp4 or https://..."
+                  placeholder="Paste YouTube Link (youtu.be / shorts), Instagram Reel, or MP4..."
                   className="w-full bg-sand-50 border border-sand-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-brand-950 focus:outline-none focus:border-gold-500"
                 />
               </div>
@@ -414,7 +416,7 @@ export default function AdminReelsClientView({
             {/* Video Player */}
             <div className="relative w-full aspect-[9/16] max-h-[440px] mx-auto rounded-2xl overflow-hidden bg-black border border-sand-800 shadow-inner flex items-center justify-center">
               {activePreviewVideo ? (
-                <video
+                <UniversalVideoPlayer
                   key={activePreviewVideo}
                   src={activePreviewVideo}
                   controls
@@ -451,7 +453,9 @@ export default function AdminReelsClientView({
                   No runway reels active yet. Upload your first video above!
                 </div>
               ) : (
-                reels.map((reel) => (
+                reels.map((reel) => {
+                  const parsed = parseVideoUrl(reel.videoUrl);
+                  return (
                   <div
                     key={reel.id}
                     className="p-3 rounded-2xl border border-sand-200 bg-sand-50/70 flex items-center justify-between gap-3 hover:bg-sand-100/70 transition-colors"
@@ -461,11 +465,23 @@ export default function AdminReelsClientView({
                       className="flex items-center gap-3 cursor-pointer flex-1 min-w-0"
                     >
                       <div className="relative w-12 h-14 rounded-xl bg-black overflow-hidden shrink-0 border border-sand-300">
-                        <video
-                          src={reel.videoUrl}
-                          className="w-full h-full object-cover"
-                          muted
-                        />
+                        {parsed.type === "youtube" ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-red-950 text-red-300 text-[9px] font-bold">
+                            <span>▶️</span>
+                            <span>YT</span>
+                          </div>
+                        ) : parsed.type === "instagram" ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-purple-950 text-purple-300 text-[9px] font-bold">
+                            <span>📸</span>
+                            <span>Reel</span>
+                          </div>
+                        ) : (
+                          <video
+                            src={reel.videoUrl}
+                            className="w-full h-full object-cover"
+                            muted
+                          />
+                        )}
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                           <Play className="w-3.5 h-3.5 text-white" />
                         </div>
@@ -494,8 +510,9 @@ export default function AdminReelsClientView({
                       </button>
                     </div>
                   </div>
-                ))
-              )}
+                );
+              })
+            )}
             </div>
           </div>
         </div>

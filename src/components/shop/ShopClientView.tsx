@@ -364,13 +364,18 @@ export default function ShopClientView({
               <div className="flex flex-col space-y-3">
                 <button
                   onClick={() => handleCategoryClick(null)}
-                  className={`text-left text-sm transition-all ${
+                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-all py-2 px-3 rounded-xl ${
                     !currentCategory
-                      ? "text-[#7A6652] font-semibold"
-                      : "text-[#6B6259] hover:text-[#171717]"
+                      ? "bg-[#171717] text-white shadow-xs"
+                      : "text-[#171717] hover:bg-[#F0EBE3] border border-[#E7E1D8]"
                   }`}
                 >
-                  All Categories
+                  <span className="font-extrabold tracking-wider">ALL (All Dresses)</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${
+                    !currentCategory ? "bg-white text-[#171717]" : "bg-[#E7E1D8] text-[#7A6652]"
+                  }`}>
+                    ALL
+                  </span>
                 </button>
                 {categories.map((cat) => {
                   const isCatActive = currentCategory === cat.slug;
@@ -489,11 +494,14 @@ export default function ShopClientView({
                     handleCategoryClick(null);
                     setMobileFilterOpen(false);
                   }}
-                  className={`text-left text-sm ${
-                    !currentCategory ? "text-[#7A6652] font-semibold" : "text-[#6B6259] hover:text-[#171717]"
+                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between py-2 px-3 rounded-xl ${
+                    !currentCategory
+                      ? "bg-[#171717] text-white shadow-xs"
+                      : "text-[#171717] hover:bg-[#F0EBE3] border border-[#E7E1D8]"
                   }`}
                 >
-                  All Categories
+                  <span>ALL (All Dresses)</span>
+                  <span className="text-[10px] bg-[#E7E1D8] text-[#171717] px-2 py-0.5 rounded font-bold">ALL</span>
                 </button>
                 {categories.map((cat) => {
                   const isCatActive = currentCategory === cat.slug;

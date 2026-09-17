@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Film, Play, Pause, Volume2, VolumeX, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { parseVideoUrl } from "@/lib/videoUtils";
 
 export interface RunwayVideoItem {
   id: string;
@@ -267,20 +268,35 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                 }`}
               >
                 {/* 9:16 Vertical Video Frame */}
-                <div
-                  className="relative aspect-[9/16] w-full cursor-pointer overflow-hidden bg-black"
-                  onClick={() => handleTogglePlay(v.id)}
-                >
-                  <video
-                    ref={(el) => setVideoRef(v.id, el)}
-                    src={v.videoUrl}
-                    loop
-                    muted={isMuted}
-                    playsInline
-                    preload="metadata"
-                    poster={v.product?.images?.[0]?.url || "/assets/reel-1.jpg"}
-                    className="w-full h-full object-cover select-none pointer-events-none"
-                  />
+                {(() => {
+                  const parsed = parseVideoUrl(v.videoUrl);
+                  const isExternal = parsed.type === "youtube" || parsed.type === "instagram";
+                  return (
+                    <div
+                      className="relative aspect-[9/16] w-full cursor-pointer overflow-hidden bg-black"
+                      onClick={() => !isExternal && handleTogglePlay(v.id)}
+                    >
+                      {isExternal ? (
+                        <iframe
+                          src={parsed.embedUrl}
+                          title={v.title}
+                          className="w-full h-full border-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          loading="lazy"
+                        />
+                      ) : (
+                        <video
+                          ref={(el) => setVideoRef(v.id, el)}
+                          src={v.videoUrl}
+                          loop
+                          muted={isMuted}
+                          playsInline
+                          preload="metadata"
+                          poster={v.product?.images?.[0]?.url || "/assets/reel-1.jpg"}
+                          className="w-full h-full object-cover select-none pointer-events-none"
+                        />
+                      )}
 
                   {/* Gradient overlays */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
@@ -344,6 +360,8 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                     )}
                   </div>
                 </div>
+              );
+            })()}
 
                 {/* Footer Shop Look Card */}
                 <div className="p-3.5 bg-[#1F1F1F] border-t border-[#2F2F2F] flex items-center justify-between gap-3">

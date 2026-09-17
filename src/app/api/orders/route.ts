@@ -103,6 +103,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Increment coupon usedCount if a valid coupon was applied
+    if (body.couponCode) {
+      try {
+        await prisma.coupon.update({
+          where: { code: body.couponCode.trim().toUpperCase() },
+          data: { usedCount: { increment: 1 } },
+        });
+      } catch (couponErr) {
+        console.warn("Coupon usage increment ignored:", couponErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       orderNumber: order.orderNumber,

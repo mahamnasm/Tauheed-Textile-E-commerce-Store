@@ -8,6 +8,7 @@ import HomeClientSection from "@/components/home/HomeClientSection";
 import HeroBannerSlider from "@/components/home/HeroBannerSlider";
 import RunwayReelsSection from "@/components/home/RunwayReelsSection";
 import HomeCategoriesSection from "@/components/home/HomeCategoriesSection";
+import HomeReviewsSlider from "@/components/home/HomeReviewsSlider";
 import { FALLBACK_PRODUCTS, FALLBACK_CATEGORIES } from "@/lib/fallbackProducts";
 
 export const dynamic = "force-dynamic";
@@ -76,9 +77,10 @@ export default async function HomePage() {
         take: 4,
       }),
       prisma.review.findMany({
-        where: { isApproved: true, isFeatured: true },
+        where: { isApproved: true },
         include: { product: true },
-        take: 3,
+        orderBy: { createdAt: "desc" },
+        take: 10,
       }),
     ]);
 
@@ -163,55 +165,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. CUSTOMER REVIEWS */}
-      {settings.showReviews && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#7A6652] block mb-2">
-              Customer Voices
-            </span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
-              {settings.reviewsTitle || "Loved by Women Across Pakistan"}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {reviews.map((rev) => (
-              <div key={rev.id} className="bg-white border border-[#E7E1D8] rounded-xl p-6 shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-1 text-[#D4AF37] mb-3">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  {rev.imageUrl && (
-                    <div className="relative h-40 w-full mb-3 rounded-lg overflow-hidden border border-[#E7E1D8]">
-                      <Image
-                        src={rev.imageUrl}
-                        alt="Customer Review Photo"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  <h4 className="font-serif font-semibold text-[#171717]">{rev.title || "Exquisite Quality"}</h4>
-                  <p className="text-sm text-[#6B6259] italic mt-2">"{rev.comment}"</p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-[#E7E1D8] flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-[#171717] text-sm">{rev.customerName}</p>
-                    {rev.reviewerCity && (
-                      <span className="text-[11px] text-[#9B8C7E]">{rev.reviewerCity}</span>
-                    )}
-                  </div>
-                  <span className="text-xs bg-[#F0EBE3] text-[#7A6652] px-2 py-0.5 rounded">
-                    Verified Buyer
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+      {/* 6. CUSTOMER REVIEWS (SLIDABLE LEFT TO RIGHT) */}
+      {settings.showReviews && reviews.length > 0 && (
+        <HomeReviewsSlider
+          reviews={reviews}
+          title={settings.reviewsTitle || "Customer Voices & Reviews"}
+          subtitle="Genuine verified customer reviews from women across Lahore, Karachi, Islamabad & nationwide."
+        />
       )}
     </div>
   );

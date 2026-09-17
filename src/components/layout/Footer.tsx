@@ -220,6 +220,16 @@ export default function Footer({ initialSettings }: FooterProps) {
                   <span>🎵</span> TikTok
                 </a>
               </li>
+              <li className="pt-2">
+                <a
+                  href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/TauheedVIP"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm"
+                >
+                  <span>💬 Join VIP WhatsApp Group</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>

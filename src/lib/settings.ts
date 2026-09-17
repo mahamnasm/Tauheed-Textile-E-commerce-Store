@@ -69,6 +69,7 @@ export interface SiteLayoutSettings {
   // 7. Contact, Concierge & Physical Studio
   contactWhatsApp: string;
   whatsappMessage: string;
+  whatsappCommunityLink: string;
   contactPhone: string;
   contactEmail: string;
   contactAddress: string;
@@ -186,6 +187,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 7. Contact, Concierge & Physical Studio
   contactWhatsApp: "0340 0262732",
   whatsappMessage: "Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order.",
+  whatsappCommunityLink: "https://chat.whatsapp.com/TauheedVIP",
   contactPhone: "0340 0262732",
   contactEmail: "care@tauheedtextile.com",
   contactAddress: "Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan",

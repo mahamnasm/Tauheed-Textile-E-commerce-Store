@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
+import UniversalVideoPlayer from "@/components/common/UniversalVideoPlayer";
 
 interface ProductDetailClientProps {
   product: any;
@@ -67,6 +68,13 @@ export default function ProductDetailClient({
   const [revImage, setRevImage] = useState<string | null>(null);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const reviewsScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollReviews = (dir: "left" | "right") => {
+    if (!reviewsScrollRef.current) return;
+    const offset = dir === "left" ? -340 : 340;
+    reviewsScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+  };
 
   const images = product.images?.length > 0 ? product.images : [{ url: "/assets/hero-model.jpg" }];
   const currentImage = images[selectedImageIndex] || images[0];
@@ -226,7 +234,7 @@ export default function ProductDetailClient({
           {/* Media Viewport */}
           {mediaMode === "VIDEO" && product.videoUrl ? (
             <div className="relative aspect-[9/16] max-h-[620px] mx-auto rounded-2xl overflow-hidden bg-black shadow-lg">
-              <video
+              <UniversalVideoPlayer
                 src={product.videoUrl}
                 poster={currentImage.url}
                 controls
@@ -578,15 +586,35 @@ export default function ProductDetailClient({
             <h2 className="font-serif text-2xl font-bold text-[#171717]">
               Customer Reviews ({reviewsList.length})
             </h2>
-            <p className="text-xs text-[#6B6259] mt-0.5">Authentic feedback with unboxing and wearing photos</p>
+            <p className="text-xs text-[#6B6259] mt-0.5">Authentic Pakistani customer feedback and unboxing reviews</p>
           </div>
-          <button
-            onClick={() => setShowReviewModal(true)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#171717] hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
-          >
-            <Camera className="w-4 h-4" />
-            Write a Review & Add Photo
-          </button>
+          <div className="flex items-center gap-3">
+            {reviewsList.length > 2 && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => scrollReviews("left")}
+                  className="w-8 h-8 rounded-full border border-[#E7E1D8] bg-white hover:bg-[#F0EBE3] text-[#171717] flex items-center justify-center transition-all shadow-sm"
+                  aria-label="Previous Reviews"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => scrollReviews("right")}
+                  className="w-8 h-8 rounded-full border border-[#E7E1D8] bg-white hover:bg-[#F0EBE3] text-[#171717] flex items-center justify-center transition-all shadow-sm"
+                  aria-label="Next Reviews"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#171717] hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm"
+            >
+              <Camera className="w-4 h-4" />
+              Write a Review
+            </button>
+          </div>
         </div>
 
         {reviewsList.length === 0 ? (
@@ -600,37 +628,46 @@ export default function ProductDetailClient({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div
+            ref={reviewsScrollRef}
+            className="flex items-stretch gap-5 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: "thin" }}
+          >
             {reviewsList.map((r: any) => (
-              <div key={r.id || r.customerName} className="p-5 rounded-xl bg-white border border-[#E7E1D8] shadow-sm space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-[#D4A017]">
-                    {[...Array(r.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
+              <div
+                key={r.id || r.customerName}
+                className="w-[280px] sm:w-[350px] flex-shrink-0 snap-start p-5 rounded-xl bg-white border border-[#E7E1D8] shadow-sm flex flex-col justify-between space-y-3"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-[#D4A017]">
+                      {[...Array(r.rating || 5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" />
+                      ))}
+                    </div>
+                    <span className="text-[11px] text-[#9B9289]">
+                      {r.reviewerCity ? `${r.reviewerCity} • ` : ""}Verified Customer
+                    </span>
                   </div>
-                  <span className="text-[11px] text-[#9B9289]">
-                    {r.reviewerCity ? `${r.reviewerCity} • ` : ""}Verified Customer
-                  </span>
+
+                  <h4 className="font-serif font-bold text-sm text-[#171717]">{r.title}</h4>
+                  <p className="text-sm text-[#6B6259] italic leading-relaxed">"{r.comment}"</p>
+
+                  {/* Customer Review Image (PC / Mobile uploaded) */}
+                  {r.imageUrl && (
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border border-[#E7E1D8] bg-[#F8F5F0]">
+                      <Image
+                        src={r.imageUrl}
+                        alt="Customer review photo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <h4 className="font-serif font-bold text-sm text-[#171717]">{r.title}</h4>
-                <p className="text-sm text-[#6B6259] italic">"{r.comment}"</p>
-
-                {/* Customer Review Image (PC / Mobile uploaded) */}
-                {r.imageUrl && (
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden border border-[#E7E1D8] bg-[#F8F5F0]">
-                    <Image
-                      src={r.imageUrl}
-                      alt="Customer review photo"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-
-                <div className="pt-2 text-xs text-[#9B9289] font-medium border-t border-[#F0EBE3] flex items-center justify-between">
-                  <span>— {r.customerName}</span>
+                <div className="pt-3 text-xs text-[#9B9289] font-medium border-t border-[#F0EBE3] flex items-center justify-between">
+                  <span className="text-[#171717] font-semibold">— {r.customerName}</span>
                   {r.isFeatured && (
                     <span className="text-[10px] bg-[#F0EBE3] text-[#7A6652] font-semibold px-2 py-0.5 rounded">
                       Featured Review

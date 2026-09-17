@@ -569,7 +569,22 @@ export default function Header({ initialSettings }: HeaderProps) {
                   <span className="text-[10px] text-[#9B8C7E]">tap to expand</span>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
+                  {/* ALL DRESSES — NAMED "ALL" */}
+                  <Link
+                    href="/shop"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-gold-950/60 via-[#201D1A] to-[#141414] text-white font-bold text-xs uppercase tracking-wider transition-all border border-gold-500/50 hover:border-gold-400 shadow-sm"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <ShoppingBag className="w-4 h-4 text-gold-400" />
+                      <span className="text-sm font-black text-white tracking-wider">ALL</span>
+                    </span>
+                    <span className="text-[10px] bg-gold-500 text-brand-950 font-black px-2.5 py-0.5 rounded uppercase shadow-xs">
+                      All Dresses
+                    </span>
+                  </Link>
+
                   {/* NEW ARRIVALS 2026 */}
                   <Link
                     href="/shop?isNewArrival=true"
