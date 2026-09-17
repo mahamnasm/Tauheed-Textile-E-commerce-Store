@@ -13,6 +13,7 @@ import {
   verifyOwnerKey,
   getLatestIntrusionAlert,
 } from "@/lib/adminSecurityStore";
+import { internalError } from "@/lib/http";
 
 function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -39,7 +40,6 @@ export async function GET(request: NextRequest) {
     const latestThreat = await getLatestIntrusionAlert();
 
     return NextResponse.json({
-      success: true,
       config: {
         emergencyLockdown: config.emergencyLockdown,
         lockdownReason: config.lockdownReason,
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
       latestThreat,
       logs,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("GET /api/admin/security error:", error);
   }
 }
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    // Verify Owner Master Key ("maham0345")
+    // Verify Owner Master Key
     if (action === "VERIFY_OWNER_KEY") {
       const { ownerKey } = body;
       const isValid = verifyOwnerKey(ownerKey);
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         ip,
         session.username,
         "CODE_SHIELD_AUTH",
-        "Owner Master Password 'maham0345' verified. System code and configuration modification authorized.",
+        "Owner Master Password verified. System code and configuration modification authorized.",
         userAgent
       );
 
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       const { ownerKey } = body;
       if (!verifyOwnerKey(ownerKey)) {
         return NextResponse.json(
-          { error: "Owner authorization password 'maham0345' is required to modify Code Shield settings." },
+          { error: "Owner authorization password is required to modify Code Shield settings." },
           { status: 403 }
         );
       }
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         success: true,
         codeShieldLocked: updated.codeShieldLocked,
         message: updated.codeShieldLocked
-          ? "Owner Code Shield is now ENCRYPTED & LOCKED. All alterations require password 'maham0345'."
+          ? "Owner Code Shield is now ENCRYPTED & LOCKED. All alterations require owner password."
           : "Owner Code Shield unlocked for maintenance.",
       });
     }
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
       const isOwnerOverride = verifyOwnerKey(currentPin);
       if (!isOwnerOverride && currentPin !== config.masterPin) {
         return NextResponse.json(
-          { error: "Current Master PIN or Owner Password 'maham0345' is required." },
+          { error: "Current Master PIN or Owner Password is required." },
           { status: 400 }
         );
       }
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: "Unknown security action." }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("POST /api/admin/security error:", error);
   }
 }

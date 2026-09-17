@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateCsv } from "@/lib/csv";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError } from "@/lib/http";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const products = await prisma.product.findMany({
       include: {
@@ -39,7 +44,7 @@ export async function GET(req: NextRequest) {
         "Content-Disposition": `attachment; filename="tauheed_products_catalog_${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return internalError("GET /api/products/csv error:", err);
   }
 }

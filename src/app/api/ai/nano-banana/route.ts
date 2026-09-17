@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { generateNanoBananaFrontPic, setOutfitCoverImage } from "@/lib/nanoBananaEngine";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await request.json();
     const { action } = body;
@@ -78,11 +83,7 @@ export async function POST(request: Request) {
       message: "Nano Banana Clickbait Front Pic generated successfully!",
       result,
     });
-  } catch (error: any) {
-    console.error("Nano Banana API Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate image via Nano Banana" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/ai/nano-banana error:", error);
   }
 }

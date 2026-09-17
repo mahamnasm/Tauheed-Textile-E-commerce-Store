@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSiteSettings, updateSiteSettings } from "@/lib/settings";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError } from "@/lib/http";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const settings = await getSiteSettings();
     const videos = await prisma.watchBuyVideo.findMany({
@@ -15,12 +20,15 @@ export async function GET() {
     });
 
     return NextResponse.json({ settings, videos, products });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return internalError("GET /api/admin/layout error:", err);
   }
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { settings, newVideo, deleteVideoId, updateProductVideo } = body;
@@ -69,8 +77,7 @@ export async function POST(req: NextRequest) {
       settings: currentSettings,
       videos,
     });
-  } catch (err: any) {
-    console.error("Layout API Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return internalError("POST /api/admin/layout error:", err);
   }
 }

@@ -120,6 +120,12 @@ model Product {
   @@index([categoryId])
   @@index([subcategoryId])
   @@index([collectionId])
+  @@index([inStock])
+  @@index([isFeatured])
+  @@index([isNewArrival])
+  @@index([isBestSeller])
+  @@index([basePrice])
+  @@index([createdAt])
 }
 
 model ProductImage {
@@ -197,6 +203,11 @@ model Order {
   returnRequests    ReturnRequest[]
 
   @@index([customerId])
+  @@index([orderStatus])
+  @@index([paymentStatus])
+  @@index([paymentMethod])
+  @@index([createdAt])
+  @@index([orderNumber])
 }
 
 model OrderItem {

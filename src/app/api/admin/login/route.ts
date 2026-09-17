@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   createAdminSessionToken,
-  ADMIN_COOKIE_NAME,
+  adminSessionCookieOptions,
+  getAdminUsername,
 } from "@/lib/adminSession";
 import {
   validateAdminCredentialsWithPin,
@@ -11,29 +12,18 @@ import {
   recordSuccessfulLogin,
   logSecurityEvent,
 } from "@/lib/adminSecurityStore";
+import { adminLoginSchema } from "@/lib/validation";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
+import { firstZodMessage, internalError } from "@/lib/http";
 
-function getClientIp(request: NextRequest): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim();
-  }
-  const realIp = request.headers.get("x-real-ip");
-  if (realIp) {
-    return realIp.trim();
-  }
-  return "127.0.0.1";
-}
+const GENERIC_AUTH_ERROR = "Invalid username, password, or PIN.";
 
 function getClientLocation(request: NextRequest, ip: string): string {
   const city = request.headers.get("x-vercel-ip-city") || request.headers.get("cf-ipcity");
   const country = request.headers.get("x-vercel-ip-country-region") || request.headers.get("cf-ipcountry");
 
-  if (city && country) {
-    return `${city}, ${country}`;
-  }
-  if (country) {
-    return country === "PK" ? "Pakistan" : country;
-  }
+  if (city && country) return `${city}, ${country}`;
+  if (country) return country === "PK" ? "Pakistan" : country;
   if (
     ip === "127.0.0.1" ||
     ip === "::1" ||
@@ -41,9 +31,9 @@ function getClientLocation(request: NextRequest, ip: string): string {
     ip.startsWith("10.") ||
     ip.startsWith("172.")
   ) {
-    return "Local Wi-Fi / LAN (Lahore/Karachi)";
+    return "Local network";
   }
-  return "Pakistan";
+  return "Unknown";
 }
 
 export async function POST(request: NextRequest) {
@@ -51,147 +41,87 @@ export async function POST(request: NextRequest) {
   const location = getClientLocation(request, ip);
   const userAgent = request.headers.get("user-agent") || undefined;
 
+  const burst = checkRateLimit(`admin_login_${ip}`, 8, 15 * 60 * 1000);
+  if (!burst.success) {
+    return rateLimitResponse(burst.resetTime, GENERIC_AUTH_ERROR);
+  }
+
   try {
-    // 1. Check IP lockout first
     const lockoutStatus = checkIpLockout(ip);
     if (lockoutStatus.locked) {
-      await logSecurityEvent(
-        ip,
-        "unknown",
-        "IP_LOCKED_OUT",
-        `Rejected attempt from locked IP. ${lockoutStatus.minutesRemaining}m remaining.`,
-        { userAgent, location }
-      );
-      return NextResponse.json(
-        {
-          error: `Security Lockout Active: Too many failed login attempts from your IP. This portal has locked your IP for ${lockoutStatus.minutesRemaining} more minutes to protect against unauthorized access.`,
-          locked: true,
-          minutesRemaining: lockoutStatus.minutesRemaining,
-        },
-        { status: 429 }
-      );
+      await logSecurityEvent(ip, "unknown", "IP_LOCKED_OUT", "Rejected attempt from locked IP.", {
+        userAgent,
+        location,
+      });
+      return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
     }
 
     const body = await request.json();
-    const { adminLoginSchema } = await import("@/lib/validation");
     const validation = adminLoginSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0]?.message || "Username, Password, and Master Security PIN are required." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: firstZodMessage(validation.error) }, { status: 400 });
     }
 
     const { username, password, pin, rememberMe } = validation.data;
-
-    // 2. Validate Credentials & 2FA Master PIN
     const authResult = await validateAdminCredentialsWithPin(username, password, pin);
 
     if (!authResult.valid) {
-      // Record failed attempt
-      const failState = recordFailedAttempt(ip);
+      recordFailedAttempt(ip);
 
       if (authResult.reason === "EMERGENCY_LOCKDOWN") {
         await logSecurityEvent(
           ip,
           username,
           "EMERGENCY_LOCKDOWN_REJECT",
-          "Login attempt rejected due to active Executive Master Lockdown.",
+          "Login attempt rejected due to active lockdown.",
           { userAgent, location }
         );
-        return NextResponse.json(
-          {
-            error: "🚨 EMERGENCY LOCKDOWN ACTIVE: Admin portal access has been completely locked by the Super Admin. No logins permitted until released.",
-            emergencyLockdown: true,
-          },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
       }
 
-      // Log sanitized event without exposing plain-text credentials
       await logSecurityEvent(
         ip,
         username,
         authResult.reason === "INVALID_PIN" ? "FAILED_PIN" : "FAILED_CREDENTIALS",
-        `Authentication failed for user "${username}". Attempts remaining: ${failState.remainingAttempts}`,
-        {
-          userAgent,
-          location,
-        }
+        "Authentication failed.",
+        { userAgent, location }
       );
 
-      if (failState.locked) {
-        return NextResponse.json(
-          {
-            error: "🚨 SECURITY ALERT: Multiple consecutive failed login attempts detected. Your IP address has been temporarily locked out to protect the store.",
-            locked: true,
-            minutesRemaining: 30,
-          },
-          { status: 429 }
-        );
-      }
-
-      return NextResponse.json(
-        {
-          error: `Invalid credentials or security PIN. You have ${failState.remainingAttempts} attempts remaining before temporary IP lockout.`,
-          remainingAttempts: failState.remainingAttempts,
-        },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
     }
 
-    // 3. Successful Login
     recordSuccessfulLogin(ip);
-    await logSecurityEvent(
-      ip,
-      username,
-      "LOGIN_SUCCESS",
-      "Executive Super Admin access granted with 2FA Master PIN.",
-      {
-        userAgent,
-        location,
-      }
-    );
+    await logSecurityEvent(ip, username, "LOGIN_SUCCESS", "Admin access granted.", {
+      userAgent,
+      location,
+    });
 
-    // Generate signed token
     const token = await createAdminSessionToken(!!rememberMe);
-    const maxAge = rememberMe
-      ? 30 * 24 * 60 * 60 // 30 days
-      : 7 * 24 * 60 * 60; // 7 days
+    const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
+    const adminUser = getAdminUsername();
 
     const response = NextResponse.json({
       success: true,
-      message: "Executive access granted. Welcome back, Usama Naseem.",
+      message: "Access granted.",
       user: {
-        username: "usamanaseem101",
-        name: "Usama Naseem",
+        username: adminUser,
+        name: adminUser,
         role: "Super Admin",
       },
     });
 
-    // Set secure HTTP-only cookie with anti-tamper flags
     response.cookies.set({
-      name: ADMIN_COOKIE_NAME,
+      ...adminSessionCookieOptions(maxAge),
       value: token,
-      httpOnly: true,
-      secure: false, // allows Wi-Fi IP access (http://192.168.x.x:3000)
-      sameSite: "lax",
-      path: "/",
-      maxAge,
     });
 
-    // Add security headers
     response.headers.set("X-Frame-Options", "DENY");
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
     return response;
-  } catch (error: any) {
-    console.error("Admin login error:", error);
-    return NextResponse.json(
-      { error: "Internal server error during authentication." },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("Admin login error:", error);
   }
 }

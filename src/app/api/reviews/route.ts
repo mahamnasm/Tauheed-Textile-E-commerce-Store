@@ -1,18 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createReviewSchema } from "@/lib/validation";
+import { getAdminSession, requireAdmin } from "@/lib/requireAdmin";
+import { firstZodMessage, internalError, jsonError } from "@/lib/http";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
-// GET: Fetch reviews
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("productId");
-    const status = searchParams.get("status"); // "all", "pending", "approved", "featured"
+    const status = searchParams.get("status");
+    const session = await getAdminSession(req);
 
-    const whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
     if (productId) {
       whereClause.productId = productId;
     }
-    if (status === "approved") {
+
+    if (!session) {
+      whereClause.isApproved = true;
+      if (!productId) {
+        return jsonError("Product is required", 400);
+      }
+    } else if (status === "approved") {
       whereClause.isApproved = true;
     } else if (status === "pending") {
       whereClause.isApproved = false;
@@ -33,103 +43,81 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: { createdAt: "desc" },
+      take: 100,
     });
 
     return NextResponse.json({ success: true, reviews });
-  } catch (error: any) {
-    console.error("GET /api/reviews error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch reviews" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("GET /api/reviews error:", error);
   }
 }
 
-// POST: Submit a new customer review (Supports PC & Mobile photo upload)
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rate = checkRateLimit(`review_${ip}`, 8, 15 * 60 * 1000);
+  if (!rate.success) {
+    return rateLimitResponse(rate.resetTime, "Too many reviews submitted. Please wait a few minutes.");
+  }
+
   try {
     const body = await req.json();
-    const {
-      productId,
-      customerName,
-      reviewerCity,
-      rating,
-      title,
-      comment,
-      imageUrl,
-    } = body;
+    const session = await getAdminSession(req);
+    const validation = createReviewSchema.safeParse(body);
 
-    if (!customerName || !comment) {
-      return NextResponse.json(
-        { success: false, error: "Customer name and review comment are required." },
-        { status: 400 }
-      );
+    if (!validation.success) {
+      return jsonError(firstZodMessage(validation.error), 400);
     }
 
-    // Resolve productId or find first fallback
-    let targetProductId = productId;
-    if (!targetProductId) {
-      const first = await prisma.product.findFirst({ select: { id: true } });
-      targetProductId = first?.id;
-    }
+    const { productId, customerName, reviewerCity, rating, title, comment, imageUrl } = validation.data;
 
-    if (!targetProductId) {
-      return NextResponse.json(
-        { success: false, error: "Product not found to attach review." },
-        { status: 404 }
-      );
+    const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
+    if (!product) {
+      return jsonError("Product not found.", 404);
     }
-
-    const isApprovedByAdmin = Boolean(body.isAdmin) || Boolean(body.isApproved);
 
     const review = await prisma.review.create({
       data: {
-        productId: targetProductId,
-        customerName: customerName.trim(),
+        productId,
+        customerName,
         reviewerCity: reviewerCity?.trim() || null,
-        rating: Math.max(1, Math.min(5, Number(rating) || 5)),
-        title: title?.trim() || "Verified Buyer Review",
-        comment: comment.trim(),
+        rating: rating || 5,
+        title: title?.trim() || "Customer Review",
+        comment,
         imageUrl: imageUrl || null,
-        isApproved: isApprovedByAdmin, // Requires admin approval before appearing on website
-        isFeatured: Boolean(body.isFeatured),
+        isApproved: session ? Boolean(body.isApproved) : false,
+        isFeatured: session ? Boolean(body.isFeatured) : false,
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: isApprovedByAdmin
+      message: session && body.isApproved
         ? "Review published successfully!"
-        : "Thank you! Your review has been submitted for approval and will appear on the website shortly.",
-      review,
+        : "Thank you! Your review has been submitted for approval.",
+      review: session ? review : { id: review.id, isApproved: false },
     });
-  } catch (error: any) {
-    console.error("POST /api/reviews error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to submit review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/reviews error:", error);
   }
 }
 
-// PATCH: Update review (Approve/Reject, Like/Feature, Edit text)
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { id, isApproved, isFeatured, title, comment, rating } = body;
 
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Review ID is required" },
-        { status: 400 }
-      );
+    if (!id || typeof id !== "string") {
+      return jsonError("Review ID is required", 400);
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (typeof isApproved === "boolean") updateData.isApproved = isApproved;
     if (typeof isFeatured === "boolean") updateData.isFeatured = isFeatured;
-    if (typeof title === "string") updateData.title = title.trim();
-    if (typeof comment === "string") updateData.comment = comment.trim();
+    if (typeof title === "string") updateData.title = title.trim().slice(0, 120);
+    if (typeof comment === "string") updateData.comment = comment.trim().slice(0, 2000);
     if (typeof rating === "number") updateData.rating = Math.max(1, Math.min(5, rating));
 
     const updated = await prisma.review.update({
@@ -142,17 +130,15 @@ export async function PATCH(req: NextRequest) {
       message: "Review updated successfully",
       review: updated,
     });
-  } catch (error: any) {
-    console.error("PATCH /api/reviews error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to update review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("PATCH /api/reviews error:", error);
   }
 }
 
-// DELETE: Remove a review
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -167,25 +153,15 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Review ID is required" },
-        { status: 400 }
-      );
+      return jsonError("Review ID is required", 400);
     }
 
-    await prisma.review.delete({
-      where: { id },
-    });
-
+    await prisma.review.delete({ where: { id } });
     return NextResponse.json({
       success: true,
       message: "Review deleted successfully",
     });
-  } catch (error: any) {
-    console.error("DELETE /api/reviews error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to delete review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("DELETE /api/reviews error:", error);
   }
 }

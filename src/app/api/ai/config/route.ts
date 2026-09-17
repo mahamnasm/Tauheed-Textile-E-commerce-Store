@@ -1,25 +1,49 @@
 import { NextResponse } from "next/server";
 import { getDynamicAiConfig, saveDynamicAiConfig } from "@/lib/dynamicAiConfig";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError } from "@/lib/http";
 
-export async function GET() {
+function withoutSecret<T extends { apiKey?: string }>(config: T) {
+  const { apiKey, ...rest } = config;
+  return {
+    ...rest,
+    apiKeyConfigured: Boolean(apiKey || process.env.GEMINI_API_KEY),
+    apiKey: apiKey ? "••••••••" : "",
+  };
+}
+
+export async function GET(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   try {
     const config = await getDynamicAiConfig();
-    return NextResponse.json({ success: true, config });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to load AI config" }, { status: 500 });
+    return NextResponse.json({ success: true, config: withoutSecret(config) });
+  } catch (error: unknown) {
+    return internalError("AI config load error:", error);
   }
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await request.json();
-    const updated = await saveDynamicAiConfig(body);
+    const { apiKey: incomingKey, ...safeBody } = body || {};
+    const patch = {
+      ...safeBody,
+      ...(typeof incomingKey === "string" && incomingKey && !incomingKey.includes("•")
+        ? { apiKey: incomingKey }
+        : {}),
+    };
+    const updated = await saveDynamicAiConfig(patch);
     return NextResponse.json({
       success: true,
-      message: "AI configuration and automation rules updated successfully without code changes!",
-      config: updated,
+      message: "AI configuration updated.",
+      config: withoutSecret(updated),
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to save AI config" }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("AI config save error:", error);
   }
 }

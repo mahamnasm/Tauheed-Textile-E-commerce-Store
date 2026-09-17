@@ -1,30 +1,58 @@
 /**
  * Tauheed Textile — Administrative Security & Session Management
- * Universal Web Crypto API HMAC-SHA256 Token Provider
- * Compatible with Edge Runtime (Middleware) and Node.js Server Runtime
+ * HMAC-SHA256 token provider compatible with Edge Runtime middleware.
  */
 
-export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "usamanaseem101";
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "0345usama00";
-export const DEFAULT_MASTER_PIN = process.env.ADMIN_MASTER_PIN || "786000";
 export const ADMIN_COOKIE_NAME = "tauheed_admin_session";
-
-const SESSION_SECRET =
-  process.env.ADMIN_SESSION_SECRET ||
-  "tauheed-textile-admin-fortress-master-secret-key-2026-lahore-secure";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+
+function requiredEnv(name: string, minLength = 1): string {
+  const value = process.env[name];
+  if (!value || value.trim().length < minLength) {
+    throw new Error(`${name} is not configured`);
+  }
+  return value.trim();
+}
+
+export function getAdminUsername(): string {
+  return requiredEnv("ADMIN_USERNAME", 3);
+}
+
+export function getAdminPassword(): string {
+  return requiredEnv("ADMIN_PASSWORD", 8);
+}
+
+export function getDefaultMasterPin(): string {
+  return requiredEnv("ADMIN_MASTER_PIN", 4);
+}
+
+function getSessionSecret(): string {
+  return requiredEnv("ADMIN_SESSION_SECRET", 32);
+}
+
+export function isSecureAdminCookie(): boolean {
+  return process.env.NODE_ENV === "production";
+}
+
+export function adminSessionCookieOptions(maxAgeSeconds: number) {
+  return {
+    name: ADMIN_COOKIE_NAME,
+    httpOnly: true,
+    secure: isSecureAdminCookie(),
+    sameSite: "strict" as const,
+    path: "/",
+    maxAge: maxAgeSeconds,
+  };
+}
 
 function bytesToBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary)
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
 function base64UrlToBytes(b64url: string): Uint8Array {
@@ -41,24 +69,24 @@ function base64UrlToBytes(b64url: string): Uint8Array {
 }
 
 async function getCryptoKey(): Promise<CryptoKey> {
-  return await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(SESSION_SECRET),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
+  const secretBytes = encoder.encode(getSessionSecret());
+  const digest = await crypto.subtle.digest("SHA-256", secretBytes);
+  return crypto.subtle.importKey("raw", digest, { name: "HMAC", hash: "SHA-256" }, false, [
+    "sign",
+    "verify",
+  ]);
 }
 
-// Universal Timing-Safe String Comparison (Zero Timing Leakage)
 export function timingSafeCompare(a: string, b: string): boolean {
   if (typeof a !== "string" || typeof b !== "string") return false;
   const bufA = encoder.encode(a);
   const bufB = encoder.encode(b);
-  if (bufA.length !== bufB.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < bufA.length; i++) {
-    mismatch |= bufA[i] ^ bufB[i];
+  const len = Math.max(bufA.length, bufB.length, 1);
+  let mismatch = bufA.length === bufB.length ? 0 : 1;
+  for (let i = 0; i < len; i++) {
+    const ca = i < bufA.length ? bufA[i] : 0;
+    const cb = i < bufB.length ? bufB[i] : 0;
+    mismatch |= ca ^ cb;
   }
   return mismatch === 0;
 }
@@ -73,29 +101,22 @@ export interface AdminSessionPayload {
 
 export async function createAdminSessionToken(rememberMe: boolean = false): Promise<string> {
   const now = Date.now();
-  const durationMs = rememberMe
-    ? 30 * 24 * 60 * 60 * 1000 // 30 days
-    : 7 * 24 * 60 * 60 * 1000; // 7 days
+  const durationMs = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000;
+  const username = getAdminUsername();
 
   const payload: AdminSessionPayload = {
-    username: ADMIN_USERNAME,
-    name: "Usama Naseem",
+    username,
+    name: username,
     role: "Super Admin",
     iat: now,
     exp: now + durationMs,
   };
 
-  const payloadJson = JSON.stringify(payload);
-  const dataB64 = bytesToBase64Url(encoder.encode(payloadJson));
-  try {
-    const key = await getCryptoKey();
-    const signatureBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(dataB64) as any);
-    const sigB64 = bytesToBase64Url(new Uint8Array(signatureBuffer));
-
-    return `${dataB64}.${sigB64}`;
-  } catch (e) {
-    throw e;
-  }
+  const dataB64 = bytesToBase64Url(encoder.encode(JSON.stringify(payload)));
+  const key = await getCryptoKey();
+  const signatureBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(dataB64));
+  const sigB64 = bytesToBase64Url(new Uint8Array(signatureBuffer));
+  return `${dataB64}.${sigB64}`;
 }
 
 export async function verifyAdminSessionToken(
@@ -116,19 +137,18 @@ export async function verifyAdminSessionToken(
       "HMAC",
       key,
       sigBytes as any,
-      encoder.encode(dataB64) as any
+      encoder.encode(dataB64)
     );
 
     if (!isValid) return null;
 
-    const payloadBytes = base64UrlToBytes(dataB64);
-    const payload: AdminSessionPayload = JSON.parse(decoder.decode(payloadBytes));
+    const payload: AdminSessionPayload = JSON.parse(decoder.decode(base64UrlToBytes(dataB64)));
 
     if (payload.exp && Date.now() > payload.exp) {
       return null;
     }
 
-    if (payload.username !== ADMIN_USERNAME) {
+    if (payload.username !== getAdminUsername()) {
       return null;
     }
 

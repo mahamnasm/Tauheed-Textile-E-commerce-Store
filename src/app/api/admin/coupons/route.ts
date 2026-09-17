@@ -1,23 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
 
 // GET all coupons
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const coupons = await prisma.coupon.findMany({
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ success: true, coupons });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch coupons" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("GET /api/admin/coupons error:", error);
   }
 }
 
 // POST: Create a new coupon
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const {
@@ -32,10 +37,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!code || discountValue === undefined || discountValue === null) {
-      return NextResponse.json(
-        { success: false, error: "Coupon code and discount value are required." },
-        { status: 400 }
-      );
+      return jsonError("Coupon code and discount value are required.", 400);
     }
 
     const cleanCode = code.trim().toUpperCase();
@@ -46,10 +48,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { success: false, error: `Coupon code '${cleanCode}' already exists.` },
-        { status: 409 }
-      );
+      return jsonError(`Coupon code '${cleanCode}' already exists.`, 409);
     }
 
     const coupon = await prisma.coupon.create({
@@ -71,29 +70,31 @@ export async function POST(req: NextRequest) {
       message: `Coupon ${coupon.code} created successfully!`,
       coupon,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to create coupon" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/admin/coupons error:", error);
   }
 }
 
 // PATCH / PUT: Update an existing coupon
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { id, code, discountType, discountValue, minOrderValue, maxDiscount, usageLimit, isActive, expiresAt } = body;
 
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Coupon ID is required." },
-        { status: 400 }
-      );
+    if (!id || typeof id !== "string") {
+      return jsonError("Coupon ID is required.", 400);
     }
 
-    const updateData: any = {};
-    if (code !== undefined) updateData.code = code.trim().toUpperCase();
+    const existing = await prisma.coupon.findUnique({ where: { id } });
+    if (!existing) {
+      return jsonError("Coupon not found.", 404);
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (code !== undefined) updateData.code = String(code).trim().toUpperCase();
     if (discountType !== undefined) updateData.discountType = discountType;
     if (discountValue !== undefined) updateData.discountValue = Number(discountValue);
     if (minOrderValue !== undefined) updateData.minOrderValue = Number(minOrderValue);
@@ -112,25 +113,27 @@ export async function PATCH(req: NextRequest) {
       message: `Coupon ${updated.code} updated successfully!`,
       coupon: updated,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to update coupon" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("PATCH /api/admin/coupons error:", error);
   }
 }
 
 // DELETE: Remove coupon
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: "Coupon ID is required." },
-        { status: 400 }
-      );
+      return jsonError("Coupon ID is required.", 400);
+    }
+
+    const existing = await prisma.coupon.findUnique({ where: { id } });
+    if (!existing) {
+      return jsonError("Coupon not found.", 404);
     }
 
     await prisma.coupon.delete({
@@ -141,10 +144,7 @@ export async function DELETE(req: NextRequest) {
       success: true,
       message: "Coupon deleted successfully.",
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to delete coupon" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("DELETE /api/admin/coupons error:", error);
   }
 }

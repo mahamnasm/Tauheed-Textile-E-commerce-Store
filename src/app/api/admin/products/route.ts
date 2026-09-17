@@ -1,7 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
+
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50", 10) || 50));
+    const search = searchParams.get("search")?.trim();
+    const categoryId = searchParams.get("categoryId");
+
+    const where: Record<string, unknown> = {};
+    if (categoryId) where.categoryId = categoryId;
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { sku: { contains: search, mode: "insensitive" } },
+        { fabric: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const [total, products] = await Promise.all([
+      prisma.product.count({ where }),
+      prisma.product.findMany({
+        where,
+        include: {
+          category: { select: { id: true, name: true, slug: true } },
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err: unknown) {
+    return internalError("GET /api/admin/products error:", err);
+  }
+}
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const {
@@ -33,16 +89,13 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!title || !sku || !basePrice || !fabric) {
-      return NextResponse.json(
-        { error: "Title, SKU, Base Price, and Fabric are required fields." },
-        { status: 400 }
-      );
+      return jsonError("Title, SKU, Base Price, and Fabric are required fields.", 400);
     }
 
     // Process image list (supports 1 to unlimited images, e.g. 6, 8, 10+ images)
     let processedImages: string[] = [];
     if (Array.isArray(images) && images.length > 0) {
-      processedImages = images.map((u: any) => (typeof u === "string" ? u.trim() : "")).filter(Boolean);
+      processedImages = images.map((u: unknown) => (typeof u === "string" ? u.trim() : "")).filter(Boolean);
     }
     if (processedImages.length === 0 && imageUrl) {
       processedImages = [imageUrl.trim()];
@@ -131,11 +184,60 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, product });
-  } catch (err: any) {
-    console.error("Admin Product Creation Error:", err);
-    return NextResponse.json(
-      { error: err.message || "Failed to create product" },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    return internalError("POST /api/admin/products error:", err);
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
+  try {
+    const body = await req.json();
+    const { id, title, basePrice, comparePrice, salePrice, inStock, isFeatured, isBestSeller, isNewArrival, isSale } = body;
+
+    if (!id || typeof id !== "string") {
+      return jsonError("Product ID is required", 400);
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (title && typeof title === "string") updateData.title = title.trim();
+    if (basePrice !== undefined) updateData.basePrice = parseFloat(basePrice);
+    if (comparePrice !== undefined) updateData.comparePrice = comparePrice ? parseFloat(comparePrice) : null;
+    if (salePrice !== undefined) updateData.salePrice = salePrice ? parseFloat(salePrice) : null;
+    if (inStock !== undefined) updateData.inStock = Boolean(inStock);
+    if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
+    if (isBestSeller !== undefined) updateData.isBestSeller = Boolean(isBestSeller);
+    if (isNewArrival !== undefined) updateData.isNewArrival = Boolean(isNewArrival);
+    if (isSale !== undefined) updateData.isSale = Boolean(isSale);
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return NextResponse.json({ success: true, product: updated });
+  } catch (err: unknown) {
+    return internalError("PATCH /api/admin/products error:", err);
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return jsonError("Product ID is required", 400);
+    }
+
+    await prisma.product.delete({ where: { id } });
+    return NextResponse.json({ success: true, message: "Product deleted successfully" });
+  } catch (err: unknown) {
+    return internalError("DELETE /api/admin/products error:", err);
   }
 }

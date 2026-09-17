@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
 
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { variantId, sku, stockQuantity, syncProductSku } = body;
 
     if (!variantId) {
-      return NextResponse.json(
-        { success: false, error: "variantId is required" },
-        { status: 400 }
-      );
+      return jsonError("variantId is required", 400);
     }
 
     const cleanSku = sku ? sku.trim().toUpperCase() : undefined;
@@ -22,10 +24,7 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (!variant) {
-      return NextResponse.json(
-        { success: false, error: "Variant not found" },
-        { status: 404 }
-      );
+      return jsonError("Variant not found", 404);
     }
 
     // Check SKU duplicate if changing SKU
@@ -34,28 +33,24 @@ export async function PATCH(req: NextRequest) {
         where: { sku: cleanSku },
       });
       if (existing && existing.id !== variantId) {
-        return NextResponse.json(
-          { success: false, error: `SKU '${cleanSku}' is already assigned to another variant.` },
-          { status: 409 }
-        );
+        return jsonError(`SKU '${cleanSku}' is already assigned to another variant.`, 409);
       }
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (cleanSku) updateData.sku = cleanSku;
-    if (typeof stockQuantity === "number") updateData.stockQuantity = Math.max(0, stockQuantity);
+    if (stockQuantity !== undefined && stockQuantity !== null) {
+      updateData.stockQuantity = Math.max(0, parseInt(stockQuantity, 10));
+    }
 
-    const oldQty = variant.stockQuantity;
-    const newQty = typeof stockQuantity === "number" ? Math.max(0, stockQuantity) : oldQty;
-
+    // Update variant
     const updatedVariant = await prisma.productVariant.update({
       where: { id: variantId },
       data: updateData,
-      include: { product: true },
     });
 
-    // Optionally sync product main SKU if requested or if this is the default variant
-    if (cleanSku && syncProductSku && variant.product) {
+    // Optionally sync master product SKU
+    if (syncProductSku && cleanSku && variant.productId) {
       try {
         await prisma.product.update({
           where: { id: variant.productId },
@@ -66,8 +61,10 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    // Record movement if quantity changed or SKU adjusted
-    if (newQty !== oldQty || (cleanSku && cleanSku !== variant.sku)) {
+    // Log inventory movement if stock changed
+    if (stockQuantity !== undefined && stockQuantity !== null) {
+      const oldQty = variant.stockQuantity;
+      const newQty = Math.max(0, parseInt(stockQuantity, 10));
       try {
         await prisma.inventoryMovement.create({
           data: {
@@ -92,11 +89,7 @@ export async function PATCH(req: NextRequest) {
       message: `Variant SKU updated to '${updatedVariant.sku}' successfully!`,
       variant: updatedVariant,
     });
-  } catch (error: any) {
-    console.error("Failed to update variant SKU:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to update SKU" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("PATCH /api/admin/inventory/sku error:", error);
   }
 }

@@ -1,10 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-const DEFAULT_DATABASE_URL =
-  "postgresql://neondb_owner:npg_sDFJWa1k7dZx@ep-lucky-wave-aeftpyv1-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = DEFAULT_DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL is not configured. Set it in your environment before starting the application."
+  );
 }
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -14,10 +15,12 @@ export const prisma =
   new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL || DEFAULT_DATABASE_URL,
+        url: databaseUrl,
       },
     },
-    log: ['error'],
+    log: ["error"],
   });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}

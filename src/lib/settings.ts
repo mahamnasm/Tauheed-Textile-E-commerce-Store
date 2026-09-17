@@ -43,6 +43,9 @@ export interface SiteLayoutSettings {
   showReviews: boolean;
   reviewsTitle: string;
   showHeritage: boolean;
+  showTrustPerks?: boolean;
+  showNewsletter?: boolean;
+  showInstagramGrid?: boolean;
 
   // 5. Brand Heritage & Story
   heritageBadge: string;

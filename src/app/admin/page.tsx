@@ -10,13 +10,16 @@ export default async function AdminDashboardPage() {
     prisma.order.findMany({
       include: { items: true },
       orderBy: { createdAt: "desc" },
+      take: 50,
     }),
     prisma.productVariant.findMany({
       select: { stockQuantity: true },
+      take: 1000,
     }),
     prisma.bankTransferProof.findMany({
       where: { status: "PENDING" },
       select: { id: true },
+      take: 50,
     }),
     getLatestIntrusionAlert(),
   ]);

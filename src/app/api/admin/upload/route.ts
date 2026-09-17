@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       }
 
       const bytes = await file.arrayBuffer();
-      let finalBuffer = Buffer.from(bytes);
+      let finalBuffer: Buffer<ArrayBufferLike> = Buffer.from(bytes);
       let finalExt = rawExt;
 
       // Automatically optimize image uploads through Sharp pipeline

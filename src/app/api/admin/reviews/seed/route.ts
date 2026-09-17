@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError } from "@/lib/http";
 
-export const DESI_REVIEWS_SEED_DATA = [
+const DESI_REVIEWS_SEED_DATA = [
   {
     customerName: "Fatima Zahra",
     reviewerCity: "Lahore, DHA Phase 5",
@@ -115,6 +117,9 @@ export const DESI_REVIEWS_SEED_DATA = [
 ];
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const products = await prisma.product.findMany({
       select: { id: true },
@@ -170,10 +175,6 @@ export async function POST(req: NextRequest) {
       reviews: createdReviews,
     });
   } catch (error: any) {
-    console.error("Seed reviews error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to seed reviews." },
-      { status: 500 }
-    );
+    return internalError(error, "Failed to seed reviews.");
   }
 }

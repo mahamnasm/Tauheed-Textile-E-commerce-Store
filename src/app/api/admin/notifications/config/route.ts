@@ -7,9 +7,14 @@ import {
   formatOrderMessage,
   generateDirectWhatsAppUrl,
 } from "@/lib/orderNotificationService";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
 
 // GET current WhatsApp and Business Email configurations
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const [whatsappConfig, emailConfig] = await Promise.all([
       getWhatsAppConfig(),
@@ -21,16 +26,16 @@ export async function GET() {
       whatsappConfig,
       emailConfig,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to load notification settings" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("GET /api/admin/notifications/config error:", error);
   }
 }
 
 // POST: Save configurations
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { whatsappConfig, emailConfig } = body;
@@ -51,16 +56,16 @@ export async function POST(req: NextRequest) {
       whatsappConfig: updatedWa,
       emailConfig: updatedEmail,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to save notification settings" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/admin/notifications/config error:", error);
   }
 }
 
 // PUT: Test sending
 export async function PUT(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
     const { type, testPhone, testEmail } = body;
@@ -101,11 +106,8 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: false, error: "Invalid test type" }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Test dispatch failed" },
-      { status: 500 }
-    );
+    return jsonError("Invalid test type", 400);
+  } catch (error: unknown) {
+    return internalError("PUT /api/admin/notifications/config error:", error);
   }
 }

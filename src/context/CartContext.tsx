@@ -21,6 +21,7 @@ interface CartContextType {
   cart: CartItem[];
   cartCount: number;
   cartSubtotal: number;
+  cartTotal: number;
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -133,6 +134,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cart,
         cartCount,
         cartSubtotal,
+        cartTotal: cartSubtotal,
         isCartOpen,
         openCart,
         closeCart,

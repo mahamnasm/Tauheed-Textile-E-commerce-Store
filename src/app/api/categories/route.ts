@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { categoryMutationSchema } from "@/lib/validation";
+import { firstZodMessage, internalError, jsonError } from "@/lib/http";
 
-// GET: Fetch all categories and subcategories
+function toSlug(name: string, slug?: string) {
+  return (slug || name)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+    .slice(0, 100);
+}
+
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
@@ -15,40 +26,28 @@ export async function GET() {
     });
 
     return NextResponse.json({ success: true, categories });
-  } catch (error: any) {
-    console.error("GET /api/categories error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch categories" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("GET /api/categories error:", error);
   }
 }
 
-// POST: Create category or subcategory
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
-    const { type, name, slug, description, image, categoryId } = body;
-
-    if (!name) {
-      return NextResponse.json(
-        { success: false, error: "Name is required" },
-        { status: 400 }
-      );
+    const parsed = categoryMutationSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError(firstZodMessage(parsed.error), 400);
     }
 
-    const generatedSlug = (slug || name)
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
+    const { type, name, slug, description, image, categoryId } = parsed.data;
+    const generatedSlug = toSlug(name, slug);
 
     if (type === "subcategory") {
       if (!categoryId) {
-        return NextResponse.json(
-          { success: false, error: "Parent category ID is required for subcategory" },
-          { status: 400 }
-        );
+        return jsonError("Parent category ID is required for subcategory", 400);
       }
 
       const sub = await prisma.subcategory.create({
@@ -62,7 +61,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, subcategory: sub });
     }
 
-    // Category create
     const cat = await prisma.category.create({
       data: {
         name: name.trim(),
@@ -73,34 +71,30 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, category: cat });
-  } catch (error: any) {
-    console.error("POST /api/categories error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to create" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/categories error:", error);
   }
 }
 
-// PATCH: Update category or subcategory
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = await req.json();
-    const { type, id, name, slug, description, image } = body;
-
-    if (!id || !name) {
-      return NextResponse.json(
-        { success: false, error: "ID and name are required" },
-        { status: 400 }
-      );
+    const parsed = categoryMutationSchema.safeParse(body);
+    if (!parsed.success || !parsed.data.id) {
+      return jsonError("ID and name are required", 400);
     }
+
+    const { type, id, name, slug, description, image } = parsed.data;
 
     if (type === "subcategory") {
       const updatedSub = await prisma.subcategory.update({
         where: { id },
         data: {
           name: name.trim(),
-          ...(slug ? { slug } : {}),
+          ...(slug ? { slug: toSlug(name, slug) } : {}),
         },
       });
       return NextResponse.json({ success: true, subcategory: updatedSub });
@@ -110,51 +104,56 @@ export async function PATCH(req: NextRequest) {
       where: { id },
       data: {
         name: name.trim(),
-        ...(slug ? { slug } : {}),
+        ...(slug ? { slug: toSlug(name, slug) } : {}),
         ...(description !== undefined ? { description } : {}),
         ...(image ? { image } : {}),
       },
     });
 
     return NextResponse.json({ success: true, category: updatedCat });
-  } catch (error: any) {
-    console.error("PATCH /api/categories error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to update" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("PATCH /api/categories error:", error);
   }
 }
 
-// DELETE: Remove category or subcategory
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const type = searchParams.get("type"); // "category" or "subcategory"
+    const type = searchParams.get("type");
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: "ID is required" },
-        { status: 400 }
-      );
+      return jsonError("ID is required", 400);
     }
 
     if (type === "subcategory") {
+      const subProductCount = await prisma.product.count({ where: { subcategoryId: id } });
+      if (subProductCount > 0) {
+        return jsonError(
+          `Cannot delete this subcategory because ${subProductCount} active product(s) are assigned to it.`,
+          400
+        );
+      }
       await prisma.subcategory.delete({ where: { id } });
       return NextResponse.json({ success: true, message: "Subcategory deleted" });
     }
 
-    // Category delete (will cascade delete subcategories if foreign key cascade is configured, or check)
+    const productCount = await prisma.product.count({ where: { categoryId: id } });
+    if (productCount > 0) {
+      return jsonError(
+        `Cannot delete this category because ${productCount} active product(s) are assigned to it. Please reassign or delete the products first.`,
+        400
+      );
+    }
+
     await prisma.subcategory.deleteMany({ where: { categoryId: id } });
     await prisma.category.delete({ where: { id } });
 
     return NextResponse.json({ success: true, message: "Category deleted" });
-  } catch (error: any) {
-    console.error("DELETE /api/categories error:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to delete" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("DELETE /api/categories error:", error);
   }
 }

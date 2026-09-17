@@ -6,7 +6,7 @@ describe('Authentication & Helper Utilities', () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
-    process.env = { ...ORIGINAL_ENV, JWT_SECRET: 'test-secret-key-12345' };
+    process.env = { ...ORIGINAL_ENV, JWT_SECRET: 'test-secret-key-12345-satisfies-32-chars-minimum' };
   });
 
   afterEach(() => {

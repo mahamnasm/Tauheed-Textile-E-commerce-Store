@@ -1,7 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { batchOptimizeCatalogWithAi } from "@/lib/aiSeo";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError } from "@/lib/http";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return auth.response;
+
   try {
     const results = await batchOptimizeCatalogWithAi();
     return NextResponse.json({
@@ -9,10 +14,7 @@ export async function POST() {
       message: `Successfully optimized ${results.updatedCount} products for Google search.`,
       results,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to run AI catalog optimization" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return internalError("POST /api/admin/seo/optimize-all error:", error);
   }
 }

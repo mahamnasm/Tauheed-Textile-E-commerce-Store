@@ -12,7 +12,7 @@ function AdminLoginForm() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/admin";
 
-  const [username, setUsername] = useState("usamanaseem101");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -159,7 +159,7 @@ function AdminLoginForm() {
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="e.g. usamanaseem101"
+                  placeholder="Enter your username"
                   className="w-full pl-10 pr-4 py-3 bg-brand-900/80 border border-sand-800 rounded-xl text-sand-100 placeholder-sand-600 text-xs focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/50 transition-all font-mono"
                 />
               </div>

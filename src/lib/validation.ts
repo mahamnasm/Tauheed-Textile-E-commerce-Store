@@ -1,8 +1,18 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { firstZodMessage, zodFieldErrors } from "./http";
 
-// Pakistani mobile phone pattern: accepts 03001234567, +923001234567, or 10-13 digits
+// Pakistani mobile phone pattern: 03001234567, +923001234567, 923001234567
 const phoneRegex = /^(\+92|92|0)?3[0-9]{9}$/;
+
+const optionalPkPhone = z
+  .string()
+  .trim()
+  .max(16)
+  .optional()
+  .refine((val) => !val || phoneRegex.test(val.replace(/[\s-]/g, "")), {
+    message: "Enter a valid Pakistani mobile number",
+  });
 
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required").max(100),
@@ -11,15 +21,14 @@ export const orderItemSchema = z.object({
   color: z.string().max(50).optional(),
   stitchedType: z.string().max(50).optional(),
   price: z.number().nonnegative().optional(),
-  costPrice: z.number().optional().default(0),
   quantity: z.number().int().min(1, "Quantity must be at least 1").max(50, "Quantity cannot exceed 50 per item"),
   total: z.number().nonnegative().optional(),
 });
 
 export const createOrderSchema = z.object({
   customerName: z.string().min(2, "Customer name must be at least 2 characters").max(100, "Name is too long").trim(),
-  customerPhone: z.string().min(10, "Valid phone number required").max(15, "Phone number is too long").trim().optional(),
-  guestPhone: z.string().min(10, "Valid phone number required").max(15, "Phone number is too long").trim().optional(),
+  customerPhone: optionalPkPhone,
+  guestPhone: optionalPkPhone,
   customerEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
   guestEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
   shippingAddress: z.string().min(5, "Delivery address must be at least 5 characters").max(300, "Address is too long").trim().optional(),
@@ -39,7 +48,7 @@ export const createOrderSchema = z.object({
   notes: z.string().max(500).optional().or(z.literal("")),
   bankTransferDetails: z
     .object({
-      proofImage: z.string().max(500).optional(),
+        proofImage: z.string().max(500).regex(/^(\/uploads\/|https:\/\/)/, "Invalid receipt path").optional(),
       referenceNumber: z.string().max(100).optional(),
       bankName: z.string().max(100).optional(),
     })
@@ -53,18 +62,51 @@ export const createOrderSchema = z.object({
 });
 
 export const createProductSchema = z.object({
-  title: z.string().min(2, "Product title is required"),
-  slug: z.string().min(2, "Product slug is required"),
-  sku: z.string().min(2, "SKU is required"),
-  description: z.string().min(10, "Description is required"),
-  fabric: z.string().min(2, "Fabric is required"),
-  workType: z.string().min(2, "Work type is required"),
-  basePrice: z.number().positive("Base price must be positive"),
-  salePrice: z.number().optional().nullable(),
-  costPrice: z.number().nonnegative().default(0),
-  categoryId: z.string().optional().nullable(),
-  subcategoryId: z.string().optional().nullable(),
-  collectionId: z.string().optional().nullable(),
+  title: z.string().min(2, "Product title is required").max(180).trim(),
+  sku: z.string().min(2, "SKU is required").max(60).trim(),
+  fabric: z.string().min(2, "Fabric is required").max(80).trim(),
+  workType: z.string().max(80).optional(),
+  description: z.string().max(8000).optional(),
+  pieceCount: z.union([z.number(), z.string()]).optional(),
+  basePrice: z.union([z.number().positive(), z.string().min(1)]),
+  comparePrice: z.union([z.number(), z.string()]).optional().nullable(),
+  costPrice: z.union([z.number(), z.string()]).optional(),
+  categoryId: z.string().max(80).optional().nullable(),
+  collectionId: z.string().max(80).optional().nullable(),
+  barcode: z.string().max(80).optional().nullable(),
+  videoUrl: z.string().max(500).optional().nullable(),
+  imageUrl: z.string().max(500).optional(),
+  images: z.array(z.string().max(500)).max(24).optional(),
+  initialStock: z.union([z.number(), z.string()]).optional(),
+  weight: z.union([z.number(), z.string()]).optional(),
+  isNewArrival: z.boolean().optional(),
+  isBestSeller: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isSale: z.boolean().optional(),
+  isPreOrder: z.boolean().optional(),
+  preOrderDate: z.string().max(40).optional().nullable(),
+  packageIncludes: z.string().max(500).optional(),
+  careInstructions: z.string().max(500).optional(),
+});
+
+export const createReviewSchema = z.object({
+  productId: z.string().min(1).max(80),
+  customerName: z.string().min(2).max(80).trim(),
+  reviewerCity: z.string().max(80).optional(),
+  rating: z.number().int().min(1).max(5).optional(),
+  title: z.string().max(120).optional(),
+  comment: z.string().min(8).max(2000).trim(),
+  imageUrl: z.string().max(400000).optional(),
+});
+
+export const categoryMutationSchema = z.object({
+  type: z.enum(["category", "subcategory"]).optional(),
+  id: z.string().max(80).optional(),
+  name: z.string().min(2).max(80).trim(),
+  slug: z.string().max(100).optional(),
+  description: z.string().max(500).optional(),
+  image: z.string().max(500).optional(),
+  categoryId: z.string().max(80).optional(),
 });
 
 export const loginSchema = z.object({
@@ -95,7 +137,7 @@ export const adminLoginSchema = z.object({
 
 export const trackOrderSchema = z.object({
   orderNumber: z.string().min(4, "Order number is required").max(50).trim(),
-  phone: z.string().min(7, "Registered phone number is required").max(20).trim(),
+  phone: z.string().min(10, "Registered phone number is required").max(20).trim(),
 });
 
 export const verifyCouponSchema = z.object({
@@ -114,16 +156,12 @@ export async function validateRequestBody<T>(
     const json = await req.json();
     const parsed = schema.safeParse(json);
     if (!parsed.success) {
-      const firstError = parsed.error.errors[0]?.message || "Invalid input data";
       return {
         success: false,
         errorResponse: NextResponse.json(
           {
-            error: firstError,
-            validationErrors: parsed.error.errors.map((e) => ({
-              field: e.path.join("."),
-              message: e.message,
-            })),
+            error: firstZodMessage(parsed.error),
+            validationErrors: zodFieldErrors(parsed.error),
           },
           { status: 400 }
         ),

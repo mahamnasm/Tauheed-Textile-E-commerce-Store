@@ -58,7 +58,7 @@ export default function AdminSecurityClientView() {
   const [togglingLockdown, setTogglingLockdown] = useState(false);
   const [clearingLockouts, setClearingLockouts] = useState(false);
 
-  // Owner Code Shield & maham0345 Authentication
+  // Owner Code Shield Authentication
   const [ownerKeyInput, setOwnerKeyInput] = useState("");
   const [isOwnerAuthorized, setIsOwnerAuthorized] = useState(false);
   const [verifyingOwner, setVerifyingOwner] = useState(false);
@@ -342,7 +342,7 @@ export default function AdminSecurityClientView() {
               </div>
               <p className="text-xs text-sand-300 mt-1 max-w-2xl leading-relaxed">
                 Source code protection is strictly enforced. Backend algorithms, payment keys, and database models are encrypted.
-                Only the site owner (Maham Naseem) using password <span className="font-mono text-gold-400 font-bold bg-black/40 px-1.5 py-0.5 rounded border border-gold-500/30">maham0345</span> can authorize code updates and security releases.
+                Only the site owner (Maham Naseem) using the owner password can authorize code updates and security releases.
               </p>
             </div>
           </div>
@@ -370,7 +370,7 @@ export default function AdminSecurityClientView() {
                 type="password"
                 value={ownerKeyInput}
                 onChange={(e) => setOwnerKeyInput(e.target.value)}
-                placeholder="Enter Owner Authorization Password (maham0345)..."
+                placeholder="Enter Owner Authorization Password..."
                 className="w-full px-4 py-2.5 bg-black/50 border border-sand-700 rounded-xl text-xs font-mono text-sand-100 placeholder-sand-500 focus:outline-none focus:border-gold-500"
               />
             </div>

@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyAdminSessionToken, ADMIN_COOKIE_NAME } from "@/lib/adminSession";
-
-async function verifyAuth(request: NextRequest) {
-  const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
-  return await verifyAdminSessionToken(token);
-}
+import { parseVideoUrl } from "@/lib/videoUtils";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { internalError, jsonError } from "@/lib/http";
 
 // GET: List all runway reels with product details
 export async function GET(request: NextRequest) {
-  try {
-    const session = await verifyAuth(request);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
 
+  try {
     const reels = await prisma.watchBuyVideo.findMany({
       orderBy: { displayOrder: "asc" },
       include: {
@@ -45,58 +40,44 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, reels, products });
-  } catch (error: any) {
-    console.error("Fetch reels error:", error);
-    return NextResponse.json({ error: error.message || "Failed to load reels" }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("Fetch reels error:", error);
   }
 }
 
 // POST: Add new runway reel or attach video to product
 export async function POST(request: NextRequest) {
-  try {
-    const session = await verifyAuth(request);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
 
+  try {
     const body = await request.json();
-    const { title, videoUrl, productId, displayOrder, isActive, attachToProduct } = body;
+    const { title, videoUrl, productId, displayOrder, makeReel = true } = body;
 
     if (!videoUrl || !productId) {
-      return NextResponse.json(
-        { error: "Video URL and Target Product are required." },
-        { status: 400 }
-      );
+      return jsonError("Video URL and Associated Product are required.", 400);
     }
 
-    // 1. Check if product exists
-    const existingProduct = await prisma.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!existingProduct) {
-      return NextResponse.json(
-        { error: `Product with ID '${productId}' does not exist.` },
-        { status: 404 }
-      );
+    const videoInfo = parseVideoUrl(videoUrl);
+    if (!videoInfo.rawUrl || !videoInfo.isEmbeddable) {
+      return jsonError("Invalid video URL. Please provide a valid direct MP4, YouTube, or Instagram video link.", 400);
     }
 
     const product = await prisma.product.update({
       where: { id: productId },
-      data: { videoUrl },
+      data: { videoUrl: videoUrl.trim() },
+      include: { images: { take: 1 } },
     });
 
     let reel = null;
-    // 2. If attaching to storefront Watch & Buy reels
-    if (attachToProduct !== false) {
-      const order = typeof displayOrder === "number" ? displayOrder : 0;
+    if (makeReel) {
       reel = await prisma.watchBuyVideo.create({
         data: {
-          title: title || `${product.title} Runway Reel`,
-          videoUrl,
-          productId,
-          displayOrder: order,
-          isActive: isActive !== false,
+          title: title ? title.trim() : `${product.title} - Runway Reel`,
+          videoUrl: videoUrl.trim(),
+          productId: product.id,
+          displayOrder: displayOrder ? parseInt(displayOrder, 10) : 0,
+          isActive: true,
         },
         include: {
           product: {
@@ -119,25 +100,27 @@ export async function POST(request: NextRequest) {
       product,
       reel,
     });
-  } catch (error: any) {
-    console.error("Create reel error:", error);
-    return NextResponse.json({ error: error.message || "Failed to save runway reel" }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("Create reel error:", error);
   }
 }
 
 // DELETE: Remove runway reel
 export async function DELETE(request: NextRequest) {
-  try {
-    const session = await verifyAuth(request);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
 
+  try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "Reel ID is required" }, { status: 400 });
+      return jsonError("Reel ID is required", 400);
+    }
+
+    const existing = await prisma.watchBuyVideo.findUnique({ where: { id } });
+    if (!existing) {
+      return jsonError("Reel not found", 404);
     }
 
     await prisma.watchBuyVideo.delete({
@@ -145,8 +128,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, message: "Runway reel deleted successfully." });
-  } catch (error: any) {
-    console.error("Delete reel error:", error);
-    return NextResponse.json({ error: error.message || "Failed to delete reel" }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("Delete reel error:", error);
   }
 }

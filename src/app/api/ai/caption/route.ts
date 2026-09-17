@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { getDynamicAiConfig } from "@/lib/dynamicAiConfig";
+import { internalError } from "@/lib/http";
 
 export async function POST(request: Request) {
   try {
@@ -15,18 +16,10 @@ export async function POST(request: Request) {
     if (apiKey) {
       try {
         const ai = new GoogleGenAI({ apiKey });
-        const prompt = `Write an engaging Instagram/TikTok reel caption for Pakistani clothing brand Tauheed Textile:
-Product: "${title}"
-Fabric: "${fabric}"
-Price: PKR ${price}
-Occasion: "${occasion || "Festive & Wedding"}"
-Include emojis, Pakistani couture aesthetic, CTA to order with Cash on Delivery, and 8-10 trending hashtags.`;
-
         const res = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: prompt,
+          model: config.activeModel || "gemini-2.5-flash",
+          contents: `Write an engaging Instagram luxury apparel caption and hashtags for Pakistani boutique 'Tauheed Textile'. Product: ${title}, Fabric: ${fabric}, Price: PKR ${price}, Occasion: ${occasion || "Festive/Daily"}. Keep it elegant, luxurious, and concise with contact/COD details.`,
         });
-
         if (res && res.text) {
           caption = res.text.trim();
         }
@@ -36,7 +29,7 @@ Include emojis, Pakistani couture aesthetic, CTA to order with Cash on Delivery,
     }
 
     return NextResponse.json({ success: true, caption });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to generate caption" }, { status: 500 });
+  } catch (error: unknown) {
+    return internalError("POST /api/ai/caption error:", error);
   }
 }

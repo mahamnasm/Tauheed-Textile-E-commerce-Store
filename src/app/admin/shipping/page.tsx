@@ -15,20 +15,33 @@ export default async function AdminShippingPage() {
         orderNumber: true,
         customerName: true,
         city: true,
-        status: true,
+        orderStatus: true,
         total: true,
         trackingNumber: true,
-        courier: true,
-        notes: true,
+        courierName: true,
+        staffNotes: true,
         createdAt: true,
       },
     }),
   ]);
 
+  const formattedOrders = recentOrders.map((order) => ({
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    city: order.city,
+    status: order.orderStatus,
+    total: order.total,
+    trackingNumber: order.trackingNumber,
+    courier: order.courierName,
+    notes: order.staffNotes,
+    createdAt: order.createdAt,
+  }));
+
   return (
     <AdminShippingClientView
       initialZones={zones as any}
-      recentOrders={recentOrders as any}
+      recentOrders={formattedOrders as any}
     />
   );
 }
