@@ -27,11 +27,13 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<Record<string, boolean>>({});
+  const [videoSources, setVideoSources] = useState<Record<string, string>>({});
 
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const playPromiseRef = useRef<Map<string, Promise<void> | null>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const activeVideoIdRef = useRef<string | null>(null);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -58,24 +60,25 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
     }
   };
 
-  // Safely play a specific video and pause all others (STRICT 1-VIDEO ONLY)
+  // Safely play a specific video and pause all others
   const playSingleVideo = useCallback((targetId: string, unmutedOverride?: boolean) => {
+    activeVideoIdRef.current = targetId;
     setActiveVideoId(targetId);
 
     // Pause all other videos first
     videoRefs.current.forEach((video, id) => {
-      if (id !== targetId) {
+      if (id !== targetId && !video.paused) {
         try {
           video.pause();
         } catch (_) {}
-        setIsPlaying((prev) => ({ ...prev, [id]: false }));
       }
     });
 
     // Play target video
     const targetVideo = videoRefs.current.get(targetId);
     if (targetVideo) {
-      targetVideo.muted = unmutedOverride !== undefined ? !unmutedOverride : isMuted;
+      const shouldMute = unmutedOverride !== undefined ? !unmutedOverride : isMuted;
+      targetVideo.muted = shouldMute;
 
       const promise = targetVideo.play();
       if (promise !== undefined) {
@@ -85,7 +88,6 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
             setIsPlaying((prev) => ({ ...prev, [targetId]: true }));
           })
           .catch((err) => {
-            // Browser autoplay policy or interruption - handle gracefully
             if (err.name !== "AbortError") {
               targetVideo.muted = true;
               setIsMuted(true);
@@ -99,7 +101,7 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
   // Pause a video safely
   const pauseVideo = useCallback((targetId: string) => {
     const targetVideo = videoRefs.current.get(targetId);
-    if (targetVideo) {
+    if (targetVideo && !targetVideo.paused) {
       const existingPromise = playPromiseRef.current.get(targetId);
       if (existingPromise) {
         existingPromise
@@ -120,12 +122,14 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
 
   // Pause ALL videos (e.g., when whole section scrolled out of view)
   const pauseAllVideos = useCallback(() => {
-    videoRefs.current.forEach((video, id) => {
-      try {
-        video.pause();
-      } catch (_) {}
-      setIsPlaying((prev) => ({ ...prev, [id]: false }));
+    videoRefs.current.forEach((video) => {
+      if (!video.paused) {
+        try {
+          video.pause();
+        } catch (_) {}
+      }
     });
+    activeVideoIdRef.current = null;
     setActiveVideoId(null);
   }, []);
 
@@ -134,10 +138,10 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
     const video = videoRefs.current.get(id);
     if (!video) return;
 
-    if (activeVideoId === id && isPlaying[id]) {
-      pauseVideo(id);
-    } else {
+    if (video.paused) {
       playSingleVideo(id);
+    } else {
+      pauseVideo(id);
     }
   };
 
@@ -147,7 +151,6 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
     const newMuted = !isMuted;
     setIsMuted(newMuted);
 
-    // Apply to current active video
     const video = videoRefs.current.get(id);
     if (video) {
       video.muted = newMuted;
@@ -157,7 +160,12 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
     }
   };
 
-  // Auto-run on scroll: IntersectionObserver detects which video is currently in view
+  const playSingleVideoRef = useRef(playSingleVideo);
+  playSingleVideoRef.current = playSingleVideo;
+  const pauseAllVideosRef = useRef(pauseAllVideos);
+  pauseAllVideosRef.current = pauseAllVideos;
+
+  // Auto-play in viewport without recursive re-render loops
   useEffect(() => {
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
 
@@ -172,9 +180,8 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
           }
         });
 
-        // Find the video card with the highest visible ratio
         let bestId: string | null = null;
-        let maxRatio = 0.35; // Minimum 35% visible to auto-play
+        let maxRatio = 0.45;
 
         visibleRatios.forEach((ratio, id) => {
           if (ratio > maxRatio) {
@@ -183,21 +190,17 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
           }
         });
 
-        if (bestId) {
-          if (bestId !== activeVideoId) {
-            playSingleVideo(bestId);
-          }
-        } else {
-          // No video sufficiently in view -> pause all to conserve resources & avoid glitches
-          pauseAllVideos();
+        if (bestId && bestId !== activeVideoIdRef.current) {
+          playSingleVideoRef.current(bestId);
+        } else if (!bestId && activeVideoIdRef.current) {
+          pauseAllVideosRef.current();
         }
       },
       {
-        threshold: [0, 0.25, 0.5, 0.75, 1.0],
+        threshold: [0, 0.5, 1.0],
       }
     );
 
-    // Observe each video card
     cardRefs.current.forEach((el) => {
       observer.observe(el);
     });
@@ -205,7 +208,7 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
     return () => {
       observer.disconnect();
     };
-  }, [videos, activeVideoId, playSingleVideo, pauseAllVideos]);
+  }, [videos]);
 
   return (
     <section className="bg-[#171717] py-16 sm:py-20 select-none">
@@ -288,13 +291,21 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                       ) : (
                         <video
                           ref={(el) => setVideoRef(v.id, el)}
-                          src={v.videoUrl}
+                          src={videoSources[v.id] || v.videoUrl}
                           loop
                           muted={isMuted}
                           playsInline
-                          preload="metadata"
-                          poster={v.product?.images?.[0]?.url || "/assets/reel-1.jpg"}
-                          className="w-full h-full object-cover select-none pointer-events-none"
+                          preload="auto"
+                          poster={v.product?.images?.[0]?.url || "/assets/products/prod-bano-printed.jpg"}
+                          className="w-full h-full object-cover select-none"
+                          onPlay={() => setIsPlaying((prev) => ({ ...prev, [v.id]: true }))}
+                          onPause={() => setIsPlaying((prev) => ({ ...prev, [v.id]: false }))}
+                          onError={() => {
+                            setVideoSources((prev) => ({
+                              ...prev,
+                              [v.id]: "/assets/runway-walk-1.mp4",
+                            }));
+                          }}
                         />
                       )}
 
@@ -342,17 +353,25 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                   {/* Center Play/Pause Overlay Indicator on Click (Native MP4 only) */}
                   {!isExternal && (
                     <div
-                      className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 pointer-events-none ${
-                        !playing ? "opacity-100 bg-black/30" : "opacity-0 group-hover:opacity-60"
+                      className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+                        !playing ? "opacity-100 bg-black/30" : "opacity-0 group-hover:opacity-80"
                       }`}
                     >
-                      <div className="w-14 h-14 rounded-full bg-black/60 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl transform transition-transform group-hover:scale-110">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePlay(v.id);
+                        }}
+                        className="w-16 h-16 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border-2 border-white/40 flex items-center justify-center text-white shadow-2xl transition-all duration-200 transform hover:scale-110 pointer-events-auto cursor-pointer"
+                        aria-label={playing ? "Pause runway reel" : "Play runway reel"}
+                      >
                         {playing ? (
-                          <Pause className="w-6 h-6 text-white" />
+                          <Pause className="w-7 h-7 text-white" />
                         ) : (
-                          <Play className="w-6 h-6 text-white fill-white ml-1" />
+                          <Play className="w-7 h-7 text-white fill-white ml-1" />
                         )}
-                      </div>
+                      </button>
                     </div>
                   )}
 
