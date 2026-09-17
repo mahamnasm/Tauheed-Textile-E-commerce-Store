@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
@@ -61,9 +62,9 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Cryptographically random filename with safe characters only
-    const randomHex = Math.random().toString(36).substring(2, 12);
-    const filename = `receipt_${Date.now()}_${randomHex}${ext}`;
+    // Cryptographically secure random filename
+    const uniqueId = crypto.randomUUID();
+    const filename = `receipt_${Date.now()}_${uniqueId}${ext}`;
     const filePath = path.join(uploadDir, filename);
 
     fs.writeFileSync(filePath, buffer);

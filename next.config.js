@@ -1,4 +1,20 @@
 /** @type {import('next').NextConfig} */
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com data:;
+  img-src 'self' data: blob: https:;
+  media-src 'self' https: blob:;
+  frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://challenges.cloudflare.com;
+  connect-src 'self' https: https://generativelanguage.googleapis.com;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'self';
+  upgrade-insecure-requests;
+`.replace(/\s{2,}/g, ' ').trim();
+
 const nextConfig = {
   reactStrictMode: true,
   compress: true,
@@ -72,6 +88,10 @@ const nextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader,
           },
         ],
       },

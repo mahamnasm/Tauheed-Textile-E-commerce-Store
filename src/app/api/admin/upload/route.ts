@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import { optimizeImageBuffer } from "@/lib/imageProcessor";
 
@@ -97,8 +98,8 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const randomHex = Math.random().toString(36).substring(2, 10);
-      const filename = `media_${Date.now()}_${randomHex}${finalExt}`;
+      const uniqueId = crypto.randomUUID();
+      const filename = `media_${Date.now()}_${uniqueId}${finalExt}`;
       const filePath = path.join(uploadDir, filename);
 
       fs.writeFileSync(filePath, finalBuffer);
