@@ -1,15 +1,21 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tauheed-textile-secret-key-2026';
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is missing. Please set JWT_SECRET in your environment configuration.');
+  }
+  return secret;
+}
 
 export function signToken(payload: { id: string; email: string; role: string; name: string }) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: string; name: string };
+    return jwt.verify(token, getJwtSecret()) as { id: string; email: string; role: string; name: string };
   } catch {
     return null;
   }
