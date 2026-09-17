@@ -165,6 +165,16 @@ export default function Footer({ initialSettings }: FooterProps) {
                   FAQs
                 </Link>
               </li>
+              <li>
+                <Link href="/policies/privacy" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/policies/terms" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
+                  Terms of Service
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -8,9 +8,11 @@ import CartFloat from "@/components/layout/CartFloat";
 import CartDrawer from "@/components/cart/CartDrawer";
 import AbandonedCartRetention from "@/components/cart/AbandonedCartRetention";
 import AIStylistModal from "@/components/ai/AIStylistModal";
+import CookieConsent from "@/components/layout/CookieConsent";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://tauheedtextile.com"),
   title: "Tauheed Textile | Luxury Pakistani Lawn, Chiffon & Pret Fashion",
   description: "Experience exquisite Pakistani women's clothing by Tauheed Textile. Shop luxury lawn, embroidered chiffon, ready-to-wear pret, unstitched 3-piece suits and bridal wedding collections with nationwide Cash on Delivery.",
   keywords: "Tauheed Textile, Pakistani Lawn 2026, Luxury Chiffon, Pakistani Pret, Unstitched Suits, Wedding Kalidar, Cash On Delivery Pakistan",
@@ -19,6 +21,30 @@ export const metadata: Metadata = {
     shortcut: "/logo-calligraphy.png",
     apple: "/logo-calligraphy.png",
   },
+  openGraph: {
+    type: "website",
+    title: "Tauheed Textile | Luxury Pakistani Lawn, Chiffon & Pret Fashion",
+    description: "Experience exquisite Pakistani women's clothing by Tauheed Textile. Shop luxury lawn, embroidered chiffon, ready-to-wear pret, unstitched 3-piece suits and bridal wedding collections with nationwide Cash on Delivery.",
+    url: "/",
+    siteName: "Tauheed Textile",
+    images: [
+      {
+        url: "/logo-calligraphy.png",
+        width: 1200,
+        height: 630,
+        alt: "Tauheed Textile Logo",
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tauheed Textile | Luxury Pakistani Lawn, Chiffon & Pret Fashion",
+    description: "Experience exquisite Pakistani women's clothing by Tauheed Textile. Shop luxury lawn, embroidered chiffon, ready-to-wear pret, unstitched 3-piece suits and bridal wedding collections with nationwide Cash on Delivery.",
+    images: ["/logo-calligraphy.png"],
+  },
+  alternates: {
+    canonical: "/",
+  }
 };
 
 import { getSiteSettings } from "@/lib/settings";
@@ -41,6 +67,14 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* Analytics Provider (e.g., Plausible) */}
+        {process.env.NEXT_PUBLIC_ANALYTICS_SCRIPT_URL && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_ANALYTICS_DOMAIN || "tauheedtextile.com"}
+            src={process.env.NEXT_PUBLIC_ANALYTICS_SCRIPT_URL}
+          />
+        )}
       </head>
       <body className="bg-[#F8F5F0] text-[#171717] antialiased selection:bg-[#7A6652] selection:text-white flex flex-col min-h-screen">
         <CartProvider>
@@ -69,6 +103,7 @@ export default async function RootLayout({
           <CartFloat />
           <main className="flex-1 pt-[88px] lg:pt-[108px]">{children}</main>
           <Footer initialSettings={settings} />
+          <CookieConsent />
         </CartProvider>
       </body>
     </html>
