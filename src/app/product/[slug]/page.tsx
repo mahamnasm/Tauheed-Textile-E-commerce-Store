@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductDetailClient from "@/components/shop/ProductDetailClient";
@@ -11,6 +12,47 @@ export const revalidate = 0;
 interface ProductPageProps {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = params;
+  let product: any = null;
+  try {
+    product = await prisma.product.findUnique({
+      where: { slug },
+      include: { images: true, category: true },
+    });
+  } catch {
+    product = FALLBACK_PRODUCTS.find((p) => p.slug === slug) || null;
+  }
+  if (!product) {
+    product = FALLBACK_PRODUCTS.find((p) => p.slug === slug) || null;
+  }
+  if (!product) {
+    return { title: "Ensemble | Tauheed Textile" };
+  }
+
+  const title = `${product.title} | Tauheed Textile`;
+  const description = product.description
+    ? product.description.slice(0, 160)
+    : `Shop ${product.title}. Premium Pakistani luxury fabric with nationwide Cash on Delivery.`;
+  const imageUrl = product.images?.[0]?.url || "/logo-calligraphy.png";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: imageUrl, alt: product.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
   };
 }
 
