@@ -59,5 +59,11 @@
   "optionalDependencies": {
     "@next/swc-linux-x64-gnu": "^14.2.35",
     "@next/swc-win32-x64-msvc": "^14.2.35"
+  },
+  "overrides": {
+    "postcss": "$postcss",
+    "vite": {
+      "esbuild": "^0.25.0"
+    }
   }
 }
