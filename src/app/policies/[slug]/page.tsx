@@ -170,6 +170,60 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
         </div>
       ),
     },
+    privacy: {
+      title: "Privacy Policy",
+      subtitle: "How we collect, use, and protect your data",
+      content: (
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <p>
+            At Tauheed Textile, we respect your privacy and are committed to protecting your personal information.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Information We Collect</h3>
+          <p>
+            We collect personal information such as your name, email address, phone number, and shipping address when you place an order or contact us. We also collect data about your browsing behavior on our website.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. How We Use Your Information</h3>
+          <p>
+            Your information is used to process orders, deliver products, and communicate with you about your order status. We may also use your email or phone number to send promotional updates, provided you have opted in.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Data Security</h3>
+          <p>
+            We implement industry-standard security measures to protect your personal information from unauthorized access, alteration, or disclosure.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Third-Party Sharing</h3>
+          <p>
+            We do not sell or share your personal data with third parties for marketing purposes. Your information is only shared with trusted service providers (such as courier companies) essential for order fulfillment.
+          </p>
+        </div>
+      ),
+    },
+    terms: {
+      title: "Terms of Service",
+      subtitle: "The rules and guidelines for using our website",
+      content: (
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <p>
+            By accessing and using the Tauheed Textile website, you agree to comply with the following Terms of Service.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Acceptance of Terms</h3>
+          <p>
+            If you do not agree to these terms, please do not use our website. We reserve the right to update or modify these terms at any time without prior notice.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. Product Availability & Pricing</h3>
+          <p>
+            All products are subject to availability. We reserve the right to limit the quantity of products we supply or to discontinue any product without notice. Prices for our products are subject to change without notice.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Intellectual Property</h3>
+          <p>
+            All content on this website, including images, text, and logos, is the property of Tauheed Textile and is protected by intellectual property laws. Unauthorized use of our content is strictly prohibited.
+          </p>
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Governing Law</h3>
+          <p>
+            These terms are governed by and construed in accordance with the laws of Pakistan.
+          </p>
+        </div>
+      ),
+    },
   };
 
   const currentPolicy = policies[slug];
@@ -232,6 +286,22 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
               className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-[#7A6652]" /> FAQ
+            </Link>
+          )}
+          {slug !== "privacy" && (
+            <Link
+              href="/policies/privacy"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4 text-[#7A6652]" /> Privacy Policy
+            </Link>
+          )}
+          {slug !== "terms" && (
+            <Link
+              href="/policies/terms"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <CheckCircle2 className="w-4 h-4 text-[#7A6652]" /> Terms of Service
             </Link>
           )}
         </div>
