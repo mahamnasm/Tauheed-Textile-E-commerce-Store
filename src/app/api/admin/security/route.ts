@@ -10,6 +10,8 @@ import {
   getSecurityAuditLogs,
   logSecurityEvent,
   clearAllLockouts,
+  verifyOwnerKey,
+  getLatestIntrusionAlert,
 } from "@/lib/adminSecurityStore";
 
 function getClientIp(request: NextRequest): string {
@@ -34,6 +36,7 @@ export async function GET(request: NextRequest) {
   try {
     const config = await getSecurityConfig();
     const logs = await getSecurityAuditLogs();
+    const latestThreat = await getLatestIntrusionAlert();
 
     return NextResponse.json({
       success: true,
@@ -42,8 +45,10 @@ export async function GET(request: NextRequest) {
         lockdownReason: config.lockdownReason,
         failedAttemptLimit: config.failedAttemptLimit,
         lockoutMinutes: config.lockoutMinutes,
+        codeShieldLocked: config.codeShieldLocked,
         masterPinMasked: "••••" + config.masterPin.slice(-2),
       },
+      latestThreat,
       logs,
     });
   } catch (error: any) {
@@ -64,8 +69,82 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    if (action === "TOGGLE_LOCKDOWN") {
+    // Verify Owner Master Key ("maham0345")
+    if (action === "VERIFY_OWNER_KEY") {
+      const { ownerKey } = body;
+      const isValid = verifyOwnerKey(ownerKey);
+
+      if (!isValid) {
+        await logSecurityEvent(
+          ip,
+          session.username,
+          "FAILED_PIN",
+          `Unauthorized attempt to unlock Owner Code Shield with key: "${ownerKey}".`,
+          userAgent
+        );
+        return NextResponse.json(
+          { error: "Incorrect Owner Master Password. Access to code modification is blocked." },
+          { status: 403 }
+        );
+      }
+
+      await logSecurityEvent(
+        ip,
+        session.username,
+        "CODE_SHIELD_AUTH",
+        "Owner Master Password 'maham0345' verified. System code and configuration modification authorized.",
+        userAgent
+      );
+
+      return NextResponse.json({
+        success: true,
+        authorized: true,
+        message: "Owner identity verified successfully. System code modification authorized.",
+      });
+    }
+
+    // Toggle Code Shield Lock
+    if (action === "TOGGLE_CODE_SHIELD") {
+      const { ownerKey } = body;
+      if (!verifyOwnerKey(ownerKey)) {
+        return NextResponse.json(
+          { error: "Owner authorization password 'maham0345' is required to modify Code Shield settings." },
+          { status: 403 }
+        );
+      }
+
       const config = await getSecurityConfig();
+      const updated = await updateSecurityConfig({ codeShieldLocked: !config.codeShieldLocked });
+
+      await logSecurityEvent(
+        ip,
+        session.username,
+        "CODE_SHIELD_AUTH",
+        `Owner Code Shield set to: ${updated.codeShieldLocked ? "ENCRYPTED & LOCKED" : "UNLOCKED"}`,
+        userAgent
+      );
+
+      return NextResponse.json({
+        success: true,
+        codeShieldLocked: updated.codeShieldLocked,
+        message: updated.codeShieldLocked
+          ? "Owner Code Shield is now ENCRYPTED & LOCKED. All alterations require password 'maham0345'."
+          : "Owner Code Shield unlocked for maintenance.",
+      });
+    }
+
+    if (action === "TOGGLE_LOCKDOWN") {
+      const { ownerKey } = body;
+      const config = await getSecurityConfig();
+
+      // If portal is currently locked down, releasing it requires owner key or current pin
+      if (config.emergencyLockdown && ownerKey && !verifyOwnerKey(ownerKey)) {
+        return NextResponse.json(
+          { error: "Incorrect Owner Password to release emergency lockdown." },
+          { status: 403 }
+        );
+      }
+
       const newStatus = !config.emergencyLockdown;
       const updated = await updateSecurityConfig({ emergencyLockdown: newStatus });
 
@@ -96,9 +175,10 @@ export async function POST(request: NextRequest) {
       }
 
       const config = await getSecurityConfig();
-      if (currentPin !== config.masterPin) {
+      const isOwnerOverride = verifyOwnerKey(currentPin);
+      if (!isOwnerOverride && currentPin !== config.masterPin) {
         return NextResponse.json(
-          { error: "Current Master PIN is incorrect." },
+          { error: "Current Master PIN or Owner Password 'maham0345' is required." },
           { status: 400 }
         );
       }
@@ -108,7 +188,7 @@ export async function POST(request: NextRequest) {
         ip,
         session.username,
         "PIN_CHANGED",
-        "Master Security PIN successfully updated by Super Admin.",
+        "Master Security PIN successfully updated.",
         userAgent
       );
 

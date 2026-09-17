@@ -10,6 +10,7 @@ import {
   Video, 
   Camera, 
   ShieldCheck, 
+  ShieldAlert,
   ArrowRight,
   ChevronRight,
   Clock,
@@ -27,6 +28,7 @@ interface AdminDashboardClientViewProps {
   lowStockCount: number;
   pendingBankProofsCount: number;
   recentOrders: any[];
+  latestSecurityAlert?: any;
 }
 
 export default function AdminDashboardClientView({
@@ -37,6 +39,7 @@ export default function AdminDashboardClientView({
   lowStockCount = 0,
   pendingBankProofsCount = 0,
   recentOrders = [],
+  latestSecurityAlert,
 }: AdminDashboardClientViewProps) {
   return (
     <div className="space-y-8 text-sand-950 pb-12">
@@ -85,6 +88,41 @@ export default function AdminDashboardClientView({
           </Link>
         </div>
       </div>
+
+      {/* Security Threat Alert (if failed attempts detected) */}
+      {latestSecurityAlert && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-amber-500 text-white shrink-0 mt-0.5">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider bg-amber-200 text-amber-950 px-2 py-0.5 rounded font-mono">
+                  ⚠️ Security Intrusion Warning
+                </span>
+                <span className="text-[11px] text-amber-800">
+                  {new Date(latestSecurityAlert.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+              <p className="text-xs text-amber-950 font-medium mt-1">
+                Unauthorized login attempt detected from IP <strong className="font-mono">{latestSecurityAlert.ip}</strong> ({latestSecurityAlert.location || "Pakistan"}).
+                {latestSecurityAlert.attemptedPassword && (
+                  <span className="ml-1.5 font-mono text-[11px] bg-rose-100 text-rose-950 px-1.5 py-0.5 rounded border border-rose-300">
+                    Password tried: "{latestSecurityAlert.attemptedPassword}"
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/security"
+            className="px-4 py-2 bg-brand-950 hover:bg-black text-sand-100 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm transition-all shrink-0 font-serif"
+          >
+            Manage Security & Lockouts →
+          </Link>
+        </div>
+      )}
 
       {/* 2. Four Essential Summary Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -33,7 +33,9 @@ import {
   RefreshCw,
   Smartphone,
   Monitor,
-  Upload
+  Upload,
+  MessageCircle,
+  Users
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -73,6 +75,22 @@ export default function AdminLayoutCustomizer({
   const [videos, setVideos] = useState<any[]>(initialVideos);
   const [isSaving, setIsSaving] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [showSimulatorModal, setShowSimulatorModal] = useState(false);
+
+  // Per-banner preview mode: Desktop vs Mobile simulator
+  const [bannerPreviewMode, setBannerPreviewMode] = useState<Record<number, "desktop" | "mobile">>({
+    1: "desktop",
+    2: "desktop",
+    3: "desktop",
+    4: "desktop",
+  });
+
+  const toggleBannerMode = (index: number) => {
+    setBannerPreviewMode((prev) => ({
+      ...prev,
+      [index]: prev[index] === "desktop" ? "mobile" : "desktop",
+    }));
+  };
 
   // New Video Reel State
   const [newVideoTitle, setNewVideoTitle] = useState("");
@@ -296,9 +314,15 @@ export default function AdminLayoutCustomizer({
       {/* TAB 1: ANNOUNCEMENT BAR */}
       {activeTab === "announcement" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-100 pb-4">
             <div>
-              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span>📍 Store Location:</span>
+                  <span className="text-gold-700 font-bold">Top of every store page (Above Header)</span>
+                </span>
+              </div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
                 <Megaphone className="w-5 h-5 text-gold-600" />
                 Top Announcement Ribbon
               </h2>
@@ -306,7 +330,7 @@ export default function AdminLayoutCustomizer({
                 The top bar displayed across the website above the navigation header.
               </p>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-sand-50 px-3 py-1.5 rounded-xl border border-sand-200">
               <input
                 type="checkbox"
                 checked={settings.announcementEnabled}
@@ -315,6 +339,37 @@ export default function AdminLayoutCustomizer({
               />
               <span className="text-xs font-bold text-brand-900">Enable Bar</span>
             </label>
+          </div>
+
+          {/* Live In-Place Preview */}
+          <div className="space-y-2 p-4 rounded-2xl bg-sand-50/70 border border-sand-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-brand-900 flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-gold-600" />
+                <span>Live Storefront Ribbon Simulation</span>
+              </span>
+              <span className="text-[10px] text-brand-500 font-medium">Updates in real time</span>
+            </div>
+            <div className={`w-full py-2.5 px-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-2 shadow-inner transition-all duration-300 ${
+              settings.announcementTheme === "midnight" ? "bg-[#171717] border-white/10 text-sand-200" :
+              settings.announcementTheme === "gold" ? "bg-amber-950 border-amber-800/40 text-amber-200" :
+              settings.announcementTheme === "emerald" ? "bg-emerald-950 border-emerald-800/40 text-emerald-200" :
+              "bg-rose-950 border-rose-800/40 text-rose-200"
+            }`}>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-bold tracking-wide">{settings.announcementText || "Festive Luxury Collection 2026 Live Now"}</span>
+                {settings.announcementSubtext && (
+                  <>
+                    <span className="opacity-40 hidden sm:inline">|</span>
+                    <span className="text-[11px] opacity-90 hidden sm:inline">{settings.announcementSubtext}</span>
+                  </>
+                )}
+              </div>
+              <div className="text-[10px] opacity-75 font-mono">
+                COD Free Above Rs. {settings.freeShippingThreshold?.toLocaleString() || "5,000"}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -397,9 +452,15 @@ export default function AdminLayoutCustomizer({
       {/* TAB 2: FESTIVE MARQUEE TICKER */}
       {activeTab === "marquee" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-100 pb-4">
             <div>
-              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span>📍 Store Location:</span>
+                  <span className="text-gold-700 font-bold">Sliding strip directly below the main navigation header</span>
+                </span>
+              </div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
                 <Sparkles className="w-5 h-5 text-gold-600" />
                 Festive Sliding Marquee Ticker
               </h2>
@@ -407,7 +468,7 @@ export default function AdminLayoutCustomizer({
                 A gold animated sliding ticker tape shown across the storefront for sales, drops, and festive notices.
               </p>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-sand-50 px-3 py-1.5 rounded-xl border border-sand-200">
               <input
                 type="checkbox"
                 checked={settings.marqueeEnabled}
@@ -418,6 +479,23 @@ export default function AdminLayoutCustomizer({
             </label>
           </div>
 
+          {/* Live In-Place Preview with sliding simulation */}
+          <div className="space-y-2 p-4 rounded-2xl bg-sand-50/70 border border-sand-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-brand-900 flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-gold-600" />
+                <span>Live Sliding Animation Simulation</span>
+              </span>
+              <span className="text-[10px] text-brand-500 font-medium">Real-time simulation</span>
+            </div>
+            <div className="w-full bg-gold-500 text-brand-950 py-2.5 px-4 rounded-xl overflow-hidden font-bold text-xs uppercase tracking-widest shadow-inner relative">
+              <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
+                <span>{settings.marqueeText || "⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE • EXPRESS 2-4 DAY COURIER DISPATCH"}</span>
+                <span>{settings.marqueeText || "⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE • EXPRESS 2-4 DAY COURIER DISPATCH"}</span>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-xs font-bold text-brand-900">Marquee Ticker Text</label>
@@ -425,11 +503,11 @@ export default function AdminLayoutCustomizer({
                 rows={3}
                 value={settings.marqueeText}
                 onChange={(e) => updateField("marqueeText", e.target.value)}
-                placeholder="âš¡ EID LUXURY LAWN DROP NOW LIVE â€¢ CASH ON DELIVERY NATIONWIDE â€¢ EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY â€¢ EXPRESS 2-4 DAY COURIER DISPATCH"
+                placeholder="⚡ EID LUXURY LAWN DROP NOW LIVE • CASH ON DELIVERY NATIONWIDE • EXCLUSIVE SWISS VOILE & REGAL EMBROIDERY • EXPRESS 2-4 DAY COURIER DISPATCH"
                 className="w-full px-4 py-3 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-sans leading-relaxed"
               />
               <p className="text-[11px] text-brand-500">
-                Tip: Separate key points with bullets (â€¢) or emojis (âš¡, âœ¨) for luxury editorial styling.
+                Tip: Separate key points with bullets (•) or emojis (⚡, ✨) for luxury editorial styling.
               </p>
             </div>
 
@@ -443,16 +521,6 @@ export default function AdminLayoutCustomizer({
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
               />
             </div>
-
-            {/* Live Ticker Preview */}
-            <div className="pt-2">
-              <label className="text-xs font-bold text-brand-900 block mb-2">Live Ticker Preview</label>
-              <div className="w-full bg-gold-500 text-brand-950 py-2.5 px-4 rounded-xl overflow-hidden font-bold text-xs uppercase tracking-widest shadow-inner">
-                <div className="truncate">
-                  {settings.marqueeText || "âš¡ LUXURY LAWN DROP NOW LIVE â€¢ CASH ON DELIVERY NATIONWIDE"}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       )}
@@ -460,9 +528,15 @@ export default function AdminLayoutCustomizer({
       {/* TAB 3: HERO BANNER & MEDIA */}
       {activeTab === "hero" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-sand-100 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-100 pb-4">
             <div>
-              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span>📍 Store Location:</span>
+                  <span className="text-gold-700 font-bold">First full-screen section visitors see on Homepage</span>
+                </span>
+              </div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
                 <ImageIcon className="w-5 h-5 text-gold-600" />
                 Hero Banner Showcase & Media
               </h2>
@@ -498,30 +572,82 @@ export default function AdminLayoutCustomizer({
             </div>
 
             {/* Banner Size Guide for Mobile & Desktop */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-amber-800" />
-                  <span className="font-serif font-bold text-xs sm:text-sm text-brand-950">
-                    Recommended Model Banner Dimensions
-                  </span>
-                  <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full">
-                    Mobile First
-                  </span>
+            <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100/50 border-2 border-amber-300 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/80 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-amber-500 text-white shadow-xs">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-bold text-sm sm:text-base text-brand-950">
+                      Master Banner Creation &amp; Mobile Cropping Guide
+                    </h3>
+                    <p className="text-xs text-brand-700">
+                      Follow these exact canvas dimensions so your models look gorgeous on all iPhones, Androids, and laptops without being cropped.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-[11px] text-brand-700 leading-relaxed max-w-xl">
-                  To ensure dresses and models look stunning on iPhone &amp; Android without cropping the embroidery or head:
-                </p>
-                <div className="flex flex-wrap gap-2 pt-1 font-mono text-[10px]">
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-300 text-amber-950 font-bold shadow-xs">
-                    📱 Mobile: 1080 × 1350 px (4:5 Ratio) or 1080 × 1920 px (9:16)
-                  </span>
-                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-300 text-amber-950 font-bold shadow-xs">
-                    💻 Desktop: 1920 × 850 px
-                  </span>
-                  <span className="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-300 text-emerald-950 font-bold">
-                    ✓ Keep model centered for auto-crop
-                  </span>
+                <span className="text-[11px] bg-amber-200 text-amber-950 font-bold px-3 py-1 rounded-full font-mono shrink-0">
+                  📱 Mobile First (~85% of Shoppers)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                {/* Mobile Dimension */}
+                <div className="bg-white/90 p-4 rounded-2xl border border-amber-200 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-brand-950 flex items-center gap-1.5">
+                      <Smartphone className="w-4 h-4 text-amber-700" />
+                      1. Mobile Phone View
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
+                      4:5 Portrait
+                    </span>
+                  </div>
+                  <div className="text-sm font-mono font-black text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200 text-center">
+                    1080 × 1350 px
+                  </div>
+                  <p className="text-[11px] text-brand-600 leading-relaxed">
+                    Mobile screens are vertical. Keep the model's head and neck embroidery centered in the canvas.
+                  </p>
+                </div>
+
+                {/* Desktop Dimension */}
+                <div className="bg-white/90 p-4 rounded-2xl border border-amber-200 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-brand-950 flex items-center gap-1.5">
+                      <Monitor className="w-4 h-4 text-amber-700" />
+                      2. Desktop / PC View
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
+                      16:6 Widescreen
+                    </span>
+                  </div>
+                  <div className="text-sm font-mono font-black text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200 text-center">
+                    1920 × 750 px
+                  </div>
+                  <p className="text-[11px] text-brand-600 leading-relaxed">
+                    Desktop screens are wide. Left 40% holds headline and buttons; right 60% shows the dress clearly.
+                  </p>
+                </div>
+
+                {/* Safe Zone Rule */}
+                <div className="bg-emerald-50/90 p-4 rounded-2xl border border-emerald-200 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-emerald-950 flex items-center gap-1.5">
+                      <Check className="w-4 h-4 text-emerald-700" />
+                      3. The Golden Safe Zone
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">
+                      Middle 60%
+                    </span>
+                  </div>
+                  <div className="text-xs text-emerald-900 bg-white p-2 rounded-xl border border-emerald-200 leading-relaxed">
+                    Always place model in the <strong>center 60%</strong>. This guarantees her face, dupatta, and embroidery never get cut off on any phone!
+                  </div>
+                  <p className="text-[10px] text-emerald-800 font-semibold">
+                    ✓ Use the [Desktop | Mobile] toggle below on each banner to verify cropping live!
+                  </p>
                 </div>
               </div>
             </div>
@@ -539,43 +665,152 @@ export default function AdminLayoutCustomizer({
                   </span>
                 </div>
 
-                {/* Banner 1 Image Preview & Upload */}
+                {/* Banner 1 Image Preview & Live Simulator */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-brand-900 block">Banner Photo (Model Editorial)</label>
-                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
-                    {settings.banner1Image ? (
-                      <Image
-                        src={settings.banner1Image}
-                        alt="Banner 1"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
-                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
-                        {uploadingBanner === 1 ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
-                            <span>Uploading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-3.5 h-3.5 text-brand-900" />
-                            <span>Upload Photo from PC</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingBanner === 1}
-                          onChange={(e) => handleBannerFileUpload(1, e)}
-                          className="hidden"
-                        />
-                      </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-brand-900">
+                      Banner Photo &amp; Live Simulation
+                    </label>
+                    <div className="flex items-center gap-1 bg-sand-100 p-0.5 rounded-lg text-[10px] font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 1: "desktop" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[1] === "desktop"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Monitor className="w-3 h-3" />
+                        <span>Desktop (16:7)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 1: "mobile" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[1] === "mobile"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>Mobile (375px)</span>
+                      </button>
                     </div>
                   </div>
+
+                  {bannerPreviewMode[1] === "desktop" ? (
+                    <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-300 shadow-inner">
+                      {settings.banner1Image ? (
+                        <Image
+                          src={settings.banner1Image}
+                          alt="Banner 1"
+                          fill
+                          className="object-cover object-top sm:object-center"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent flex items-center p-4 pointer-events-none">
+                        <div className="max-w-[240px] space-y-1 text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner1Tag || "FESTIVE SALE"}
+                            </span>
+                            {settings.banner1SaleBadge && (
+                              <span className="px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-[#9B3D3D] text-white">
+                                {settings.banner1SaleBadge}
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="font-serif text-sm font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner1Title || "UP TO 50% OFF"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner1Subtitle || "Exclusive seasonal markdowns..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-white text-brand-950 text-[9px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner1BtnText || "SHOP SALE"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2.5 right-2.5 z-10">
+                        <label className="cursor-pointer px-3 py-1.5 bg-white/95 hover:bg-white text-brand-950 text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all">
+                          {uploadingBanner === 1 ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-brand-900" />
+                              <span>Upload from PC</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingBanner === 1}
+                            onChange={(e) => handleBannerFileUpload(1, e)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-center">
+                      <div className="relative w-[240px] aspect-[9/16] max-h-[340px] mx-auto bg-black rounded-[28px] overflow-hidden border-4 border-brand-950 shadow-2xl flex flex-col justify-end">
+                        <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-2.5 bg-brand-950 rounded-full z-20" />
+                        {settings.banner1Image ? (
+                          <Image
+                            src={settings.banner1Image}
+                            alt="Banner 1 Mobile"
+                            fill
+                            className="object-cover object-top"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                        )}
+                        <div className="relative z-10 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-1 text-white text-left">
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner1Tag || "FESTIVE SALE"}
+                            </span>
+                            {settings.banner1SaleBadge && (
+                              <span className="px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-[#9B3D3D] text-white">
+                                {settings.banner1SaleBadge}
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="font-serif text-xs font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner1Title || "UP TO 50% OFF"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner1Subtitle || "Exclusive seasonal markdowns..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-white text-brand-950 text-[8px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner1BtnText || "SHOP SALE"}
+                          </span>
+                        </div>
+                        <div className="absolute top-5 right-2 z-20">
+                          <label className="cursor-pointer px-2 py-1 bg-white/90 hover:bg-white text-brand-950 text-[10px] font-bold rounded-lg shadow flex items-center gap-1 transition-all">
+                            <Upload className="w-3 h-3 text-brand-900" />
+                            <span>Change</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingBanner === 1}
+                              onChange={(e) => handleBannerFileUpload(1, e)}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-brand-500 font-medium block">
+                        📱 375px Mobile View: Verify that model's face is visible and embroidery is clear.
+                      </span>
+                    </div>
+                  )}
                   <input
                     type="text"
                     value={settings.banner1Image}
@@ -663,43 +898,142 @@ export default function AdminLayoutCustomizer({
                   </span>
                 </div>
 
-                {/* Banner 2 Image Preview & Upload */}
+                {/* Banner 2 Image Preview & Live Simulator */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
-                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
-                    {settings.banner2Image ? (
-                      <Image
-                        src={settings.banner2Image}
-                        alt="Banner 2"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
-                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
-                        {uploadingBanner === 2 ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
-                            <span>Uploading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-3.5 h-3.5 text-brand-900" />
-                            <span>Upload Photo from PC</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingBanner === 2}
-                          onChange={(e) => handleBannerFileUpload(2, e)}
-                          className="hidden"
-                        />
-                      </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-brand-900">
+                      Banner Photo &amp; Live Simulation
+                    </label>
+                    <div className="flex items-center gap-1 bg-sand-100 p-0.5 rounded-lg text-[10px] font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 2: "desktop" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[2] === "desktop"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Monitor className="w-3 h-3" />
+                        <span>Desktop (16:7)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 2: "mobile" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[2] === "mobile"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>Mobile (375px)</span>
+                      </button>
                     </div>
                   </div>
+
+                  {bannerPreviewMode[2] === "desktop" ? (
+                    <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-300 shadow-inner">
+                      {settings.banner2Image ? (
+                        <Image
+                          src={settings.banner2Image}
+                          alt="Banner 2"
+                          fill
+                          className="object-cover object-top sm:object-center"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent flex items-center p-4 pointer-events-none">
+                        <div className="max-w-[240px] space-y-1 text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner2Tag || "NEW ARRIVALS 2026"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-sm font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner2Title || "SUMMER LAWN '26"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner2Subtitle || "Breathable pure Egyptian cotton lawn..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-white text-brand-950 text-[9px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner2BtnText || "EXPLORE LAWN"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2.5 right-2.5 z-10">
+                        <label className="cursor-pointer px-3 py-1.5 bg-white/95 hover:bg-white text-brand-950 text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all">
+                          {uploadingBanner === 2 ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-brand-900" />
+                              <span>Upload from PC</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingBanner === 2}
+                            onChange={(e) => handleBannerFileUpload(2, e)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-center">
+                      <div className="relative w-[240px] aspect-[9/16] max-h-[340px] mx-auto bg-black rounded-[28px] overflow-hidden border-4 border-brand-950 shadow-2xl flex flex-col justify-end">
+                        <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-2.5 bg-brand-950 rounded-full z-20" />
+                        {settings.banner2Image ? (
+                          <Image
+                            src={settings.banner2Image}
+                            alt="Banner 2 Mobile"
+                            fill
+                            className="object-cover object-top"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                        )}
+                        <div className="relative z-10 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-1 text-white text-left">
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner2Tag || "NEW ARRIVALS 2026"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-xs font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner2Title || "SUMMER LAWN '26"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner2Subtitle || "Breathable pure Egyptian cotton lawn..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-white text-brand-950 text-[8px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner2BtnText || "EXPLORE LAWN"}
+                          </span>
+                        </div>
+                        <div className="absolute top-5 right-2 z-20">
+                          <label className="cursor-pointer px-2 py-1 bg-white/90 hover:bg-white text-brand-950 text-[10px] font-bold rounded-lg shadow flex items-center gap-1 transition-all">
+                            <Upload className="w-3 h-3 text-brand-900" />
+                            <span>Change</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingBanner === 2}
+                              onChange={(e) => handleBannerFileUpload(2, e)}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-brand-500 font-medium block">
+                        📱 375px Mobile View: Verify that model's face is visible and embroidery is clear.
+                      </span>
+                    </div>
+                  )}
                   <input
                     type="text"
                     value={settings.banner2Image}
@@ -775,43 +1109,142 @@ export default function AdminLayoutCustomizer({
                   </span>
                 </div>
 
-                {/* Banner 3 Image Preview & Upload */}
+                {/* Banner 3 Image Preview & Live Simulator */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
-                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
-                    {settings.banner3Image ? (
-                      <Image
-                        src={settings.banner3Image}
-                        alt="Banner 3"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
-                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
-                        {uploadingBanner === 3 ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
-                            <span>Uploading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-3.5 h-3.5 text-brand-900" />
-                            <span>Upload Photo from PC</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingBanner === 3}
-                          onChange={(e) => handleBannerFileUpload(3, e)}
-                          className="hidden"
-                        />
-                      </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-brand-900">
+                      Banner Photo &amp; Live Simulation
+                    </label>
+                    <div className="flex items-center gap-1 bg-sand-100 p-0.5 rounded-lg text-[10px] font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 3: "desktop" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[3] === "desktop"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Monitor className="w-3 h-3" />
+                        <span>Desktop (16:7)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 3: "mobile" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[3] === "mobile"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>Mobile (375px)</span>
+                      </button>
                     </div>
                   </div>
+
+                  {bannerPreviewMode[3] === "desktop" ? (
+                    <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-300 shadow-inner">
+                      {settings.banner3Image ? (
+                        <Image
+                          src={settings.banner3Image}
+                          alt="Banner 3"
+                          fill
+                          className="object-cover object-top sm:object-center"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent flex items-center p-4 pointer-events-none">
+                        <div className="max-w-[240px] space-y-1 text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner3Tag || "LUXURY FORMALS"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-sm font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner3Title || "ROYAL CHIFFON EDIT"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner3Subtitle || "Hand-embellished tilla, sequins..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-white text-brand-950 text-[9px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner3BtnText || "SHOP FORMALS"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2.5 right-2.5 z-10">
+                        <label className="cursor-pointer px-3 py-1.5 bg-white/95 hover:bg-white text-brand-950 text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all">
+                          {uploadingBanner === 3 ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-brand-900" />
+                              <span>Upload from PC</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingBanner === 3}
+                            onChange={(e) => handleBannerFileUpload(3, e)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-center">
+                      <div className="relative w-[240px] aspect-[9/16] max-h-[340px] mx-auto bg-black rounded-[28px] overflow-hidden border-4 border-brand-950 shadow-2xl flex flex-col justify-end">
+                        <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-2.5 bg-brand-950 rounded-full z-20" />
+                        {settings.banner3Image ? (
+                          <Image
+                            src={settings.banner3Image}
+                            alt="Banner 3 Mobile"
+                            fill
+                            className="object-cover object-top"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                        )}
+                        <div className="relative z-10 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-1 text-white text-left">
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner3Tag || "LUXURY FORMALS"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-xs font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner3Title || "ROYAL CHIFFON EDIT"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner3Subtitle || "Hand-embellished tilla, sequins..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-white text-brand-950 text-[8px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner3BtnText || "SHOP FORMALS"}
+                          </span>
+                        </div>
+                        <div className="absolute top-5 right-2 z-20">
+                          <label className="cursor-pointer px-2 py-1 bg-white/90 hover:bg-white text-brand-950 text-[10px] font-bold rounded-lg shadow flex items-center gap-1 transition-all">
+                            <Upload className="w-3 h-3 text-brand-900" />
+                            <span>Change</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingBanner === 3}
+                              onChange={(e) => handleBannerFileUpload(3, e)}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-brand-500 font-medium block">
+                        📱 375px Mobile View: Verify that model's face is visible and embroidery is clear.
+                      </span>
+                    </div>
+                  )}
                   <input
                     type="text"
                     value={settings.banner3Image}
@@ -887,43 +1320,142 @@ export default function AdminLayoutCustomizer({
                   </span>
                 </div>
 
-                {/* Banner 4 Image Preview & Upload */}
+                {/* Banner 4 Image Preview & Live Simulator */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-brand-900 block">Banner Photo</label>
-                  <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-200">
-                    {settings.banner4Image ? (
-                      <Image
-                        src={settings.banner4Image}
-                        alt="Banner 4"
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 flex items-end p-3">
-                      <label className="cursor-pointer px-3 py-1.5 bg-white hover:bg-sand-100 text-brand-950 text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-all">
-                        {uploadingBanner === 4 ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
-                            <span>Uploading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-3.5 h-3.5 text-brand-900" />
-                            <span>Upload Photo from PC</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingBanner === 4}
-                          onChange={(e) => handleBannerFileUpload(4, e)}
-                          className="hidden"
-                        />
-                      </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-brand-900">
+                      Banner Photo &amp; Live Simulation
+                    </label>
+                    <div className="flex items-center gap-1 bg-sand-100 p-0.5 rounded-lg text-[10px] font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 4: "desktop" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[4] === "desktop"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Monitor className="w-3 h-3" />
+                        <span>Desktop (16:7)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBannerPreviewMode((prev) => ({ ...prev, 4: "mobile" }))}
+                        className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                          bannerPreviewMode[4] === "mobile"
+                            ? "bg-brand-950 text-white shadow-xs"
+                            : "text-brand-700 hover:text-brand-950"
+                        }`}
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>Mobile (375px)</span>
+                      </button>
                     </div>
                   </div>
+
+                  {bannerPreviewMode[4] === "desktop" ? (
+                    <div className="relative aspect-[16/7] w-full bg-brand-950 rounded-xl overflow-hidden border border-sand-300 shadow-inner">
+                      {settings.banner4Image ? (
+                        <Image
+                          src={settings.banner4Image}
+                          alt="Banner 4"
+                          fill
+                          className="object-cover object-top sm:object-center"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/25 to-transparent flex items-center p-4 pointer-events-none">
+                        <div className="max-w-[240px] space-y-1 text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner4Tag || "SIGNATURE COUTURE"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-sm font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner4Title || "EVERYDAY ELEGANCE"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner4Subtitle || "Timeless ivory & antique gold..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-white text-brand-950 text-[9px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner4BtnText || "SHOP COLLECTION"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2.5 right-2.5 z-10">
+                        <label className="cursor-pointer px-3 py-1.5 bg-white/95 hover:bg-white text-brand-950 text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all">
+                          {uploadingBanner === 4 ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-brand-900" />
+                              <span>Upload from PC</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingBanner === 4}
+                            onChange={(e) => handleBannerFileUpload(4, e)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-center">
+                      <div className="relative w-[240px] aspect-[9/16] max-h-[340px] mx-auto bg-black rounded-[28px] overflow-hidden border-4 border-brand-950 shadow-2xl flex flex-col justify-end">
+                        <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-2.5 bg-brand-950 rounded-full z-20" />
+                        {settings.banner4Image ? (
+                          <Image
+                            src={settings.banner4Image}
+                            alt="Banner 4 Mobile"
+                            fill
+                            className="object-cover object-top"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-sand-400">No Image Selected</div>
+                        )}
+                        <div className="relative z-10 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-1 text-white text-left">
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
+                              {settings.banner4Tag || "SIGNATURE COUTURE"}
+                            </span>
+                          </div>
+                          <h4 className="font-serif text-xs font-bold text-white leading-tight drop-shadow truncate">
+                            {settings.banner4Title || "EVERYDAY ELEGANCE"}
+                          </h4>
+                          <p className="text-[9px] text-white/80 line-clamp-1">
+                            {settings.banner4Subtitle || "Timeless ivory & antique gold..."}
+                          </p>
+                          <span className="inline-block px-2.5 py-0.5 rounded-full bg-white text-brand-950 text-[8px] font-bold uppercase tracking-wider shadow">
+                            {settings.banner4BtnText || "SHOP COLLECTION"}
+                          </span>
+                        </div>
+                        <div className="absolute top-5 right-2 z-20">
+                          <label className="cursor-pointer px-2 py-1 bg-white/90 hover:bg-white text-brand-950 text-[10px] font-bold rounded-lg shadow flex items-center gap-1 transition-all">
+                            <Upload className="w-3 h-3 text-brand-900" />
+                            <span>Change</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingBanner === 4}
+                              onChange={(e) => handleBannerFileUpload(4, e)}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-brand-500 font-medium block">
+                        📱 375px Mobile View: Verify that model's face is visible and embroidery is clear.
+                      </span>
+                    </div>
+                  )}
                   <input
                     type="text"
                     value={settings.banner4Image}
@@ -1171,14 +1703,53 @@ export default function AdminLayoutCustomizer({
       {/* TAB 4: HOMEPAGE SECTIONS & TITLES */}
       {activeTab === "sections" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
-          <div>
-            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+          <div className="border-b border-sand-100 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                <span>📍 Store Location:</span>
+                <span className="text-gold-700 font-bold">Homepage Body — Vertical layout stack from top to footer</span>
+              </span>
+            </div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
               <Layers className="w-5 h-5 text-gold-600" />
               Homepage Sections & Section Headings
             </h2>
             <p className="text-xs text-brand-600 mt-0.5">
-              Turn individual sections on/off and customize their titles and subheadings.
+              Turn individual sections on/off and customize their titles and subheadings. Changes apply directly to storefront visitors.
             </p>
+          </div>
+
+          {/* Visual Layout Blueprint */}
+          <div className="p-4 rounded-2xl bg-sand-50/80 border border-sand-200 space-y-2">
+            <span className="text-xs font-bold text-brand-900 block">
+              Live Homepage Section Blueprint &amp; Active Visibility
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { name: "1. Categories", active: settings.showCategories !== false },
+                { name: "2. New Arrivals", active: settings.showTrending !== false },
+                { name: "3. Runway Reels", active: settings.showVideos !== false },
+                { name: "4. Trust Perks", active: settings.showTrustPerks !== false },
+                { name: "5. Reviews", active: settings.showReviews !== false },
+                { name: "6. Heritage", active: settings.showHeritage !== false },
+                { name: "7. Newsletter", active: settings.showNewsletter !== false },
+                { name: "8. Instagram", active: settings.showInstagramGrid !== false },
+              ].map((s, idx) => (
+                <div
+                  key={idx}
+                  className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all ${
+                    s.active
+                      ? "bg-white border-emerald-300 text-emerald-900 shadow-xs"
+                      : "bg-sand-100/60 border-sand-200 text-brand-400 opacity-60"
+                  }`}
+                >
+                  <span className="block truncate">{s.name}</span>
+                  <span className={`text-[9px] uppercase tracking-wider font-mono ${s.active ? "text-emerald-600" : "text-brand-400"}`}>
+                    {s.active ? "● Live On Site" : "○ Hidden"}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-6 divide-y divide-sand-100">
@@ -1572,14 +2143,58 @@ export default function AdminLayoutCustomizer({
       {/* TAB 7: WHATSAPP CONCIERGE, CONTACT & STUDIO */}
       {activeTab === "contact" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-6">
-          <div>
-            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-gold-600" />
-              Direct Concierge, WhatsApp & Studio Info
-            </h2>
-            <p className="text-xs text-brand-600 mt-0.5">
-              These details control the floating WhatsApp chat button, footer address, customer hotline, and contact links across the entire store.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sand-100 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span>📍 Store Location:</span>
+                  <span className="text-gold-700 font-bold">Floating bottom-right corner across all store pages &amp; mobile menu</span>
+                </span>
+              </div>
+              <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
+                <Phone className="w-5 h-5 text-gold-600" />
+                Direct Concierge, WhatsApp & Studio Info
+              </h2>
+              <p className="text-xs text-brand-600 mt-0.5">
+                These details control the floating WhatsApp chat button, VIP Community invite, footer address, customer hotline, and contact links across the entire store.
+              </p>
+            </div>
+          </div>
+
+          {/* Live Storefront Widget Preview */}
+          <div className="space-y-2 p-5 rounded-2xl bg-sand-50/80 border border-sand-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-brand-900 flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-gold-600" />
+                <span>Live Floating WhatsApp Widget Simulation</span>
+              </span>
+              <span className="text-[10px] text-brand-500 font-medium">As shown on customer screen (bottom-right)</span>
+            </div>
+            <div className="h-32 bg-sand-100/50 rounded-xl border border-dashed border-sand-300 relative flex flex-col items-end justify-end p-4 gap-2 overflow-hidden">
+              <span className="absolute top-3 left-4 text-[11px] text-brand-500 font-mono">
+                Storefront Screen (Bottom-Right Corner)
+              </span>
+
+              {/* VIP Community Button Simulator */}
+              {settings.showWhatsappCommunity !== false && settings.whatsappCommunityLink && (
+                <div className="flex items-center gap-2 bg-[#128C7E] text-white px-3 py-1.5 rounded-full shadow-lg border border-white text-xs font-bold transition-all">
+                  <div className="relative">
+                    <Users className="w-3.5 h-3.5 text-emerald-200" />
+                    <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  </div>
+                  <span className="text-[10px] font-semibold flex items-center gap-1">
+                    <span>VIP Community</span>
+                    <span className="text-[8px] bg-amber-400 text-black px-1 rounded font-black">JOIN</span>
+                  </span>
+                </div>
+              )}
+
+              {/* 1-on-1 Chat Button Simulator */}
+              <div className="flex items-center gap-2 bg-emerald-600 text-white px-3.5 py-2 rounded-full shadow-lg border-2 border-white text-xs font-bold">
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span className="text-xs font-semibold">Chat with Us ({settings.contactWhatsApp || "0340 0262732"})</span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1592,7 +2207,7 @@ export default function AdminLayoutCustomizer({
                 placeholder="0340 0262732"
                 className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono font-bold"
               />
-              <p className="text-[11px] text-brand-500">Powers floating WhatsApp button & click-to-chat links.</p>
+              <p className="text-[11px] text-brand-500">Powers floating WhatsApp button &amp; click-to-chat links.</p>
             </div>
 
             <div className="space-y-2">
@@ -1607,23 +2222,31 @@ export default function AdminLayoutCustomizer({
               <p className="text-[11px] text-brand-500">Auto-filled in customer's WhatsApp when they tap chat.</p>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-3 md:col-span-2 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-brand-900">WhatsApp VIP Community Link</label>
-                <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded">
-                  VIP Channel
-                </span>
+                <div>
+                  <label className="text-xs font-bold text-emerald-950">WhatsApp VIP Customer Community Channel</label>
+                  <p className="text-[11px] text-emerald-800">
+                    Direct invite link to your VIP broadcast channel or group for special sale announcements.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-emerald-300 shadow-xs">
+                  <input
+                    type="checkbox"
+                    checked={settings.showWhatsappCommunity !== false}
+                    onChange={(e) => updateField("showWhatsappCommunity", e.target.checked)}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-xs font-bold text-emerald-950">Enable VIP Button</span>
+                </label>
               </div>
               <input
                 type="url"
                 value={settings.whatsappCommunityLink || ""}
                 onChange={(e) => updateField("whatsappCommunityLink", e.target.value)}
                 placeholder="https://chat.whatsapp.com/TauheedVIP"
-                className="w-full px-4 py-2.5 text-xs rounded-xl border border-sand-300 focus:outline-none focus:border-gold-500 font-mono"
+                className="w-full px-4 py-2.5 text-xs rounded-xl border border-emerald-300 focus:outline-none focus:border-emerald-600 font-mono bg-white"
               />
-              <p className="text-[11px] text-brand-500">
-                Direct invite link to your VIP customer channel or broadcast group. Displayed in footer &amp; quick access.
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -1800,13 +2423,19 @@ export default function AdminLayoutCustomizer({
       {/* TAB 10: SHOPPABLE VIDEO REELS */}
       {activeTab === "videos" && (
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-sand-200 shadow-sm space-y-8">
-          <div>
-            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2">
+          <div className="border-b border-sand-100 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-sand-100 text-brand-800 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                <span>📍 Store Location:</span>
+                <span className="text-gold-700 font-bold">Homepage Editorial Cinema Section — "Runway Watch &amp; Buy"</span>
+              </span>
+            </div>
+            <h2 className="text-lg font-serif font-bold text-brand-950 flex items-center gap-2 mt-1.5">
               <Video className="w-5 h-5 text-gold-600" />
               Shoppable Runway Watch & Buy Video Reels
             </h2>
             <p className="text-xs text-brand-600 mt-0.5">
-              Add vertical runway videos that link directly to outfits so customers can buy in 1 click while watching.
+              Add vertical runway videos that link directly to outfits so customers can buy in 1 click while watching without leaving the store.
             </p>
           </div>
 

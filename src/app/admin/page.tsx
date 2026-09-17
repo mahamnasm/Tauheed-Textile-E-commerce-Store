@@ -1,11 +1,12 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import AdminDashboardClientView from "@/components/admin/AdminDashboardClientView";
+import { getLatestIntrusionAlert } from "@/lib/adminSecurityStore";
 
 export const revalidate = 0;
 
 export default async function AdminDashboardPage() {
-  const [orders, variants, bankProofs] = await Promise.all([
+  const [orders, variants, bankProofs, latestSecurityAlert] = await Promise.all([
     prisma.order.findMany({
       include: { items: true },
       orderBy: { createdAt: "desc" },
@@ -17,6 +18,7 @@ export default async function AdminDashboardPage() {
       where: { status: "PENDING" },
       select: { id: true },
     }),
+    getLatestIntrusionAlert(),
   ]);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
@@ -36,6 +38,7 @@ export default async function AdminDashboardPage() {
       lowStockCount={lowStockCount}
       pendingBankProofsCount={pendingBankProofsCount}
       recentOrders={recentOrders}
+      latestSecurityAlert={latestSecurityAlert}
     />
   );
 }

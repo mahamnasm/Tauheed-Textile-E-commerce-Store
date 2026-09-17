@@ -371,27 +371,36 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
               );
             })()}
 
-                {/* Footer Shop Look Card */}
+                {/* Footer Shop Look Card — Strictly In-Store Internal Landing */}
                 <div className="p-3.5 bg-[#1F1F1F] border-t border-[#2F2F2F] flex items-center justify-between gap-3">
                   <div className="truncate flex-1">
-                    <h4 className="font-serif font-bold text-xs text-white truncate">
-                      {v.product?.title || v.title}
-                    </h4>
-                    {v.product && (
-                      <p className="text-[#C4A882] text-xs font-bold mt-0.5">
-                        Rs. {v.product.basePrice.toLocaleString()}
-                      </p>
+                    {v.product ? (
+                      <Link href={`/product/${v.product.slug}`} className="hover:underline block truncate">
+                        <h4 className="font-serif font-bold text-xs text-white truncate">
+                          {v.product.title}
+                        </h4>
+                        <p className="text-[#C4A882] text-xs font-bold mt-0.5">
+                          Rs. {v.product.basePrice.toLocaleString()}
+                        </p>
+                      </Link>
+                    ) : (
+                      <Link href="/shop" className="hover:underline block truncate">
+                        <h4 className="font-serif font-bold text-xs text-white truncate">
+                          {v.title}
+                        </h4>
+                        <p className="text-[#C4A882] text-xs font-bold mt-0.5">
+                          Exclusive Ensemble
+                        </p>
+                      </Link>
                     )}
                   </div>
 
-                  {v.product && (
-                    <Link
-                      href={`/product/${v.product.slug}`}
-                      className="shrink-0 px-4 py-2 rounded-full bg-white hover:bg-[#F8F5F0] text-[#171717] text-[11px] font-bold uppercase tracking-wider transition-all duration-200 shadow hover:scale-105"
-                    >
-                      Shop Look
-                    </Link>
-                  )}
+                  <Link
+                    href={v.product ? `/product/${v.product.slug}` : "/shop"}
+                    className="shrink-0 px-4 py-2 rounded-full bg-white hover:bg-[#F8F5F0] text-[#171717] text-[11px] font-bold uppercase tracking-wider transition-all duration-200 shadow hover:scale-105"
+                  >
+                    Shop Look
+                  </Link>
                 </div>
               </div>
             );

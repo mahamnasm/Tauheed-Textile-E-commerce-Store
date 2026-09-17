@@ -14,7 +14,8 @@ import {
   Truck, 
   RotateCcw, 
   Phone,
-  Sparkles
+  Sparkles,
+  Users
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { SiteLayoutSettings } from "@/lib/settings";
@@ -709,6 +710,23 @@ export default function Header({ initialSettings }: HeaderProps) {
                       Online
                     </span>
                   </a>
+
+                  {initialSettings?.showWhatsappCommunity !== false && initialSettings?.whatsappCommunityLink && (
+                    <a
+                      href={initialSettings.whatsappCommunityLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#E8E3DC] hover:text-amber-300 flex items-center justify-between py-1 border-b border-[#2A2626]/50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2 font-medium">
+                        <Users className="w-3.5 h-3.5 text-amber-400" />
+                        VIP WhatsApp Community
+                      </span>
+                      <span className="text-[10px] text-amber-300 bg-amber-950/70 border border-amber-700 px-1.5 py-0.5 rounded font-bold">
+                        Join VIP
+                      </span>
+                    </a>
+                  )}
 
                   <Link
                     href="/policies/returns"

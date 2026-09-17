@@ -34,7 +34,7 @@ export default async function HomePage() {
   let reviews: any[] = [];
 
   try {
-    const [fetchedSettings, fetchedCats, featProds, newProds, bestProds, fetchedVideos, fetchedReviews] = await Promise.all([
+    const [fetchedSettings, fetchedCats, featProds, newProds, bestProds, fetchedVideos, fetchedReviews, prodsWithVideo] = await Promise.all([
       getSiteSettings(),
       prisma.category.findMany({
         orderBy: { displayOrder: "asc" },

@@ -70,6 +70,7 @@ export interface SiteLayoutSettings {
   contactWhatsApp: string;
   whatsappMessage: string;
   whatsappCommunityLink: string;
+  showWhatsappCommunity: boolean;
   contactPhone: string;
   contactEmail: string;
   contactAddress: string;
@@ -188,6 +189,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   contactWhatsApp: "0340 0262732",
   whatsappMessage: "Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order.",
   whatsappCommunityLink: "https://chat.whatsapp.com/TauheedVIP",
+  showWhatsappCommunity: true,
   contactPhone: "0340 0262732",
   contactEmail: "care@tauheedtextile.com",
   contactAddress: "Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan",

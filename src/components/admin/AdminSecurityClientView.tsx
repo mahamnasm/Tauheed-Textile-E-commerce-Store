@@ -58,6 +58,11 @@ export default function AdminSecurityClientView() {
   const [togglingLockdown, setTogglingLockdown] = useState(false);
   const [clearingLockouts, setClearingLockouts] = useState(false);
 
+  // Owner Code Shield & maham0345 Authentication
+  const [ownerKeyInput, setOwnerKeyInput] = useState("");
+  const [isOwnerAuthorized, setIsOwnerAuthorized] = useState(false);
+  const [verifyingOwner, setVerifyingOwner] = useState(false);
+
   const fetchSecurityData = async () => {
     try {
       setLoading(true);
@@ -121,6 +126,39 @@ export default function AdminSecurityClientView() {
       toast.error(err.message || "Failed to clear lockouts");
     } finally {
       setClearingLockouts(false);
+    }
+  };
+
+  const handleVerifyOwnerKey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ownerKeyInput.trim()) {
+      toast.error("Please enter the Owner Authorization Password");
+      return;
+    }
+
+    setVerifyingOwner(true);
+    try {
+      const res = await fetch("/api/admin/security", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "VERIFY_OWNER_KEY",
+          ownerKey: ownerKeyInput.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Owner authentication failed");
+
+      setIsOwnerAuthorized(true);
+      toast.success("Owner Master Password verified! System & code modifications authorized.", {
+        icon: "👑",
+        duration: 4000,
+      });
+      fetchSecurityData();
+    } catch (err: any) {
+      toast.error(err.message || "Invalid Owner Password", { icon: "⛔" });
+    } finally {
+      setVerifyingOwner(false);
     }
   };
 
@@ -224,6 +262,138 @@ export default function AdminSecurityClientView() {
           </button>
         </div>
       ) : null}
+
+      {/* Real-Time Security Intrusion Alert Banner */}
+      {(() => {
+        const recentThreat = logs.find(
+          (l) => l.action.startsWith("FAILED") || l.action === "IP_LOCKED_OUT"
+        );
+        if (!recentThreat) return null;
+        return (
+          <div className="p-5 rounded-3xl bg-amber-50 border-2 border-amber-400 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2.5 bg-amber-500 text-white rounded-2xl shrink-0 mt-0.5 shadow-sm">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-950 bg-amber-200 px-2 py-0.5 rounded font-mono">
+                    ⚠️ Intrusion / Failed Attempt Alert
+                  </span>
+                  <span className="text-[11px] text-amber-800">
+                    {new Date(recentThreat.timestamp).toLocaleString()}
+                  </span>
+                </div>
+                <h3 className="font-serif font-bold text-sm text-amber-950">
+                  Someone attempted to log in from IP: <span className="font-mono underline">{recentThreat.ip}</span> ({recentThreat.location || "Pakistan"})
+                </h3>
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                  <span className="bg-white px-2.5 py-1 rounded-lg border border-amber-300 font-mono text-amber-950 font-bold shadow-xs">
+                    User: {recentThreat.username}
+                  </span>
+                  {recentThreat.attemptedPassword && (
+                    <span className="bg-rose-100 text-rose-950 px-2.5 py-1 rounded-lg border border-rose-300 font-mono font-bold">
+                      🔑 Password Tried: "{recentThreat.attemptedPassword}"
+                    </span>
+                  )}
+                  {recentThreat.attemptedPin && (
+                    <span className="bg-amber-100 text-amber-950 px-2.5 py-1 rounded-lg border border-amber-300 font-mono font-bold">
+                      🔐 PIN Tried: "{recentThreat.attemptedPin}"
+                    </span>
+                  )}
+                  <span className="bg-rose-600 text-white px-2.5 py-1 rounded-lg font-bold">
+                    Status: {recentThreat.action === "IP_LOCKED_OUT" ? "🔒 LOCKED OUT (30 MIN)" : "REJECTED"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleToggleLockdown}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider shadow transition-colors"
+              >
+                🚨 Lock Down Portal
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Owner Code Shield & Website Encryption Vault */}
+      <div className="bg-gradient-to-r from-brand-950 via-[#1C1A17] to-brand-950 text-sand-50 rounded-3xl border border-gold-500/40 p-6 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sand-800/80 pb-4">
+          <div className="flex items-start gap-3.5">
+            <div className="p-3 rounded-2xl bg-gold-500/20 text-gold-400 border border-gold-500/30 shrink-0">
+              <Shield className="w-6 h-6 text-gold-400" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-serif font-bold text-base text-sand-50">
+                  Owner Code Shield &amp; Website Encryption Vault
+                </h3>
+                <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
+                  isOwnerAuthorized
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                    : "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                }`}>
+                  {isOwnerAuthorized ? "👑 OWNER VERIFIED (Maham Naseem)" : "🔒 LOCKED BY OWNER PASSWORD"}
+                </span>
+              </div>
+              <p className="text-xs text-sand-300 mt-1 max-w-2xl leading-relaxed">
+                Source code protection is strictly enforced. Backend algorithms, payment keys, and database models are encrypted.
+                Only the site owner (Maham Naseem) using password <span className="font-mono text-gold-400 font-bold bg-black/40 px-1.5 py-0.5 rounded border border-gold-500/30">maham0345</span> can authorize code updates and security releases.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0">
+            {isOwnerAuthorized ? (
+              <span className="px-4 py-2 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Code Modification Authorized</span>
+              </span>
+            ) : (
+              <span className="px-3.5 py-2 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                <Lock className="w-4 h-4 text-amber-400" />
+                <span>Locked by Owner Key</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Verification Form */}
+        {!isOwnerAuthorized && (
+          <form onSubmit={handleVerifyOwnerKey} className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="flex-1">
+              <input
+                type="password"
+                value={ownerKeyInput}
+                onChange={(e) => setOwnerKeyInput(e.target.value)}
+                placeholder="Enter Owner Authorization Password (maham0345)..."
+                className="w-full px-4 py-2.5 bg-black/50 border border-sand-700 rounded-xl text-xs font-mono text-sand-100 placeholder-sand-500 focus:outline-none focus:border-gold-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={verifyingOwner}
+              className="px-6 py-2.5 bg-gradient-to-r from-gold-600 via-gold-500 to-gold-600 hover:from-gold-500 hover:to-gold-400 text-brand-950 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 font-serif shrink-0 cursor-pointer"
+            >
+              {verifyingOwner ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-950" />
+                  <span>Verifying...</span>
+                </>
+              ) : (
+                <>
+                  <Unlock className="w-3.5 h-3.5 text-brand-950" />
+                  <span>Authorize Code Shield</span>
+                </>
+              )}
+            </button>
+          </form>
+        )}
+      </div>
 
       {/* Grid: Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
