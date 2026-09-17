@@ -64,3 +64,5 @@ export function toPublicOrder(order: TrackableOrder) {
     })),
   };
 }
+
+export { toPublicOrder as sanitizePublicOrder };

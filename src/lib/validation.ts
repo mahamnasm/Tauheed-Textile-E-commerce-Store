@@ -137,7 +137,14 @@ export const adminLoginSchema = z.object({
 
 export const trackOrderSchema = z.object({
   orderNumber: z.string().min(4, "Order number is required").max(50).trim(),
-  phone: z.string().min(10, "Registered phone number is required").max(20).trim(),
+  phone: z
+    .string()
+    .min(10, "Registered phone number is required")
+    .max(20)
+    .trim()
+    .refine((val) => phoneRegex.test(val.replace(/[\s-]/g, "")), {
+      message: "Enter a valid Pakistani mobile number (e.g., 03001234567)",
+    }),
 });
 
 export const verifyCouponSchema = z.object({
