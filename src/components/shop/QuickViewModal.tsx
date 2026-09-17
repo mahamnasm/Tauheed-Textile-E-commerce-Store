@@ -37,6 +37,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
         stitchedType: selectedVariant.stitchedType,
         price: effectivePrice,
         maxStock: selectedVariant.stockQuantity || 10,
+        weight: (product as any).weight || (product.pieceCount === 2 ? 0.8 : (product.pieceCount === 1 ? 0.5 : 1.0)),
       },
       quantity
     );

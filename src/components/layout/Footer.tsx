@@ -84,52 +84,52 @@ export default function Footer({ initialSettings }: FooterProps) {
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Shop Collections</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/shop?isNewArrival=true" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?isNewArrival=true" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   New In 2026
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=lawn-summer" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=lawn-summer" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Lawn & Summer
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=lawn-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=lawn-formals" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Lawn Formals
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=chiffon-formal" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=chiffon-formal" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Chiffon & Formal
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=silk" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=silk" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Silk Collection
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=net-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=net-formals" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Net Formals
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=organza-formals" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=organza-formals" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Organza Formals
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=bridal-maxies" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=bridal-maxies" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Bridal Maxies
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=saries" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=saries" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Saries
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=winter-collection" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/shop?category=winter-collection" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Winter Collection
                 </Link>
               </li>
@@ -146,22 +146,22 @@ export default function Footer({ initialSettings }: FooterProps) {
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Customer Care</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/track-order" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/track-order" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Track Order
                 </Link>
               </li>
               <li>
-                <Link href="/policies/shipping" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/policies/shipping" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Shipping Info
                 </Link>
               </li>
               <li>
-                <Link href="/policies/returns" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/policies/returns" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Exchange Policy
                 </Link>
               </li>
               <li>
-                <Link href="/policies/faq" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <Link href="/policies/faq" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   FAQs
                 </Link>
               </li>
@@ -179,12 +179,12 @@ export default function Footer({ initialSettings }: FooterProps) {
                 </span>
               </li>
               <li>
-                <a href={`https://wa.me/${formattedWa}`} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <a href={`https://wa.me/${formattedWa}`} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   WhatsApp: +92 340 0262732
                 </a>
               </li>
               <li>
-                <a href={`mailto:${initialSettings?.contactEmail || "care@tauheedtextile.com"}`} className="text-[#6B6259] hover:text-[#171717] transition-colors block">
+                <a href={`mailto:${initialSettings?.contactEmail || "care@tauheedtextile.com"}`} className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   Email: {initialSettings?.contactEmail || "care@tauheedtextile.com"}
                 </a>
               </li>
@@ -216,7 +216,7 @@ export default function Footer({ initialSettings }: FooterProps) {
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#171717] transition-colors flex items-center gap-2">
+                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors flex items-center gap-2">
                   <span>🎵</span> TikTok
                 </a>
               </li>

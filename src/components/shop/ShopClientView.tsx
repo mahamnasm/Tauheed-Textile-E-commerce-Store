@@ -364,15 +364,19 @@ export default function ShopClientView({
               <div className="flex flex-col space-y-3">
                 <button
                   onClick={() => handleCategoryClick(null)}
-                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-all py-2 px-3 rounded-xl ${
+                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-all py-2.5 px-3.5 rounded-xl border ${
                     !currentCategory
-                      ? "bg-[#171717] text-white shadow-xs"
-                      : "text-[#171717] hover:bg-[#F0EBE3] border border-[#E7E1D8]"
+                      ? "bg-[#171717] text-white border-[#171717] shadow-sm ring-2 ring-[#B28A3E]/50"
+                      : "text-[#171717] bg-[#F8F5F0] hover:bg-[#E7E1D8] border-[#E7E1D8]"
                   }`}
                 >
-                  <span className="font-extrabold tracking-wider">ALL (All Dresses)</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${
-                    !currentCategory ? "bg-white text-[#171717]" : "bg-[#E7E1D8] text-[#7A6652]"
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#B28A3E]"></span>
+                    <span className="font-extrabold text-sm tracking-wider">ALL</span>
+                    <span className="text-[10px] text-[#7A6652] lowercase font-normal">(all dresses)</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-black font-mono ${
+                    !currentCategory ? "bg-[#B28A3E] text-white" : "bg-[#E7E1D8] text-[#171717]"
                   }`}>
                     ALL
                   </span>
@@ -494,14 +498,22 @@ export default function ShopClientView({
                     handleCategoryClick(null);
                     setMobileFilterOpen(false);
                   }}
-                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between py-2 px-3 rounded-xl ${
+                  className={`text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between py-2.5 px-3.5 rounded-xl border transition-all ${
                     !currentCategory
-                      ? "bg-[#171717] text-white shadow-xs"
-                      : "text-[#171717] hover:bg-[#F0EBE3] border border-[#E7E1D8]"
+                      ? "bg-[#171717] text-white border-[#171717] shadow-sm ring-2 ring-[#B28A3E]/50"
+                      : "text-[#171717] bg-[#F8F5F0] hover:bg-[#E7E1D8] border-[#E7E1D8]"
                   }`}
                 >
-                  <span>ALL (All Dresses)</span>
-                  <span className="text-[10px] bg-[#E7E1D8] text-[#171717] px-2 py-0.5 rounded font-bold">ALL</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#B28A3E]"></span>
+                    <span className="font-extrabold text-sm tracking-wider">ALL</span>
+                    <span className="text-[10px] text-[#7A6652] lowercase font-normal">(all dresses)</span>
+                  </div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-black font-mono ${
+                    !currentCategory ? "bg-[#B28A3E] text-white" : "bg-[#E7E1D8] text-[#171717]"
+                  }`}>
+                    ALL
+                  </span>
                 </button>
                 {categories.map((cat) => {
                   const isCatActive = currentCategory === cat.slug;

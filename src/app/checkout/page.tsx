@@ -62,9 +62,23 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Total weight calculation (default 1.0kg per suit)
+  // Automatically detect parcel weight from products & suit types (default 1.0kg per 3pc suit)
   const totalWeight = cart.reduce((acc, item: any) => {
-    const itemWeight = typeof item.weight === "number" && item.weight > 0 ? item.weight : 1.0;
+    let itemWeight = typeof item.weight === "number" && item.weight > 0 ? item.weight : null;
+    if (!itemWeight) {
+      const titleLower = (item.productTitle || "").toLowerCase();
+      if (titleLower.includes("kurti") || titleLower.includes("1 piece") || titleLower.includes("pret")) {
+        itemWeight = 0.5;
+      } else if (titleLower.includes("2 piece") || titleLower.includes("2pc")) {
+        itemWeight = 0.8;
+      } else if (titleLower.includes("velvet") || titleLower.includes("bridal") || titleLower.includes("maxi")) {
+        itemWeight = 1.8;
+      } else if (titleLower.includes("chiffon") || titleLower.includes("formal") || titleLower.includes("embroidered")) {
+        itemWeight = 1.3;
+      } else {
+        itemWeight = 1.0;
+      }
+    }
     return acc + itemWeight * (item.quantity || 1);
   }, 0);
 
@@ -887,11 +901,11 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between">
                 <span>
-                  Delivery Charges ({city === "Karachi" ? "Karachi Flat" : `${totalWeight.toFixed(1)}kg Weight`})
+                  Delivery Charges ({city === "Karachi" ? "Karachi Flat" : `${totalWeight.toFixed(1)}kg Auto-Detected Weight`})
                 </span>
                 <span className="font-bold text-[#171717]">
                   {shippingFee === 0 ? (
-                    <span className="text-[#1A6B3C] font-bold">FREE (Orders &ge; 10k) 🎉</span>
+                    <span className="text-[#1A6B3C] font-bold">DCC FREE (Order Above 10k) 🎉</span>
                   ) : (
                     `Rs. ${grossShippingFee}`
                   )}
@@ -900,14 +914,14 @@ export default function CheckoutPage() {
 
               {deliveryDiscount > 0 && shippingFee > 0 && (
                 <div className="flex justify-between text-[#1A6B3C] text-[11px] font-semibold bg-[#E8F5E9] px-2 py-1 rounded">
-                  <span>Delivery Subsidy Discount (Max Rs. 200)</span>
+                  <span>Special Delivery Discount (Max Rs. 200 Subsidy)</span>
                   <span>-Rs. {deliveryDiscount}</span>
                 </div>
               )}
 
               {shippingFee > 0 && deliveryDiscount > 0 && (
-                <div className="flex justify-between text-[11px] text-brand-700 font-bold border-b border-dashed border-[#E7E1D8] pb-1">
-                  <span>Net Delivery Payable</span>
+                <div className="flex justify-between text-[11px] text-[#171717] font-bold border-b border-dashed border-[#E7E1D8] pb-1">
+                  <span>Rest Delivery Payable (By Weight)</span>
                   <span>Rs. {shippingFee}</span>
                 </div>
               )}

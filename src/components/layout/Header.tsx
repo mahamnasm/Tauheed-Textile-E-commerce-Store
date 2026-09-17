@@ -378,6 +378,14 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </button>
 
                 <Link
+                  href="/shop"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold-500/20 text-gold-300 hover:bg-gold-500 hover:text-brand-950 text-xs uppercase tracking-wider font-extrabold border border-gold-500/40 transition-all shadow-xs"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5 text-gold-400" />
+                  <span>ALL</span>
+                </Link>
+
+                <Link
                   href="/shop?isNewArrival=true"
                   className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
                 >

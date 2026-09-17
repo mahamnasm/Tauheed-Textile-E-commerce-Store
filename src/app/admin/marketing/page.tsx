@@ -2,6 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { Megaphone, Tag, ShoppingBag } from "lucide-react";
 import AdminAbandonedCartManager from "@/components/admin/AdminAbandonedCartManager";
+import AdminCouponManager from "@/components/admin/AdminCouponManager";
 
 export const revalidate = 0;
 

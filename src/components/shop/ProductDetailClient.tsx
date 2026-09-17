@@ -96,6 +96,7 @@ export default function ProductDetailClient({
         stitchedType: "Unstitched",
         price: effectivePrice,
         maxStock: defaultVariant.stockQuantity || 50,
+        weight: (product as any).weight || (product.pieceCount === 2 ? 0.8 : (product.pieceCount === 1 ? 0.5 : (product.fabric?.toLowerCase().includes("velvet") ? 1.8 : 1.0))),
       },
       quantity
     );

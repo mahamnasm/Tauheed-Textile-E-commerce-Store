@@ -27,6 +27,7 @@ export interface ProductCardProps {
     priceAdjustment: number;
     stockQuantity: number;
   }[];
+  weight?: number;
   onQuickView?: (product: any) => void;
 }
 
@@ -44,13 +45,14 @@ export default function ProductCard({
   isSale,
   isPreOrder,
   variants = [],
+  weight,
   onQuickView,
 }: ProductCardProps) {
   const { toggleWishlist, isInWishlist, addToCart } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
-  const primaryImage = images[0]?.url || "/assets/reel-2.jpg";
+  const primaryImage = images[0]?.url || "/placeholder-dress.jpg";
   const hoverImage = images[1]?.url || primaryImage;
   const wishlisted = isInWishlist(id);
 
@@ -65,13 +67,22 @@ export default function ProductCard({
     e.stopPropagation();
 
     const defaultVariant = variants[0] || {
-      id: `${id}-def`,
-      size: "Unstitched",
+      id: `${id}-default`,
+      size: "Standard",
       color: "Default",
       stitchedType: "Unstitched",
       priceAdjustment: 0,
       stockQuantity: 10,
     };
+
+    const detectedWeight =
+      weight && weight > 0
+        ? weight
+        : fabric?.toLowerCase().includes("velvet")
+        ? 1.8
+        : fabric?.toLowerCase().includes("chiffon")
+        ? 1.2
+        : 1.0;
 
     addToCart(
       {
@@ -85,6 +96,7 @@ export default function ProductCard({
         stitchedType: defaultVariant.stitchedType,
         price: effectivePrice + defaultVariant.priceAdjustment,
         maxStock: defaultVariant.stockQuantity,
+        weight: detectedWeight,
       },
       1
     );

@@ -14,6 +14,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   maxStock: number;
+  weight?: number;
 }
 
 interface CartContextType {
