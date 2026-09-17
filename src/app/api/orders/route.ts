@@ -124,10 +124,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Trigger Automated WhatsApp & Business Email Order Confirmation
+    let notificationStatus = null;
+    try {
+      const { triggerOrderConfirmationNotifications } = await import("@/lib/orderNotificationService");
+      notificationStatus = await triggerOrderConfirmationNotifications({
+        ...order,
+        items,
+      });
+    } catch (notifErr) {
+      console.error("Automated notification warning:", notifErr);
+    }
+
     return NextResponse.json({
       success: true,
       orderNumber: order.orderNumber,
       orderId: order.id,
+      whatsappUrl: notificationStatus?.whatsappUrl,
     });
   } catch (error: any) {
     console.error("Order creation failed:", error);
