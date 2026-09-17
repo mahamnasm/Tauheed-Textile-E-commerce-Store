@@ -639,12 +639,28 @@ export default function AdminProductsClientView({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {images.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to remove all images and start fresh with your own pictures?")) {
+                            setImages([]);
+                          }
+                        }}
+                        className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs"
+                        title="Remove all pre-filled images and start fresh"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        <span>🗑️ Remove All Images (Start Fresh)</span>
+                      </button>
+                    )}
+
                     <label
                       htmlFor="pc-image-upload-top"
                       className="cursor-pointer px-3.5 py-1.5 bg-brand-900 hover:bg-black text-sand-50 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all"
                     >
-                      <Upload className="w-3.5 h-3.5 text-gold-400" /> Upload from PC
+                      <Upload className="w-3.5 h-3.5 text-gold-400" /> 📱 Upload from Gallery / PC
                     </label>
                     <input
                       id="pc-image-upload-top"
@@ -666,7 +682,7 @@ export default function AdminProductsClientView({
                   </div>
                 </div>
 
-                {/* PC File Upload Dropzone */}
+                {/* PC / Phone File Upload Dropzone */}
                 <label
                   htmlFor="pc-image-upload-dropzone"
                   className="cursor-pointer border-2 border-dashed border-gold-400/70 hover:border-gold-600 bg-sand-100/70 hover:bg-sand-100 p-4 rounded-xl flex flex-col items-center justify-center text-center transition-all group"
@@ -684,10 +700,10 @@ export default function AdminProductsClientView({
                     <Upload className="w-5 h-5" />
                   </div>
                   <p className="font-bold text-xs text-brand-950">
-                    {uploadingPC ? "Uploading Photos from PC..." : "Click to Browse or Drag & Drop Photos from Your PC"}
+                    {uploadingPC ? "Uploading Photos from Device..." : "📱 Click to Browse Gallery or Drag & Drop Photos from PC / Phone"}
                   </p>
                   <p className="text-[11px] text-brand-600 mt-0.5">
-                    Select multiple high-resolution photos (.jpg, .png, .webp). Photos are saved to the server and assigned instantly.
+                    Select multiple high-resolution photos (.jpg, .png, .webp). Photos are uploaded instantly and ready for ordering.
                   </p>
                 </label>
 

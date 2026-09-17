@@ -1,5 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <circle cx="50" cy="50" r="46" stroke="#B28A3E" stroke-width="2.5" fill="#12110F"/>
-  <circle cx="50" cy="50" r="40" stroke="#B28A3E" stroke-width="1" stroke-dasharray="3 3"/>
-  <text x="50" y="62" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#F8F5EF" text-anchor="middle">TT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Outer luxury ring -->
+  <circle cx="256" cy="256" r="248" fill="#0B0A09"/>
+  <circle cx="256" cy="256" r="240" stroke="url(#goldGrad)" stroke-width="5" fill="none"/>
+  <!-- Inner decorative ring -->
+  <circle cx="256" cy="256" r="220" stroke="#B28A3E" stroke-width="1.5" stroke-dasharray="6 4" fill="none" opacity="0.5"/>
+  <!-- TT monogram -->
+  <text x="256" y="310" font-family="Georgia, 'Times New Roman', serif" font-size="200" font-weight="bold" fill="url(#goldText)" text-anchor="middle" letter-spacing="-8">TT</text>
+  <!-- Bottom accent line -->
+  <line x1="140" y1="340" x2="372" y2="340" stroke="#B28A3E" stroke-width="2.5" opacity="0.6"/>
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8E6D2E"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#8E6D2E"/>
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F5EF"/>
+      <stop offset="40%" stop-color="#D4AF37"/>
+      <stop offset="60%" stop-color="#F8F5EF"/>
+      <stop offset="100%" stop-color="#B28A3E"/>
+    </linearGradient>
+  </defs>
 </svg>

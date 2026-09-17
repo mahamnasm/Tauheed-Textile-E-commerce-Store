@@ -40,6 +40,17 @@ interface CategoryItem {
   };
 }
 
+const CURATED_CATEGORY_PRESETS = [
+  { label: "Summer Lawn", url: "/assets/cat-lawn-summer.jpg" },
+  { label: "Chiffon Formal", url: "/assets/cat-chiffon-formal.jpg" },
+  { label: "Pret Ready to Wear", url: "/assets/cat-pret-readytowear.jpg" },
+  { label: "Wedding Luxury", url: "/assets/cat-wedding-luxury.jpg" },
+  { label: "Nafasat Chiffon", url: "/assets/prod-nafasat.jpg" },
+  { label: "Armani Schiffli", url: "/assets/prod-armani.jpg" },
+  { label: "Bridal Barat", url: "/assets/prod-bridal.jpg" },
+  { label: "Velvet Silk", url: "/assets/prod-velvet.jpg" },
+];
+
 export default function CategoriesClientView({
   initialCategories = [],
 }: {
@@ -57,6 +68,7 @@ export default function CategoriesClientView({
   const [catImage, setCatImage] = useState("");
   const [savingCat, setSavingCat] = useState(false);
   const [uploadingCatImg, setUploadingCatImg] = useState(false);
+  const [aiFitMode, setAiFitMode] = useState<"cover" | "contain" | "vignette">("cover");
 
   const handleUploadCatImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -525,12 +537,12 @@ export default function CategoriesClientView({
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block font-bold text-brand-900">Category Cover Photo</label>
+                  <label className="block font-bold text-brand-900 text-xs sm:text-sm">Category Cover Photo</label>
                   <label className="cursor-pointer px-3 py-1.5 bg-brand-900 hover:bg-black text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
                     <Upload className="w-3.5 h-3.5 text-gold-400" />
-                    <span>{uploadingCatImg ? "Uploading..." : "Upload from Gallery / PC"}</span>
+                    <span>{uploadingCatImg ? "Uploading..." : "📱 Upload from Gallery / PC"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -548,20 +560,81 @@ export default function CategoriesClientView({
                   className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 font-mono text-xs focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
 
-                {/* Auto-Resized 4:5 Storefront Card Live Preview */}
+                {/* 🎨 Curated Luxury Photo Presets */}
+                <div>
+                  <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-1.5">
+                    🎨 Curated Luxury Photo Library (1-Click Select):
+                  </span>
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                    {CURATED_CATEGORY_PRESETS.map((preset, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => setCatImage(preset.url)}
+                        className={`relative aspect-[4/5] rounded-lg overflow-hidden border transition-all ${
+                          catImage === preset.url
+                            ? "border-gold-600 ring-2 ring-gold-500/50 scale-105"
+                            : "border-sand-300 hover:border-sand-500 opacity-80 hover:opacity-100"
+                        }`}
+                        title={preset.label}
+                      >
+                        <Image src={preset.url} alt={preset.label} fill className="object-cover" />
+                        <span className="absolute inset-x-0 bottom-0 bg-black/70 text-[8px] text-white font-medium truncate px-1 py-0.5 text-center">
+                          {preset.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ✨ AI Auto-Fit / Improvise (4:5 Card Preview) */}
                 {catImage && (
-                  <div className="pt-2 p-3 bg-sand-50 border border-sand-200 rounded-xl text-center">
-                    <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider block mb-1.5">
-                      Storefront Live Preview (Shop by Category 4:5 Ratio):
-                    </span>
+                  <div className="pt-2 p-3 bg-sand-50 border border-sand-200 rounded-xl text-center space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-gold-600" />
+                        AI Auto-Fit Preview (Shop by Category 4:5):
+                      </span>
+                      <div className="inline-flex rounded-lg bg-sand-200 p-0.5 text-[10px] font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setAiFitMode("cover")}
+                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "cover" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
+                        >
+                          Center Crop
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAiFitMode("contain")}
+                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "contain" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
+                        >
+                          Smart Fit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAiFitMode("vignette")}
+                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "vignette" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
+                        >
+                          Vignette
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="relative aspect-[4/5] max-w-[170px] rounded-xl overflow-hidden bg-sand-200 border border-sand-300 shadow-md mx-auto">
                       <Image
                         src={catImage}
                         alt="Category preview"
                         fill
-                        className="object-cover"
+                        className={`transition-all duration-300 ${
+                          aiFitMode === "contain"
+                            ? "object-contain bg-brand-950/20"
+                            : "object-cover"
+                        }`}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-3">
+                      {aiFitMode === "vignette" && (
+                        <div className="absolute inset-0 bg-radial from-transparent via-black/20 to-black/70 pointer-events-none" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-3 pointer-events-none">
                         <p className="font-serif font-bold text-white text-xs leading-tight drop-shadow">
                           {catName || "Category Title"}
                         </p>

@@ -120,7 +120,7 @@ export default async function HomePage() {
     console.warn("Database cold start / connection retry:", dbError);
   }
 
-  // Graceful fallback: Storefront will ALWAYS display products even during database cold-start
+  // Graceful fallback: Storefront will ALWAYS display products & runway reels even during database cold-start
   if (!categories || categories.length === 0) {
     categories = FALLBACK_CATEGORIES;
   }
@@ -132,6 +132,58 @@ export default async function HomePage() {
   }
   if (!bestSellers || bestSellers.length === 0) {
     bestSellers = FALLBACK_PRODUCTS.filter((p) => p.isBestSeller);
+  }
+  if (!videos || videos.length === 0) {
+    videos = [
+      {
+        id: "fallback-reel-1",
+        title: "Nafasat Chiffon Luxury Edit",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        product: {
+          id: "prod-1",
+          title: "Nafasat Hand-Embellished Chiffon",
+          slug: "nafasat-hand-embellished-chiffon-luxury-formal",
+          basePrice: 16500,
+          images: [{ url: "/assets/prod-nafasat.jpg" }],
+        },
+      },
+      {
+        id: "fallback-reel-2",
+        title: "Armani Schiffli Lawn Showcase",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        product: {
+          id: "prod-2",
+          title: "Armani Schiffli Embroidered Lawn 3pc",
+          slug: "armani-schiffli-embroidered-lawn-3pc",
+          basePrice: 12500,
+          images: [{ url: "/assets/prod-armani.jpg" }],
+        },
+      },
+      {
+        id: "fallback-reel-3",
+        title: "Zehra Emerald Runway Walk",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        product: {
+          id: "prod-3",
+          title: "Trendz Raw Silk Luxury Pret",
+          slug: "trendz-raw-silk-luxury-pret",
+          basePrice: 14500,
+          images: [{ url: "/assets/reel-1.jpg" }],
+        },
+      },
+      {
+        id: "fallback-reel-4",
+        title: "Royal Barat Bridal Kalidar",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+        product: {
+          id: "prod-4",
+          title: "Noor-e-Jahan Handcrafted Bridal Barat",
+          slug: "noor-e-jahan-handcrafted-bridal-barat",
+          basePrice: 48500,
+          images: [{ url: "/assets/prod-bridal.jpg" }],
+        },
+      },
+    ];
   }
 
   return (

@@ -309,9 +309,17 @@ export default function Header({ initialSettings }: HeaderProps) {
           navVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        {/* ── SCROLLING MARQUEE ANNOUNCEMENT BAR (FROSTED GLASS) ── */}
+        {/* ── SCROLLING MARQUEE ANNOUNCEMENT BAR (DYNAMIC THEME ACC TO WEBSITE) ── */}
         {initialSettings?.announcementEnabled !== false && (
-          <div className="bg-black/75 backdrop-blur-md text-[#C8C2BB] text-[11px] py-1.5 overflow-hidden relative border-b border-white/5">
+          <div className={`text-[11px] py-1.5 overflow-hidden relative transition-colors duration-300 ${
+            initialSettings?.announcementTheme === "gold"
+              ? "bg-gradient-to-r from-[#8E6D2E] via-[#B28A3E] to-[#8E6D2E] text-brand-950 border-b border-[#D4AF37]/50 font-bold shadow-sm"
+              : initialSettings?.announcementTheme === "emerald"
+                ? "bg-[#0F3E2E]/95 backdrop-blur-md text-[#F8F5EF] border-b border-emerald-500/30"
+                : initialSettings?.announcementTheme === "maroon"
+                  ? "bg-[#5A1A24]/95 backdrop-blur-md text-[#F8F5EF] border-b border-rose-500/30"
+                  : "bg-[#0B0A09]/95 backdrop-blur-md text-[#E8DEC8] border-b border-white/10"
+          }`}>
             <div className="flex animate-marquee whitespace-nowrap">
               {allItems.map((item, i) => (
                 <div
