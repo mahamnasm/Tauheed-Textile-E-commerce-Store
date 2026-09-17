@@ -33,6 +33,8 @@ model AuditLog {
   beforeValue String?
   afterValue  String?
   createdAt   DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Category {
@@ -57,6 +59,8 @@ model Subcategory {
   products     Product[]
   displayOrder Int        @default(0)
   createdAt    DateTime   @default(now())
+
+  @@index([categoryId])
 }
 
 model Collection {
@@ -112,6 +116,10 @@ model Product {
   watchBuyVideos   WatchBuyVideo[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([collectionId])
 }
 
 model ProductImage {
@@ -121,6 +129,8 @@ model ProductImage {
   url          String
   alt          String?
   displayOrder Int      @default(0)
+
+  @@index([productId])
 }
 
 model ProductVariant {
@@ -136,6 +146,8 @@ model ProductVariant {
   stockQuantity   Int                 @default(10)
   reservedStock   Int                 @default(0)
   movements       InventoryMovement[]
+
+  @@index([productId])
 }
 
 model InventoryMovement {
@@ -149,6 +161,8 @@ model InventoryMovement {
   reason      String?
   staffName   String         @default("Admin")
   createdAt   DateTime       @default(now())
+
+  @@index([variantId])
 }
 
 model Order {
@@ -181,6 +195,8 @@ model Order {
   items             OrderItem[]
   bankTransferProof BankTransferProof?
   returnRequests    ReturnRequest[]
+
+  @@index([customerId])
 }
 
 model OrderItem {
@@ -194,6 +210,9 @@ model OrderItem {
   costPrice      Float          @default(0)
   quantity       Int
   total          Float
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model BankTransferProof {
@@ -225,6 +244,8 @@ model ReturnRequest {
   adminNotes        String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  @@index([orderId])
 }
 
 model Coupon {
@@ -261,6 +282,8 @@ model WatchBuyVideo {
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true)
+
+  @@index([productId])
 }
 
 model Review {
@@ -278,6 +301,9 @@ model Review {
   isApproved   Boolean  @default(true)
   isFeatured   Boolean  @default(false)
   createdAt    DateTime @default(now())
+
+  @@index([productId])
+  @@index([userId])
 }
 
 model ShippingZone {
