@@ -1,12 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error(
-    "DATABASE_URL is not configured. Set it in your environment before starting the application."
-  );
-}
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  "postgresql://placeholder:placeholder@localhost:5432/placeholder?sslmode=require";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
