@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
+import { optimizeImageBuffer } from "@/lib/imageProcessor";
 
 const ALLOWED_ADMIN_EXTENSIONS = new Set([
   ".jpg",
@@ -77,13 +78,30 @@ export async function POST(req: NextRequest) {
       }
 
       const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      let finalBuffer = Buffer.from(bytes);
+      let finalExt = rawExt;
+
+      // Automatically optimize image uploads through Sharp pipeline
+      if (rawExt !== ".mp4") {
+        try {
+          const optimized = await optimizeImageBuffer(finalBuffer, {
+            maxWidth: 1920,
+            maxHeight: 1920,
+            quality: 85,
+            format: rawExt === ".png" ? "png" : "webp",
+          });
+          finalBuffer = optimized.data;
+          finalExt = rawExt === ".png" ? ".png" : ".webp";
+        } catch (imgErr) {
+          console.warn("Sharp optimization skipped, using original buffer:", imgErr);
+        }
+      }
 
       const randomHex = Math.random().toString(36).substring(2, 10);
-      const filename = `media_${Date.now()}_${randomHex}${rawExt}`;
+      const filename = `media_${Date.now()}_${randomHex}${finalExt}`;
       const filePath = path.join(uploadDir, filename);
 
-      fs.writeFileSync(filePath, buffer);
+      fs.writeFileSync(filePath, finalBuffer);
       savedUrls.push(`/uploads/${filename}`);
     }
 

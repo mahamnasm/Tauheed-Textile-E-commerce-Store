@@ -78,3 +78,33 @@ export function rateLimitResponse(resetTime: number, customMessage?: string): Ne
     }
   );
 }
+
+/**
+ * Validates Cloudflare Turnstile CAPTCHA token with Cloudflare API.
+ */
+export async function verifyTurnstileToken(token: string, ip?: string): Promise<boolean> {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  if (!secretKey) {
+    // If secret key is not configured, pass in development/fallback mode
+    return true;
+  }
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append("secret", secretKey);
+    formData.append("response", token);
+    if (ip) formData.append("remoteip", ip);
+
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    return Boolean(data.success);
+  } catch (err) {
+    console.error("Turnstile verification error:", err);
+    return false;
+  }
+}
+

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { signToken } from "./auth";
 
 export const ACCESS_TOKEN_COOKIE = "tauheed_access_token";
+export const REFRESH_TOKEN_COOKIE = "tauheed_refresh_token";
 
 /**
  * Sets secure HttpOnly, SameSite=Lax, Secure cookies for customer sessions.
@@ -29,5 +30,6 @@ export function setAuthCookies(
  */
 export function clearAuthCookies(response: NextResponse): NextResponse {
   response.cookies.delete(ACCESS_TOKEN_COOKIE);
+  response.cookies.delete(REFRESH_TOKEN_COOKIE);
   return response;
 }

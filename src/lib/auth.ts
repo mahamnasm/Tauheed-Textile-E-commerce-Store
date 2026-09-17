@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') {
-    throw new Error('SECURITY CONFIGURATION ERROR: JWT_SECRET environment variable must be set in production.');
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is missing. Please set JWT_SECRET in your environment configuration.');
   }
-  return secret || 'tauheed-textile-secret-key-2026';
+  return secret;
 }
 
 export function signToken(payload: { id: string; email: string; role: string; name: string }) {
