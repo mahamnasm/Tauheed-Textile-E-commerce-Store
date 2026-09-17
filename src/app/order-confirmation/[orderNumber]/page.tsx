@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { CheckCircle, Truck, Package, Phone, ArrowRight, ShieldCheck, MapPin, ExternalLink, FileCheck } from "lucide-react";
+import { CheckCircle, Truck, Package, Phone, ArrowRight, ShieldCheck, MapPin, ExternalLink, FileCheck, AlertCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 0;
@@ -172,6 +172,29 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Receipt received. Our accounts team will verify and confirm within 15-30 mins.
                   </p>
+                </div>
+              )}
+
+              {["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(order.paymentMethod) && !order.bankTransferProof && (
+                <div className="mt-3 p-4 bg-amber-50 rounded-xl border border-amber-300 space-y-2.5">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Payment Receipt / Screenshot Required</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 leading-snug">
+                    Your order was placed with Advance Payment. Please share your transaction receipt screenshot on WhatsApp to confirm order dispatch.
+                  </p>
+                  <a
+                    href={`https://wa.me/923400262732?text=${encodeURIComponent(
+                      `Salam Tauheed Textile, here is the payment transfer receipt/screenshot for my order #${order.orderNumber}. Total: Rs. ${order.total.toLocaleString()}.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs"
+                  >
+                    <span>📱 Send Receipt on WhatsApp</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               )}
             </div>

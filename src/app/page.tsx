@@ -82,6 +82,15 @@ export default async function HomePage() {
         orderBy: { createdAt: "desc" },
         take: 10,
       }),
+      prisma.product.findMany({
+        where: {
+          videoUrl: { not: null },
+        },
+        include: {
+          images: { take: 1, select: { url: true } },
+        },
+        take: 8,
+      }),
     ]);
 
     if (fetchedSettings) settings = fetchedSettings;
@@ -89,8 +98,24 @@ export default async function HomePage() {
     if (featProds && featProds.length > 0) featuredProducts = featProds;
     if (newProds && newProds.length > 0) newArrivals = newProds;
     if (bestProds && bestProds.length > 0) bestSellers = bestProds;
-    if (fetchedVideos) videos = fetchedVideos;
     if (fetchedReviews) reviews = fetchedReviews;
+
+    const productVideoReels = (prodsWithVideo || [])
+      .filter((p: any) => p.videoUrl && p.videoUrl.trim() !== "")
+      .map((p: any) => ({
+        id: `prod-reel-${p.id}`,
+        title: p.title,
+        videoUrl: p.videoUrl,
+        product: {
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          basePrice: p.basePrice,
+          images: p.images,
+        },
+      }));
+
+    videos = [...(fetchedVideos || []), ...productVideoReels];
   } catch (dbError) {
     console.warn("Database cold start / connection retry:", dbError);
   }

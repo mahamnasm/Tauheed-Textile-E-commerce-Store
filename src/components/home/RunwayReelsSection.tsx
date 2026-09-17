@@ -308,45 +308,53 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                       Runway Reel
                     </span>
 
-                    {/* Sound Mute / Unmute Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => handleToggleVolume(e, v.id)}
-                      className={`p-2 rounded-full backdrop-blur-md transition-all shadow-lg flex items-center gap-1 text-[10px] font-bold ${
-                        isMuted
-                          ? "bg-black/60 hover:bg-black/80 text-white/90 border border-white/20"
-                          : "bg-[#C4A882] text-black border border-[#D4AF37] shadow-gold-500/20"
-                      }`}
-                      aria-label={isMuted ? "Unmute Video" : "Mute Video"}
-                    >
-                      {isMuted ? (
-                        <>
-                          <VolumeX className="w-3.5 h-3.5 text-white" />
-                          <span className="hidden sm:inline pr-1 text-[9px] uppercase tracking-wider">Unmute</span>
-                        </>
-                      ) : (
-                        <>
-                          <Volume2 className="w-3.5 h-3.5 text-black" />
-                          <span className="hidden sm:inline pr-1 text-[9px] uppercase tracking-wider">Sound On</span>
-                        </>
-                      )}
-                    </button>
+                    {/* Top Right Controls: Mute toggle for native video, or Platform badge for YouTube/Instagram */}
+                    {!isExternal ? (
+                      <button
+                        type="button"
+                        onClick={(e) => handleToggleVolume(e, v.id)}
+                        className={`p-2 rounded-full backdrop-blur-md transition-all shadow-lg flex items-center gap-1 text-[10px] font-bold ${
+                          isMuted
+                            ? "bg-black/60 hover:bg-black/80 text-white/90 border border-white/20"
+                            : "bg-[#C4A882] text-black border border-[#D4AF37] shadow-gold-500/20"
+                        }`}
+                        aria-label={isMuted ? "Unmute Video" : "Mute Video"}
+                      >
+                        {isMuted ? (
+                          <>
+                            <VolumeX className="w-3.5 h-3.5 text-white" />
+                            <span className="hidden sm:inline pr-1 text-[9px] uppercase tracking-wider">Unmute</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-black" />
+                            <span className="hidden sm:inline pr-1 text-[9px] uppercase tracking-wider">Sound On</span>
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[10px] font-bold border border-white/20 flex items-center gap-1">
+                        {parsed.type === "youtube" ? "▶️ YouTube" : "📸 Instagram"}
+                      </span>
+                    )}
                   </div>
 
-                  {/* Center Play/Pause Overlay Indicator on Click */}
-                  <div
-                    className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 pointer-events-none ${
-                      !playing ? "opacity-100 bg-black/30" : "opacity-0 group-hover:opacity-60"
-                    }`}
-                  >
-                    <div className="w-14 h-14 rounded-full bg-black/60 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl transform transition-transform group-hover:scale-110">
-                      {playing ? (
-                        <Pause className="w-6 h-6 text-white" />
-                      ) : (
-                        <Play className="w-6 h-6 text-white fill-white ml-1" />
-                      )}
+                  {/* Center Play/Pause Overlay Indicator on Click (Native MP4 only) */}
+                  {!isExternal && (
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 pointer-events-none ${
+                        !playing ? "opacity-100 bg-black/30" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    >
+                      <div className="w-14 h-14 rounded-full bg-black/60 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl transform transition-transform group-hover:scale-110">
+                        {playing ? (
+                          <Pause className="w-6 h-6 text-white" />
+                        ) : (
+                          <Play className="w-6 h-6 text-white fill-white ml-1" />
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Bottom Caption Overlay */}
                   <div className="absolute bottom-3 left-3 right-3 pointer-events-none">

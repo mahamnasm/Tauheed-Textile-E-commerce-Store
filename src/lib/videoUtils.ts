@@ -28,9 +28,9 @@ export function parseVideoUrl(url?: string | null): ParsedVideo {
     };
   }
 
-  // YouTube Shorts / Watch / youtu.be
+  // YouTube Shorts / Watch / youtu.be / live / embed
   const ytMatch = trimmed.match(
-    /(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
+    /(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|v\/|live\/))([a-zA-Z0-9_-]{11})/i
   );
   if (ytMatch && ytMatch[1]) {
     const videoId = ytMatch[1];
@@ -38,14 +38,14 @@ export function parseVideoUrl(url?: string | null): ParsedVideo {
       type: "youtube",
       rawUrl: trimmed,
       videoId,
-      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&playsinline=1&controls=1`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&playsinline=1&controls=1&rel=0`,
       isEmbeddable: true,
     };
   }
 
-  // Instagram Reels & Posts
+  // Instagram Reels, Posts, and TV
   const instaMatch = trimmed.match(
-    /instagram\.com\/(?:reel|p|tv)\/([a-zA-Z0-9_-]+)/i
+    /(?:www\.)?instagram\.com\/(?:reel|reels|p|tv|share\/reel)\/([a-zA-Z0-9_-]+)/i
   );
   if (instaMatch && instaMatch[1]) {
     const code = instaMatch[1];
@@ -53,7 +53,7 @@ export function parseVideoUrl(url?: string | null): ParsedVideo {
       type: "instagram",
       rawUrl: trimmed,
       videoId: code,
-      embedUrl: `https://www.instagram.com/reel/${code}/embed`,
+      embedUrl: `https://www.instagram.com/reel/${code}/embed/captioned/`,
       isEmbeddable: true,
     };
   }

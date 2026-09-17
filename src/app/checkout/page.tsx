@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +22,8 @@ import {
   Trash2,
   Copy,
   Check,
-  Camera
+  Camera,
+  Upload
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { PAKISTAN_CITIES } from "@/lib/pakistan-data";
@@ -951,6 +952,13 @@ export default function CheckoutPage() {
                     Please attach your bank transfer or wallet payment receipt slip above before confirming this order.
                   </p>
                 </div>
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="p-3 bg-[#FDF2F2] border border-[#F2BDBD] rounded-xl text-[#9B3D3D] text-xs font-semibold flex items-center gap-2 shadow-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 text-[#9B3D3D]" />
+                <span>{errorMessage}</span>
               </div>
             )}
 

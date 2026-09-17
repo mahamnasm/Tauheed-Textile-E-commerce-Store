@@ -31,6 +31,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Strict Enforcement: For Advance Payment, receipt/screenshot is MANDATORY before checkout
+    const isAdvancePayment = ["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(paymentMethod);
+    if (isAdvancePayment && (!bankTransferDetails || !bankTransferDetails.proofImage || !bankTransferDetails.proofImage.trim())) {
+      return NextResponse.json(
+        { error: "Please attach or upload your payment receipt / transfer screenshot before checkout for order confirmation." },
+        { status: 400 }
+      );
+    }
+
     // Generate unique order number (e.g. TT-2026-XXXX)
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderNumber = `TT-${new Date().getFullYear()}-${randomSuffix}`;
