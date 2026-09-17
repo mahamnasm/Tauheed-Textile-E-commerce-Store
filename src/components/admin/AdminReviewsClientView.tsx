@@ -16,7 +16,10 @@ import {
   Camera,
   ExternalLink,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  RotateCcw,
+  CheckCheck
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -36,9 +39,37 @@ interface ReviewItem {
     id: string;
     title: string;
     slug: string;
-    images: { url: string }[];
+    images?: { url: string }[];
   } | null;
 }
+
+const PAKISTANI_NAME_PRESETS = [
+  "Fatima Zahra",
+  "Ayesha Bilal",
+  "Zainab Farooq",
+  "Maryam Sheikh",
+  "Hira Siddiqui",
+  "Maham Khan",
+  "Sana Naveed",
+  "Anum Javed",
+  "Komal Riaz",
+  "Bushra Alvi",
+  "Sadia Imran",
+  "Nida Yasir"
+];
+
+const PAKISTANI_CITY_PRESETS = [
+  "Lahore, DHA Phase 5",
+  "Karachi, Clifton",
+  "Islamabad, F-7",
+  "Rawalpindi, Bahria Town",
+  "Faisalabad",
+  "Multan, Cantt",
+  "Peshawar, Hayatabad",
+  "Sialkot",
+  "Gujranwala",
+  "Hyderabad, Sindh"
+];
 
 export default function AdminReviewsClientView({
   initialReviews = [],
@@ -52,26 +83,29 @@ export default function AdminReviewsClientView({
   // Create Desi Review Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addCustomerName, setAddCustomerName] = useState("");
-  const [addCity, setAddCity] = useState("Lahore, DHA");
+  const [addCity, setAddCity] = useState("Lahore, DHA Phase 5");
   const [addRating, setAddRating] = useState(5);
-  const [addTitle, setAddTitle] = useState("Original Swiss Lawn & Beautiful Embroidery");
+  const [addTitle, setAddTitle] = useState("Original Swiss Lawn & Breathtaking Embroidery!");
   const [addComment, setAddComment] = useState("");
   const [addImageUrl, setAddImageUrl] = useState("");
   const [addIsApproved, setAddIsApproved] = useState(true);
   const [addIsFeatured, setAddIsFeatured] = useState(true);
   const [isSubmittingAdd, setIsSubmittingAdd] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   // Edit modal state
   const [editingReview, setEditingReview] = useState<ReviewItem | null>(null);
+  const [editCustomerName, setEditCustomerName] = useState("");
+  const [editCity, setEditCity] = useState("");
   const [editTitle, setEditTitle] = useState("");
   const [editComment, setEditComment] = useState("");
   const [editRating, setEditRating] = useState(5);
   const [savingEdit, setSavingEdit] = useState(false);
 
-  // Quick Seed 10 authentic Pakistani reviews
+  // Quick Seed 10 authentic Pakistani reviews (Wipes old ones)
   const handleSeedReviews = async () => {
-    if (!confirm("This will replace all reviews with 10 authentic Pakistani customer reviews. Proceed?")) return;
+    if (!confirm("This will delete all old reviews and replace them with 10 authentic Pakistani customer reviews (with Pakistani names, local cities & desi feedback). Proceed?")) return;
 
     setIsSeeding(true);
     try {
@@ -85,6 +119,49 @@ export default function AdminReviewsClientView({
       toast.error(err.message || "Failed to seed reviews");
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  // Bulk Delete All Reviews
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to permanently delete ALL reviews currently in the database?")) return;
+
+    setIsDeletingAll(true);
+    try {
+      const res = await fetch("/api/reviews?all=true", { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete reviews");
+
+      setReviews([]);
+      toast.success("All reviews deleted from the database.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete reviews");
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
+  // Approve all pending reviews with 1 click
+  const handleApproveAllPending = async () => {
+    const pending = reviews.filter((r) => !r.isApproved);
+    if (pending.length === 0) return;
+
+    const count = pending.length;
+    try {
+      await Promise.all(
+        pending.map((r) =>
+          fetch("/api/reviews", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: r.id, isApproved: true }),
+          })
+        )
+      );
+
+      setReviews((prev) => prev.map((r) => ({ ...r, isApproved: true })));
+      toast.success(`All ${count} pending reviews are now approved and live on the website!`, { icon: "✅" });
+    } catch {
+      toast.error("Failed to approve all pending reviews");
     }
   };
 
@@ -118,7 +195,7 @@ export default function AdminReviewsClientView({
       if (!res.ok) throw new Error(data.error || "Failed to create review");
 
       setReviews((prev) => [data.review, ...prev]);
-      toast.success("Desi review added successfully!");
+      toast.success(addIsApproved ? "Desi review published and live on website!" : "Review saved as pending approval!");
       setIsAddModalOpen(false);
       // Reset
       setAddCustomerName("");
@@ -131,19 +208,25 @@ export default function AdminReviewsClientView({
     }
   };
 
-  // Toggle approval
+  // Toggle approval (Approve / Unapprove before showing on live store)
   const handleToggleApprove = async (id: string, currentStatus: boolean) => {
     try {
+      const nextStatus = !currentStatus;
       const res = await fetch("/api/reviews", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, isApproved: !currentStatus }),
+        body: JSON.stringify({ id, isApproved: nextStatus }),
       });
       if (res.ok) {
         setReviews((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, isApproved: !currentStatus } : r))
+          prev.map((r) => (r.id === id ? { ...r, isApproved: nextStatus } : r))
         );
-        toast.success(!currentStatus ? "Review approved for live store" : "Review hidden from store");
+        toast.success(
+          nextStatus 
+            ? "✅ Review Approved & Live on Website!" 
+            : "🚫 Review Hidden from Live Website", 
+          { icon: nextStatus ? "✅" : "👁️‍🗨️" }
+        );
       }
     } catch {
       toast.error("Failed to update approval status");
@@ -153,16 +236,17 @@ export default function AdminReviewsClientView({
   // Toggle feature / like
   const handleToggleFeature = async (id: string, currentStatus: boolean) => {
     try {
+      const nextStatus = !currentStatus;
       const res = await fetch("/api/reviews", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, isFeatured: !currentStatus }),
+        body: JSON.stringify({ id, isFeatured: nextStatus }),
       });
       if (res.ok) {
         setReviews((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, isFeatured: !currentStatus } : r))
+          prev.map((r) => (r.id === id ? { ...r, isFeatured: nextStatus } : r))
         );
-        toast.success(!currentStatus ? "Review liked & featured on homepage!" : "Removed from featured");
+        toast.success(nextStatus ? "Review featured on homepage!" : "Removed from featured");
       }
     } catch {
       toast.error("Failed to toggle feature");
@@ -172,6 +256,8 @@ export default function AdminReviewsClientView({
   // Open edit modal
   const openEditModal = (review: ReviewItem) => {
     setEditingReview(review);
+    setEditCustomerName(review.customerName);
+    setEditCity(review.reviewerCity || "");
     setEditTitle(review.title);
     setEditComment(review.comment);
     setEditRating(review.rating);
@@ -189,8 +275,10 @@ export default function AdminReviewsClientView({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingReview.id,
-          title: editTitle,
-          comment: editComment,
+          customerName: editCustomerName.trim(),
+          reviewerCity: editCity.trim() || null,
+          title: editTitle.trim(),
+          comment: editComment.trim(),
           rating: editRating,
         }),
       });
@@ -199,7 +287,14 @@ export default function AdminReviewsClientView({
         setReviews((prev) =>
           prev.map((r) =>
             r.id === editingReview.id
-              ? { ...r, title: editTitle, comment: editComment, rating: editRating }
+              ? { 
+                  ...r, 
+                  customerName: editCustomerName.trim(), 
+                  reviewerCity: editCity.trim() || null,
+                  title: editTitle.trim(), 
+                  comment: editComment.trim(), 
+                  rating: editRating 
+                }
               : r
           )
         );
@@ -222,7 +317,7 @@ export default function AdminReviewsClientView({
       const res = await fetch(`/api/reviews?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setReviews((prev) => prev.filter((r) => r.id !== id));
-        toast.success("Review deleted");
+        toast.success("Review deleted permanently");
       }
     } catch {
       toast.error("Failed to delete review");
@@ -239,6 +334,7 @@ export default function AdminReviewsClientView({
 
     const matchesSearch =
       r.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (r.reviewerCity || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (r.product?.title || "").toLowerCase().includes(searchQuery.toLowerCase());
@@ -247,37 +343,48 @@ export default function AdminReviewsClientView({
   });
 
   const pendingCount = reviews.filter((r) => !r.isApproved).length;
+  const approvedCount = reviews.filter((r) => r.isApproved).length;
   const featuredCount = reviews.filter((r) => r.isFeatured).length;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="font-serif font-bold text-2xl sm:text-3xl text-brand-950">
-              Customer Reviews Management
+              Customer Reviews & Moderation
             </h1>
-            {pendingCount > 0 && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                {pendingCount} Pending
+            {pendingCount > 0 ? (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                {pendingCount} Awaiting Approval
+              </span>
+            ) : (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                All Approved & Live
               </span>
             )}
           </div>
           <p className="text-xs text-brand-600 mt-1">
-            Moderate reviews, manage customer unboxing photos, like/feature on homepage, and edit feedback.
+            Moderate authentic Pakistani reviews, approve or hide before uploading to the live website, and like/feature on the homepage.
           </p>
         </div>
 
         {/* Stats & Actions */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
-          <div className="px-3.5 py-2 bg-white rounded-xl border border-sand-300 shadow-sm text-center">
+        <div className="flex flex-wrap items-center gap-2.5 text-xs">
+          <div className="px-3 py-1.5 bg-white rounded-xl border border-sand-300 shadow-xs text-center">
             <span className="text-brand-500 block text-[10px] font-semibold uppercase">Total</span>
-            <span className="font-bold text-brand-950 text-base">{reviews.length}</span>
+            <span className="font-bold text-brand-950 text-sm">{reviews.length}</span>
           </div>
-          <div className="px-3.5 py-2 bg-white rounded-xl border border-sand-300 shadow-sm text-center">
-            <span className="text-emerald-700 block text-[10px] font-semibold uppercase">Featured</span>
-            <span className="font-bold text-emerald-700 text-base">{featuredCount}</span>
+          <div className="px-3 py-1.5 bg-white rounded-xl border border-sand-300 shadow-xs text-center">
+            <span className="text-emerald-700 block text-[10px] font-semibold uppercase">Live</span>
+            <span className="font-bold text-emerald-700 text-sm">{approvedCount}</span>
+          </div>
+          <div className="px-3 py-1.5 bg-white rounded-xl border border-sand-300 shadow-xs text-center">
+            <span className="text-amber-700 block text-[10px] font-semibold uppercase">Pending</span>
+            <span className="font-bold text-amber-700 text-sm">{pendingCount}</span>
           </div>
 
           <button
@@ -285,10 +392,21 @@ export default function AdminReviewsClientView({
             onClick={handleSeedReviews}
             disabled={isSeeding}
             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-sand-300 bg-white hover:bg-sand-50 text-brand-900 text-xs font-bold transition-all shadow-xs"
-            title="Reset & Load 10 Authentic Pakistani Customer Reviews"
+            title="Wipe old reviews and seed 10 authentic Pakistani reviews"
           >
             <span>🇵🇰</span>
-            <span>{isSeeding ? "Seeding..." : "Reload 10 Desi Reviews"}</span>
+            <span>{isSeeding ? "Seeding..." : "Load 10 Desi Reviews"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDeleteAll}
+            disabled={isDeletingAll || reviews.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-maroon-200 bg-white hover:bg-maroon-50 text-maroon-700 text-xs font-bold transition-all shadow-xs disabled:opacity-40"
+            title="Delete all reviews in the database"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete All</span>
           </button>
 
           <button
@@ -302,14 +420,38 @@ export default function AdminReviewsClientView({
         </div>
       </div>
 
+      {/* Pending Reviews Alert Banner */}
+      {pendingCount > 0 && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <div>
+              <p className="text-xs font-bold">
+                {pendingCount} review(s) are awaiting admin approval!
+              </p>
+              <p className="text-[11px] text-amber-700">
+                These reviews are currently hidden from visitors. Click "Approve & Publish" on each card or approve all at once.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleApproveAllPending}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm transition-all"
+          >
+            <CheckCheck className="w-4 h-4" />
+            <span>Approve All ({pendingCount}) to Live Store</span>
+          </button>
+        </div>
+      )}
+
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-sand-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
           {[
             { id: "ALL", label: `All (${reviews.length})` },
-            { id: "APPROVED", label: "Live Store" },
-            { id: "PENDING", label: `Pending (${pendingCount})` },
-            { id: "FEATURED", label: `Liked & Featured (${featuredCount})` },
+            { id: "PENDING", label: `⏳ Pending Approval (${pendingCount})` },
+            { id: "APPROVED", label: `✅ Live on Website (${approvedCount})` },
+            { id: "FEATURED", label: `🌟 Featured (${featuredCount})` },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -329,7 +471,7 @@ export default function AdminReviewsClientView({
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-brand-400" />
           <input
             type="text"
-            placeholder="Search reviews by name or text..."
+            placeholder="Search by Pakistani name, city, comment..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full text-xs pl-9 pr-3 py-2 border border-sand-300 rounded-xl bg-sand-50/50 focus:outline-none focus:ring-1 focus:ring-gold-500"
@@ -343,6 +485,15 @@ export default function AdminReviewsClientView({
           <MessageSquare className="w-10 h-10 text-brand-300 mx-auto" />
           <h3 className="font-serif font-bold text-lg text-brand-950">No reviews found</h3>
           <p className="text-xs text-brand-500">No reviews match the selected filter criteria.</p>
+          {reviews.length === 0 && (
+            <button
+              onClick={handleSeedReviews}
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-950 text-white text-xs font-bold"
+            >
+              <span>🇵🇰</span>
+              <span>Load 10 Authentic Pakistani Reviews</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -350,14 +501,16 @@ export default function AdminReviewsClientView({
             <div
               key={rev.id}
               className={`bg-white rounded-2xl border p-5 shadow-sm flex flex-col justify-between transition-all ${
-                rev.isFeatured
+                !rev.isApproved
+                  ? "border-amber-300 bg-amber-50/20 ring-1 ring-amber-300"
+                  : rev.isFeatured
                   ? "border-gold-500/80 ring-1 ring-gold-500/20"
                   : "border-sand-200 hover:border-sand-300"
               }`}
             >
               <div className="space-y-3">
-                {/* Top Row: Stars + Product Link */}
-                <div className="flex items-center justify-between">
+                {/* Top Row: Stars + Live/Pending Approval Badge */}
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1 text-gold-500">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -369,21 +522,21 @@ export default function AdminReviewsClientView({
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
                     {rev.isFeatured && (
                       <span className="text-[10px] bg-gold-100 text-gold-900 border border-gold-300 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Heart className="w-3 h-3 fill-gold-500 text-gold-500" /> Featured
                       </span>
                     )}
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        rev.isApproved
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {rev.isApproved ? "Live" : "Pending"}
-                    </span>
+                    {rev.isApproved ? (
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600" /> Live on Web
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 text-amber-600" /> Pending Approval
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -407,17 +560,27 @@ export default function AdminReviewsClientView({
                   <h4 className="font-serif font-bold text-sm text-brand-950 line-clamp-1">
                     {rev.title}
                   </h4>
-                  <p className="text-xs text-brand-600 mt-1 line-clamp-3 leading-relaxed">
+                  <p className="text-xs text-brand-700 mt-1 line-clamp-4 leading-relaxed italic">
                     "{rev.comment}"
                   </p>
                 </div>
 
-                {/* Customer Info */}
+                {/* Pakistani Customer Info */}
                 <div className="text-[11px] text-brand-500 pt-2 border-t border-sand-100 flex items-center justify-between">
-                  <span className="font-semibold text-brand-900">
-                    {rev.customerName} {rev.reviewerCity ? `(${rev.reviewerCity})` : ""}
+                  <div>
+                    <span className="font-bold text-brand-950 block">
+                      {rev.customerName}
+                    </span>
+                    {rev.reviewerCity && (
+                      <span className="text-[10px] text-brand-600 flex items-center gap-1">
+                        <span>📍</span>
+                        <span>{rev.reviewerCity}</span>
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-sand-500">
+                    {new Date(rev.createdAt).toLocaleDateString("en-PK")}
                   </span>
-                  <span>{new Date(rev.createdAt).toLocaleDateString("en-PK")}</span>
                 </div>
 
                 {/* Attached Product */}
@@ -438,46 +601,50 @@ export default function AdminReviewsClientView({
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-4 mt-3 border-t border-sand-200 flex items-center justify-between gap-1.5">
+              {/* Action Buttons: Explicit Approve / Reject Option Before Uploading to Website */}
+              <div className="pt-3.5 mt-3 border-t border-sand-200 flex items-center justify-between gap-1.5 flex-wrap">
+                {/* APPROVE / HIDE TOGGLE */}
                 <button
                   onClick={() => handleToggleApprove(rev.id, rev.isApproved)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs ${
                     rev.isApproved
-                      ? "bg-sand-200 text-brand-800 hover:bg-sand-300"
-                      : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                      ? "bg-sand-100 text-brand-800 hover:bg-sand-200 border border-sand-300"
+                      : "bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
                   }`}
-                  title={rev.isApproved ? "Hide review" : "Approve review"}
+                  title={rev.isApproved ? "Hide this review from live website" : "Approve and publish this review to live website"}
                 >
                   <Check className="w-3.5 h-3.5" />
-                  {rev.isApproved ? "Hide" : "Approve"}
+                  <span>{rev.isApproved ? "Hide from Web" : "Approve for Web"}</span>
                 </button>
 
+                {/* LIKE / FEATURE TOGGLE */}
                 <button
                   onClick={() => handleToggleFeature(rev.id, rev.isFeatured)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                     rev.isFeatured
-                      ? "bg-gold-500 text-white"
-                      : "bg-sand-100 hover:bg-gold-100 text-gold-800"
+                      ? "bg-gold-500 text-white shadow-xs"
+                      : "bg-sand-100 hover:bg-gold-100 text-gold-800 border border-sand-200"
                   }`}
-                  title="Like / Feature on homepage"
+                  title="Like / Feature on homepage reviews slider"
                 >
                   <Heart className={`w-3.5 h-3.5 ${rev.isFeatured ? "fill-white" : ""}`} />
-                  {rev.isFeatured ? "Liked" : "Like"}
+                  <span>{rev.isFeatured ? "Liked" : "Like"}</span>
                 </button>
 
+                {/* EDIT BUTTON */}
                 <button
                   onClick={() => openEditModal(rev)}
                   className="p-1.5 rounded-lg text-brand-600 hover:bg-sand-200 transition-colors"
-                  title="Edit review text"
+                  title="Edit customer name or review text"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
 
+                {/* DELETE BUTTON */}
                 <button
                   onClick={() => handleDelete(rev.id)}
                   className="p-1.5 rounded-lg text-maroon-600 hover:bg-maroon-50 transition-colors"
-                  title="Delete review"
+                  title="Delete review permanently"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -490,7 +657,7 @@ export default function AdminReviewsClientView({
       {/* Edit Review Modal */}
       {editingReview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setEditingReview(null)} />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setEditingReview(null)} />
           <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl z-10 space-y-4">
             <div className="flex items-center justify-between border-b border-sand-200 pb-3">
               <h3 className="font-serif font-bold text-lg text-brand-950">
@@ -505,6 +672,28 @@ export default function AdminReviewsClientView({
             </div>
 
             <form onSubmit={handleSaveEdit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">Customer Name (Pakistani)</label>
+                  <input
+                    type="text"
+                    required
+                    value={editCustomerName}
+                    onChange={(e) => setEditCustomerName(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">City / Location</label>
+                  <input
+                    type="text"
+                    value={editCity}
+                    onChange={(e) => setEditCity(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block font-bold text-brand-900 mb-1">Star Rating</label>
                 <div className="flex items-center gap-2">
@@ -522,31 +711,33 @@ export default function AdminReviewsClientView({
                       />
                     </button>
                   ))}
-                  <span className="font-semibold text-brand-700 ml-2">{editRating} Stars</span>
+                  <span className="font-bold text-brand-800 ml-2">{editRating} Stars</span>
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-brand-900 mb-1">Review Title</label>
+                <label className="block font-bold text-brand-900 mb-1">Review Headline</label>
                 <input
                   type="text"
+                  required
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-brand-900 mb-1">Review Comment</label>
+                <label className="block font-bold text-brand-900 mb-1">Desi Review Comment</label>
                 <textarea
                   rows={4}
+                  required
                   value={editComment}
                   onChange={(e) => setEditComment(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 leading-relaxed"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-sand-200">
                 <button
                   type="button"
                   onClick={() => setEditingReview(null)}
@@ -570,12 +761,15 @@ export default function AdminReviewsClientView({
       {/* CREATE NEW DESI REVIEW MODAL */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-sand-300 shadow-2xl max-w-lg w-full p-6 space-y-5">
+          <div className="bg-white rounded-3xl border border-sand-300 shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-sand-200 pb-3">
-              <h3 className="font-serif font-bold text-lg text-brand-950 flex items-center gap-2">
-                <span>🇵🇰</span>
-                <span>Add Authentic Pakistani Review</span>
-              </h3>
+              <div>
+                <h3 className="font-serif font-bold text-lg text-brand-950 flex items-center gap-2">
+                  <span>🇵🇰</span>
+                  <span>Add Authentic Pakistani Desi Review</span>
+                </h3>
+                <p className="text-[11px] text-brand-600">Enter customer details, feedback, and choose approval status</p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
@@ -586,29 +780,56 @@ export default function AdminReviewsClientView({
             </div>
 
             <form onSubmit={handleCreateReview} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">
-                    Customer Name (Pakistani) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={addCustomerName}
-                    onChange={(e) => setAddCustomerName(e.target.value)}
-                    placeholder="e.g. Fatima Zahra, Ayesha Bilal"
-                    className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium text-brand-950"
-                  />
+              {/* Quick Name Presets */}
+              <div>
+                <label className="block font-bold text-brand-900 mb-1">
+                  Customer Name (Pakistani) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={addCustomerName}
+                  onChange={(e) => setAddCustomerName(e.target.value)}
+                  placeholder="e.g. Fatima Zahra, Ayesha Bilal"
+                  className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium text-brand-950"
+                />
+                <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                  <span className="text-[10px] text-sand-500 font-semibold">Quick Names:</span>
+                  {PAKISTANI_NAME_PRESETS.slice(0, 6).map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => setAddCustomerName(name)}
+                      className="px-2 py-0.5 rounded-md bg-sand-100 hover:bg-sand-200 text-[10px] font-medium text-brand-800"
+                    >
+                      {name}
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <label className="block font-bold text-brand-900 mb-1">City / Location</label>
-                  <input
-                    type="text"
-                    value={addCity}
-                    onChange={(e) => setAddCity(e.target.value)}
-                    placeholder="e.g. Lahore, DHA Phase 5"
-                    className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium text-brand-950"
-                  />
+              </div>
+
+              {/* City / Location */}
+              <div>
+                <label className="block font-bold text-brand-900 mb-1">City / Location</label>
+                <input
+                  type="text"
+                  value={addCity}
+                  onChange={(e) => setAddCity(e.target.value)}
+                  placeholder="e.g. Lahore, DHA Phase 5"
+                  className="w-full p-2.5 rounded-xl border border-sand-300 bg-sand-50 font-medium text-brand-950"
+                />
+                <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                  <span className="text-[10px] text-sand-500 font-semibold">Cities:</span>
+                  {PAKISTANI_CITY_PRESETS.slice(0, 5).map((city) => (
+                    <button
+                      key={city}
+                      type="button"
+                      onClick={() => setAddCity(city)}
+                      className="px-2 py-0.5 rounded-md bg-sand-100 hover:bg-sand-200 text-[10px] font-medium text-brand-800"
+                    >
+                      {city.split(",")[0]}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -672,27 +893,60 @@ export default function AdminReviewsClientView({
                 />
               </div>
 
-              {/* Toggles */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-sand-100">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={addIsApproved}
-                    onChange={(e) => setAddIsApproved(e.target.checked)}
-                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
-                  />
-                  <span className="font-bold text-brand-900">Approve immediately on live website</span>
-                </label>
+              {/* APPROVE REVIEW OPTION BEFORE UPLOADING ON WEBSITE */}
+              <div className="p-3.5 rounded-xl bg-sand-50 border border-sand-300 space-y-2.5">
+                <p className="font-bold text-brand-950 uppercase tracking-wider text-[11px]">
+                  Website Upload & Approval Status:
+                </p>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="approvalStatus"
+                      checked={addIsApproved}
+                      onChange={() => setAddIsApproved(true)}
+                      className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <div>
+                      <span className="font-bold text-emerald-800 block">
+                        ✅ Approve & Upload to Website Immediately
+                      </span>
+                      <span className="text-[10px] text-brand-500">
+                        Will be live immediately on storefront and product pages.
+                      </span>
+                    </div>
+                  </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={addIsFeatured}
-                    onChange={(e) => setAddIsFeatured(e.target.checked)}
-                    className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
-                  />
-                  <span className="font-bold text-brand-900">Feature on homepage</span>
-                </label>
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="approvalStatus"
+                      checked={!addIsApproved}
+                      onChange={() => setAddIsApproved(false)}
+                      className="w-4 h-4 text-amber-600 focus:ring-amber-500"
+                    />
+                    <div>
+                      <span className="font-bold text-amber-900 block">
+                        ⏳ Hold as Pending (Require Approval Before Uploading)
+                      </span>
+                      <span className="text-[10px] text-brand-500">
+                        Kept hidden in Admin until you explicitly click "Approve for Web".
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="pt-2 border-t border-sand-200">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={addIsFeatured}
+                      onChange={(e) => setAddIsFeatured(e.target.checked)}
+                      className="w-4 h-4 rounded text-gold-600 focus:ring-gold-500"
+                    />
+                    <span className="font-bold text-brand-900">Feature on homepage reviews slider</span>
+                  </label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-sand-100">

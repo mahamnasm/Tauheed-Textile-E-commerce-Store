@@ -149,6 +149,16 @@ export async function POST(req: NextRequest) {
           isApproved: rev.isApproved,
           isFeatured: rev.isFeatured,
         },
+        include: {
+          product: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              images: { take: 1, select: { url: true } },
+            },
+          },
+        },
       });
       createdReviews.push(created);
     }

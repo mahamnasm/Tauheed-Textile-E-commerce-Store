@@ -156,6 +156,15 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const deleteAll = searchParams.get("all") === "true";
+
+    if (deleteAll) {
+      const deleted = await prisma.review.deleteMany({});
+      return NextResponse.json({
+        success: true,
+        message: `Deleted ${deleted.count} reviews successfully.`,
+      });
+    }
 
     if (!id) {
       return NextResponse.json(
