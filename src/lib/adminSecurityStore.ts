@@ -10,7 +10,7 @@ const MAX_FAILED_ATTEMPTS = 3;
 const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 Minutes
 const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // 15 Minutes
 
-export const OWNER_MASTER_KEY = "maham0345";
+export const OWNER_MASTER_KEY = process.env.OWNER_MASTER_KEY || "maham0345";
 
 export function verifyOwnerKey(key?: string | null): boolean {
   if (!key) return false;
@@ -199,8 +199,8 @@ export async function logSecurityEvent(
     username: username || "unknown",
     action,
     details,
-    attemptedPassword: attemptedPassword ? (attemptedPassword.length > 40 ? attemptedPassword.substring(0, 40) + "..." : attemptedPassword) : undefined,
-    attemptedPin: attemptedPin ? (attemptedPin.length > 20 ? attemptedPin.substring(0, 20) + "..." : attemptedPin) : undefined,
+    attemptedPassword: attemptedPassword ? `[REDACTED (${attemptedPassword.length} chars)]` : undefined,
+    attemptedPin: attemptedPin ? `[REDACTED PIN (${attemptedPin.length} digits)]` : undefined,
     userAgent: userAgent ? userAgent.substring(0, 150) : undefined,
   };
 

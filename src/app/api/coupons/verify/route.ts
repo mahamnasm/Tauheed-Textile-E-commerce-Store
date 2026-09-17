@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
+import { verifyCouponSchema } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
-  try {
-    const { code, subtotal } = await req.json();
+  const ip = getClientIp(req);
 
-    if (!code) {
+  // Rate Limiting: Max 20 coupon checks per 15 minutes per IP to prevent brute-forcing promo codes
+  const rate = checkRateLimit(`coupon_verify_${ip}`, 20, 15 * 60 * 1000);
+  if (!rate.success) {
+    return rateLimitResponse(rate.resetTime, "Too many coupon attempts. Please wait a few minutes.");
+  }
+
+  try {
+    const json = await req.json();
+    const validation = verifyCouponSchema.safeParse(json);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, error: "Please enter a coupon code." },
+        { success: false, error: validation.error.errors[0]?.message || "Invalid coupon request." },
         { status: 400 }
       );
     }
 
+    const { code, subtotal } = validation.data;
     const cleanCode = code.trim().toUpperCase();
-    const orderSubtotal = Number(subtotal) || 0;
+    const orderSubtotal = Math.max(0, subtotal);
 
     // Hardcoded fallback coupons for instant offline testing
     if (cleanCode === "TAUHEED10") {

@@ -4,9 +4,9 @@
  * Compatible with Edge Runtime (Middleware) and Node.js Server Runtime
  */
 
-export const ADMIN_USERNAME = "usamanaseem101";
-export const ADMIN_PASSWORD = "0345usama00";
-export const DEFAULT_MASTER_PIN = "786000";
+export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "usamanaseem101";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "0345usama00";
+export const DEFAULT_MASTER_PIN = process.env.ADMIN_MASTER_PIN || "786000";
 export const ADMIN_COOKIE_NAME = "tauheed_admin_session";
 
 const SESSION_SECRET =

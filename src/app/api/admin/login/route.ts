@@ -73,14 +73,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { username, password, pin, rememberMe } = body;
+    const { adminLoginSchema } = await import("@/lib/validation");
+    const validation = adminLoginSchema.safeParse(body);
 
-    if (!username || !password || !pin) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Username, Password, and 6-Digit Master Security PIN are all required." },
+        { error: validation.error.errors[0]?.message || "Username, Password, and Master Security PIN are required." },
         { status: 400 }
       );
     }
+
+    const { username, password, pin, rememberMe } = validation.data;
 
     // 2. Validate Credentials & 2FA Master PIN
     const authResult = await validateAdminCredentialsWithPin(username, password, pin);
@@ -106,38 +109,22 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (authResult.reason === "INVALID_PIN") {
-        await logSecurityEvent(
-          ip,
-          username,
-          "FAILED_PIN",
-          `Invalid Master Security PIN attempted: "${pin}". Remaining: ${failState.remainingAttempts}`,
-          {
-            userAgent,
-            location,
-            attemptedPassword: password,
-            attemptedPin: pin,
-          }
-        );
-      } else {
-        await logSecurityEvent(
-          ip,
-          username,
-          "FAILED_CREDENTIALS",
-          `Invalid credentials attempted. User: "${username}", Pass: "${password}". Remaining: ${failState.remainingAttempts}`,
-          {
-            userAgent,
-            location,
-            attemptedPassword: password,
-            attemptedPin: pin,
-          }
-        );
-      }
+      // Log sanitized event without exposing plain-text credentials
+      await logSecurityEvent(
+        ip,
+        username,
+        authResult.reason === "INVALID_PIN" ? "FAILED_PIN" : "FAILED_CREDENTIALS",
+        `Authentication failed for user "${username}". Attempts remaining: ${failState.remainingAttempts}`,
+        {
+          userAgent,
+          location,
+        }
+      );
 
       if (failState.locked) {
         return NextResponse.json(
           {
-            error: "🚨 SECURITY ALERT: 3 consecutive failed login attempts detected. Your IP address has been LOCKED OUT for 30 minutes. All subsequent attempts are blocked.",
+            error: "🚨 SECURITY ALERT: Multiple consecutive failed login attempts detected. Your IP address has been temporarily locked out to protect the store.",
             locked: true,
             minutesRemaining: 30,
           },
@@ -147,7 +134,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          error: `Access Denied: Incorrect credentials or Master Security PIN. Warning: You have ${failState.remainingAttempts} attempt(s) remaining before a 30-minute security lockout.`,
+          error: `Invalid credentials or security PIN. You have ${failState.remainingAttempts} attempts remaining before temporary IP lockout.`,
           remainingAttempts: failState.remainingAttempts,
         },
         { status: 401 }
