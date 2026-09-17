@@ -5,6 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SiteLayoutSettings } from "@/lib/settings";
+import {
+  YouTubeBrandIcon,
+  InstagramBrandIcon,
+  FacebookBrandIcon,
+  TikTokBrandIcon,
+  WhatsAppBrandIcon,
+} from "@/components/common/SocialBrandIcons";
 
 interface FooterProps {
   initialSettings?: SiteLayoutSettings;
@@ -161,8 +168,23 @@ export default function Footer({ initialSettings }: FooterProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/policies/fabric-care" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
+                  Fabric Care
+                </Link>
+              </li>
+              <li>
                 <Link href="/policies/faq" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
                   FAQs
+                </Link>
+              </li>
+              <li>
+                <Link href="/policies/privacy" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/policies/terms" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
@@ -199,25 +221,29 @@ export default function Footer({ initialSettings }: FooterProps) {
           {/* SOCIAL */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Connect With Us</h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2.5 text-sm">
               <li>
-                <a href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#C4302B] transition-colors flex items-center gap-2">
-                  <span>▶️</span> YouTube Channel
+                <a href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#C4302B] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><YouTubeBrandIcon className="w-5 h-5" /></span>
+                  <span>YouTube Channel</span>
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialInstagram || "https://instagram.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#E1306C] transition-colors flex items-center gap-2">
-                  <span>📸</span> Instagram
+                <a href={initialSettings?.socialInstagram || "https://instagram.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#E1306C] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><InstagramBrandIcon className="w-5 h-5" /></span>
+                  <span>Instagram</span>
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialFacebook || "https://facebook.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#1877F2] transition-colors flex items-center gap-2">
-                  <span>📘</span> Facebook
+                <a href={initialSettings?.socialFacebook || "https://facebook.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#1877F2] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><FacebookBrandIcon className="w-5 h-5" /></span>
+                  <span>Facebook</span>
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors flex items-center gap-2">
-                  <span>🎵</span> TikTok
+                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#000000] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><TikTokBrandIcon className="w-5 h-5" /></span>
+                  <span>TikTok</span>
                 </a>
               </li>
               <li className="pt-2">
@@ -225,9 +251,10 @@ export default function Footer({ initialSettings }: FooterProps) {
                   href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/TauheedVIP"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-xs hover:shadow-md hover:scale-105"
                 >
-                  <span>💬 Join VIP WhatsApp Group</span>
+                  <WhatsAppBrandIcon className="w-4 h-4 shrink-0" />
+                  <span>Join VIP WhatsApp Group</span>
                 </a>
               </li>
             </ul>
@@ -242,6 +269,14 @@ export default function Footer({ initialSettings }: FooterProps) {
             © 2026 Tauheed Textile. All rights reserved. Made with ❤️ in Pakistan.
           </p>
           <div className="flex items-center gap-4 text-[11px]">
+            <Link href="/policies/privacy" className="hover:text-[#171717] transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <Link href="/policies/terms" className="hover:text-[#171717] transition-colors">
+              Terms of Service
+            </Link>
+            <span>•</span>
             <Link
               href="/admin"
               className="text-[#8E857B] hover:text-[#171717] transition-colors flex items-center gap-1 opacity-70 hover:opacity-100"

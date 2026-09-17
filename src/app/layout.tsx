@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Header from "@/components/layout/Header";
@@ -8,12 +9,44 @@ import CartFloat from "@/components/layout/CartFloat";
 import CartDrawer from "@/components/cart/CartDrawer";
 import AbandonedCartRetention from "@/components/cart/AbandonedCartRetention";
 import AIStylistModal from "@/components/ai/AIStylistModal";
+import CookieConsent from "@/components/common/CookieConsent";
 import { Toaster } from "react-hot-toast";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tauheedtextile.com";
+
 export const metadata: Metadata = {
-  title: "Tauheed Textile | Luxury Pakistani Lawn, Chiffon & Pret Fashion",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Tauheed Textile | Luxury Pakistani Lawn, Chiffon & Pret Fashion",
+    template: "%s | Tauheed Textile",
+  },
   description: "Experience exquisite Pakistani women's clothing by Tauheed Textile. Shop luxury lawn, embroidered chiffon, ready-to-wear pret, unstitched 3-piece suits and bridal wedding collections with nationwide Cash on Delivery.",
   keywords: "Tauheed Textile, Pakistani Lawn 2026, Luxury Chiffon, Pakistani Pret, Unstitched Suits, Wedding Kalidar, Cash On Delivery Pakistan",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Tauheed Textile | Luxury Pakistani Haute Couture",
+    description: "Shop authentic luxury Pakistani lawn, embroidered chiffon, raw silk, and unstitched collections with nationwide Cash on Delivery.",
+    url: siteUrl,
+    siteName: "Tauheed Textile",
+    images: [
+      {
+        url: "/logo-calligraphy.png",
+        width: 600,
+        height: 800,
+        alt: "Tauheed Textile Logo Calligraphy",
+      },
+    ],
+    locale: "en_PK",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tauheed Textile | Luxury Pakistani Fashion",
+    description: "Shop authentic luxury Pakistani lawn, embroidered chiffon, and unstitched collections.",
+    images: ["/logo-calligraphy.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -76,7 +109,28 @@ export default async function RootLayout({
           <CartFloat />
           <main className="flex-1 pt-[88px] lg:pt-[108px]">{children}</main>
           <Footer initialSettings={settings} />
+          <CookieConsent />
         </CartProvider>
+
+        {/* Analytics Hook (Google Analytics 4) */}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShieldCheck, Truck, RotateCcw, Clock, Scissors, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Truck, RotateCcw, Clock, Scissors, CheckCircle2, Lock, FileText } from "lucide-react";
 
 export default function PolicyPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -170,6 +170,78 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
         </div>
       ),
     },
+    privacy: {
+      title: "Privacy Policy",
+      subtitle: "How Tauheed Textile collects, protects, and handles your personal information",
+      content: (
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <p>
+            Tauheed Textile is committed to safeguarding your privacy and ensuring transparency in how your personal data is handled. This Privacy Policy details the types of information we collect, how it is used for order fulfillment, and the measures we take to protect your rights.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Information We Collect</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Contact Details:</strong> Name, WhatsApp / mobile number, and email address used for order confirmation, shipment tracking, and customer support.</li>
+            <li><strong>Delivery Information:</strong> Street address, nearest landmark, city, and postal code required for nationwide courier delivery.</li>
+            <li><strong>Payment Verification Data:</strong> Transaction reference IDs and optional payment receipt screenshots for Bank Transfer, JazzCash, or EasyPaisa verification. We never store credit card or bank credentials.</li>
+            <li><strong>Technical &amp; Browsing Data:</strong> Anonymized device type, browser information, and cookie identifiers used strictly to remember your bag, wishlist, and user preferences.</li>
+          </ul>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. How We Use Your Data</h3>
+          <p>
+            Your information is used exclusively to fulfill your orders, provide dispatch tracking updates via SMS and WhatsApp, process authorized exchanges, and respond to your concierge inquiries. We do not sell, rent, or trade customer information to third-party advertisers.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Data Security &amp; Encryption</h3>
+          <p>
+            All website communications are secured using industry-standard SSL (256-bit encryption). Customer orders and verification proofs are stored in access-controlled administrative systems with multi-factor authentication.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Your Rights &amp; Preferences</h3>
+          <p>
+            You have the right to inspect, correct, or request deletion of your personal contact records. You may opt out of promotional WhatsApp announcements at any time by replying "STOP" or contacting our support concierge at <strong>0340 0262732</strong>.
+          </p>
+        </div>
+      ),
+    },
+    terms: {
+      title: "Terms of Service",
+      subtitle: "Official operating rules, order terms, and intellectual property rights",
+      content: (
+        <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
+          <p>
+            Welcome to Tauheed Textile. By browsing our website, placing an order, or communicating via our concierge channels, you agree to the following terms and conditions.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">1. Order Placement &amp; Pricing</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>All prices listed on tauheedtextile.com are in Pakistani Rupees (PKR) and include applicable product pricing.</li>
+            <li>Orders are confirmed subject to fabric availability and successful verification. Tauheed Textile reserves the right to cancel or decline orders in the event of stock discrepancies or verification failure.</li>
+          </ul>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">2. Payment &amp; Courier Surcharges</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Cash on Delivery (COD):</strong> A 4% courier handling fee is automatically added to COD parcels at checkout.</li>
+            <li><strong>Advance Payment:</strong> Paying via Bank Transfer, JazzCash, or EasyPaisa waives the 4% fee and provides an instant Flat 5% discount on the order subtotal. Payment proof must be attached prior to final dispatch.</li>
+          </ul>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">3. Exchanges &amp; Returns</h3>
+          <p>
+            In accordance with our <strong>7-Day Exchange Policy</strong>, garments may be exchanged within 7 calendar days from parcel delivery provided they are unwashed, uncut, and in original luxury packaging with seal tags intact. Cash refunds are not provided.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">4. Intellectual Property</h3>
+          <p>
+            All original photography, bespoke embroidery motifs, calligraphy logos, brand copy, and video runway reels on tauheedtextile.com are the exclusive intellectual property of Tauheed Textile. Unauthorized reproduction or commercial use is strictly prohibited.
+          </p>
+
+          <h3 className="font-serif font-bold text-sm text-[#171717]">5. Governing Law &amp; Jurisdiction</h3>
+          <p>
+            These terms are governed by and construed in accordance with the laws of the Islamic Republic of Pakistan. Any disputes shall be subject to the exclusive jurisdiction of the courts of Karachi and Lahore, Pakistan.
+          </p>
+        </div>
+      ),
+    },
   };
 
   const currentPolicy = policies[slug];
@@ -232,6 +304,22 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
               className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-[#7A6652]" /> FAQ
+            </Link>
+          )}
+          {slug !== "privacy" && (
+            <Link
+              href="/policies/privacy"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <Lock className="w-4 h-4 text-[#7A6652]" /> Privacy Policy
+            </Link>
+          )}
+          {slug !== "terms" && (
+            <Link
+              href="/policies/terms"
+              className="p-3.5 rounded-xl border border-[#E7E1D8] bg-white hover:border-[#7A6652] transition-colors text-xs font-bold text-[#171717] flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4 text-[#7A6652]" /> Terms of Service
             </Link>
           )}
         </div>
