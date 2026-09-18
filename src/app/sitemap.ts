@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tauheedtextile.com";
@@ -61,6 +61,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
   ];
+
+  if (!isDatabaseConfigured()) {
+    return staticRoutes;
+  }
 
   try {
     // Dynamic products

@@ -6,6 +6,12 @@ const databaseUrl =
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
+const isConfigured = Boolean(
+  process.env.DATABASE_URL &&
+    !process.env.DATABASE_URL.includes("placeholder") &&
+    !process.env.DATABASE_URL.includes("localhost:5432/placeholder")
+);
+
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
@@ -14,7 +20,7 @@ export const prisma =
         url: databaseUrl,
       },
     },
-    log: ["error"],
+    log: isConfigured ? ["error"] : [],
   });
 
 if (process.env.NODE_ENV !== "production") {
