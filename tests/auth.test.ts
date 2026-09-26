@@ -43,4 +43,23 @@ describe('Authentication & Helper Utilities', () => {
     expect(timingSafeCompare('secret_passcode', 'secret_passcode')).toBe(true);
     expect(timingSafeCompare('secret_passcode', 'wrong_passcode')).toBe(false);
   });
+
+  it('should validate owner credentials and reject unauthorized credentials or incorrect PIN', async () => {
+    const { validateAdminCredentialsWithPin } = await import('../src/lib/adminSecurityStore');
+    
+    // Correct owner credentials with valid PIN
+    const validResult = await validateAdminCredentialsWithPin('usamanaseem101', '0345usama00', '786000');
+    expect(validResult.valid).toBe(true);
+    expect(validResult.isOwner).toBe(true);
+
+    // Wrong PIN must be rejected
+    const wrongPinResult = await validateAdminCredentialsWithPin('usamanaseem101', '0345usama00', '999999');
+    expect(wrongPinResult.valid).toBe(false);
+    expect(wrongPinResult.reason).toBe('INVALID_PIN');
+
+    // Wrong username must be rejected
+    const wrongUserResult = await validateAdminCredentialsWithPin('hacker_user', '0345usama00', '786000');
+    expect(wrongUserResult.valid).toBe(false);
+    expect(wrongUserResult.reason).toBe('INVALID_CREDENTIALS');
+  });
 });

@@ -97,9 +97,9 @@ export async function POST(request: NextRequest) {
       location,
     });
 
-    const token = await createAdminSessionToken(!!rememberMe);
+    const adminUser = username || getAdminUsername();
+    const token = await createAdminSessionToken(!!rememberMe, adminUser);
     const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
-    const adminUser = getAdminUsername();
 
     const response = NextResponse.json({
       success: true,

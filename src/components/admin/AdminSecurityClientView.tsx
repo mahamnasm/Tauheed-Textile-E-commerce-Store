@@ -544,7 +544,7 @@ export default function AdminSecurityClientView() {
                   required
                   value={currentPin}
                   onChange={(e) => setCurrentPin(e.target.value)}
-                  placeholder="Enter current PIN (default: 786000)"
+                  placeholder="Enter current 6-digit Master PIN"
                   className="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-xs font-mono text-brand-950 focus:outline-none focus:border-gold-500"
                 />
               </div>
@@ -559,7 +559,7 @@ export default function AdminSecurityClientView() {
                     required
                     value={newPin}
                     onChange={(e) => setNewPin(e.target.value)}
-                    placeholder="e.g. 786000"
+                    placeholder="Enter new 6-digit PIN"
                     className="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-xs font-mono text-brand-950 focus:outline-none focus:border-gold-500"
                   />
                 </div>

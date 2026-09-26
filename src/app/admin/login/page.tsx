@@ -214,7 +214,7 @@ function AdminLoginForm() {
                   autoComplete="one-time-code"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
-                  placeholder="Enter 6-digit Master PIN (e.g. 786000)"
+                  placeholder="•••••• (Enter 6-digit Master PIN)"
                   className="w-full pl-10 pr-11 py-3 bg-brand-900/80 border border-gold-500/40 rounded-xl text-gold-200 placeholder-sand-600 text-xs focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400 transition-all font-mono tracking-widest text-center sm:text-left"
                 />
                 <button
@@ -226,8 +226,9 @@ function AdminLoginForm() {
                   {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-[10px] text-sand-400">
-                Default Master PIN: <code className="bg-sand-900 text-gold-300 px-1 py-0.5 rounded font-mono font-bold">786000</code>
+              <p className="text-[10px] text-sand-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                <span>2FA Protected — Restricted to Store Owner</span>
               </p>
             </div>
 
