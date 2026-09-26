@@ -334,8 +334,8 @@ export default function Header({ initialSettings }: HeaderProps) {
           </div>
         )}
 
-        {/* ── MAIN NAVIGATION BAR (LUXURY FROSTED GLASS BAR) ── */}
-        <div className="bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-lg transition-all">
+        {/* ── MAIN NAVIGATION BAR (SOLID JET-BLACK LUXURY BAR) ── */}
+        <div className="bg-[#000000] border-b border-[#222222] shadow-xl transition-all">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
 
