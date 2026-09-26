@@ -2177,21 +2177,21 @@ export default function AdminLayoutCustomizer({
 
               {/* VIP Community Button Simulator */}
               {settings.showWhatsappCommunity !== false && settings.whatsappCommunityLink && (
-                <div className="flex items-center gap-2 bg-[#128C7E] text-white px-3 py-1.5 rounded-full shadow-lg border border-white text-xs font-bold transition-all">
-                  <div className="relative">
-                    <Users className="w-3.5 h-3.5 text-emerald-200" />
-                    <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <div className="flex items-center gap-2 bg-[#171717] text-white px-3 py-1.5 rounded-full shadow-lg border-2 border-[#C4A882] text-xs font-bold transition-all">
+                  <div className="relative flex items-center justify-center">
+                    <Users className="w-3.5 h-3.5 text-[#C4A882]" />
+                    <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#B28A3E] animate-pulse" />
                   </div>
-                  <span className="text-[10px] font-semibold flex items-center gap-1">
+                  <span className="text-[10px] font-semibold flex items-center gap-1.5">
                     <span>VIP Community</span>
-                    <span className="text-[8px] bg-amber-400 text-black px-1 rounded font-black">JOIN</span>
+                    <span className="text-[8px] bg-[#C4A882] text-[#171717] px-1 rounded font-black tracking-widest uppercase">JOIN</span>
                   </span>
                 </div>
               )}
 
               {/* 1-on-1 Chat Button Simulator */}
-              <div className="flex items-center gap-2 bg-emerald-600 text-white px-3.5 py-2 rounded-full shadow-lg border-2 border-white text-xs font-bold">
-                <MessageCircle className="w-4 h-4 fill-current" />
+              <div className="flex items-center gap-2 bg-[#171717] text-white px-3.5 py-2 rounded-full shadow-lg border-2 border-[#C4A882] text-xs font-bold">
+                <MessageCircle className="w-4 h-4 text-[#25D366] fill-current" />
                 <span className="text-xs font-semibold">Chat with Us ({settings.contactWhatsApp || "0340 0262732"})</span>
               </div>
             </div>
