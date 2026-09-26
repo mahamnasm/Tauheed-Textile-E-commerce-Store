@@ -45,7 +45,7 @@ export default function AbandonedCartRetention() {
         let toggle = false;
         const messages = [
           `(${cartCount}) 🛍️ You left items in your bag!`,
-          `⚡ Flat 5% Off Reserved — 𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆`,
+          `⚡ Flat 5% Off Reserved — Tauheed Textile`,
           `🔥 Your luxury dress is selling fast!`,
         ];
         let msgIndex = 0;
@@ -58,7 +58,7 @@ export default function AbandonedCartRetention() {
         // Optional Web Push Notification if permission was granted
         if (typeof Notification !== "undefined" && Notification.permission === "granted") {
           try {
-            new Notification("𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆 — Don't Miss Out!", {
+            new Notification("Tauheed Textile — Don't Miss Out!", {
               body: `You have ${cartCount} unstitched article(s) in your bag (Rs. ${cartSubtotal.toLocaleString()}). Complete your order with free delivery above Rs. 10k.`,
               icon: "/logo-calligraphy.png",
               badge: "/logo-calligraphy.png",
@@ -72,7 +72,7 @@ export default function AbandonedCartRetention() {
           clearInterval(titleIntervalRef.current);
           titleIntervalRef.current = null;
         }
-        document.title = originalTitleRef.current || "𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆 | Luxury Pakistani Fashion";
+        document.title = originalTitleRef.current || "Tauheed Textile | Luxury Pakistani Fashion";
       }
     };
 

@@ -64,24 +64,30 @@ export default function Footer({ initialSettings }: FooterProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Unified Logo and Tagline */}
-        <div className="mb-10 text-center sm:text-left">
-          <Link href="/" className="inline-flex items-center justify-center sm:justify-start gap-3 mb-2 select-none group">
-            <div className="relative h-12 w-9 sm:h-14 sm:w-11 shrink-0 transition-transform duration-200 group-hover:scale-105">
+        {/* Unified Logo and Tagline Lockup */}
+        <div className="mb-10 flex flex-col items-start">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-3.5 select-none group"
+            title="Tauheed Textile"
+          >
+            <div className="relative h-12 w-9 sm:h-14 sm:w-10.5 shrink-0 transition-transform duration-300 group-hover:scale-105 drop-shadow-xs">
               <Image
-                src="/logo-calligraphy.png"
+                src="/logo-calligraphy-black.png"
                 alt="Tauheed Textile Logo"
                 fill
                 className="object-contain"
               />
             </div>
-            <span className="font-serif text-2xl sm:text-3xl font-bold text-[#171717] whitespace-nowrap leading-none select-none">
-              𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
-            </span>
+            <div className="flex flex-col text-left">
+              <span className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#171717] leading-tight select-none">
+                Tauheed Textile
+              </span>
+              <span className="text-[11px] sm:text-xs font-medium tracking-wider uppercase text-[#7A6652] mt-0.5 select-none">
+                Premium Quality at Best Price
+              </span>
+            </div>
           </Link>
-          <p className="text-sm font-medium text-[#6B6259]">
-            Premium Quality at Best Price
-          </p>
         </div>
 
         {/* 4 Columns */}

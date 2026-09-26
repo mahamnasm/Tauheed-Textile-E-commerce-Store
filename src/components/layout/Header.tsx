@@ -370,8 +370,8 @@ export default function Header({ initialSettings }: HeaderProps) {
                       priority
                     />
                   </div>
-                  <span className="font-serif text-base min-[380px]:text-lg sm:text-2xl lg:text-3xl font-bold text-white whitespace-nowrap select-none leading-none tracking-normal">
-                    𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
+                  <span className="font-serif text-base min-[380px]:text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-white whitespace-nowrap select-none leading-none">
+                    Tauheed Textile
                   </span>
                 </Link>
               </div>
@@ -530,8 +530,8 @@ export default function Header({ initialSettings }: HeaderProps) {
                     className="object-contain"
                   />
                 </div>
-                <span className="font-serif font-bold text-lg sm:text-xl text-white whitespace-nowrap select-none">
-                  𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆
+                <span className="font-serif font-bold text-lg sm:text-xl tracking-tight text-white whitespace-nowrap select-none">
+                  Tauheed Textile
                 </span>
               </Link>
               <button
@@ -813,7 +813,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 <User className="w-4 h-4 text-gold-400" />
                 <span>My Account / Orders</span>
               </Link>
-              <span className="text-xs text-[#6B6259]">𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆</span>
+              <span className="text-xs font-serif tracking-wide text-[#8E8A82]">Tauheed Textile</span>
             </div>
           </aside>
         </div>

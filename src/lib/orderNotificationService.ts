@@ -63,7 +63,7 @@ export const DEFAULT_BUSINESS_EMAIL_CONFIG: BusinessEmailConfig = {
   subjectTemplate: "Order Confirmation #{order_number} — Tauheed Textile",
   emailBodyTemplate: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #171717; background-color: #F8F5F0; padding: 24px; border-radius: 12px; border: 1px solid #E7E1D8;">
   <div style="text-align: center; border-bottom: 2px solid #B28A3E; padding-bottom: 16px; margin-bottom: 20px;">
-    <h1 style="font-family: serif; color: #171717; margin: 0; font-size: 26px;">𝑻𝒂𝒖𝒉𝒆𝒆𝒅 𝑻𝒆𝒙𝒕𝒊𝒍𝒆</h1>
+    <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #171717; margin: 0; font-size: 26px; font-weight: bold; letter-spacing: 0.5px;">Tauheed Textile</h1>
     <p style="color: #7A6652; margin: 4px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Order Confirmation Receipt</p>
   </div>
 
