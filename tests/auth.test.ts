@@ -1,6 +1,18 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { signToken, verifyToken } from '../src/lib/auth';
 import { timingSafeCompare } from '../src/lib/adminSession';
+
+vi.mock('../src/lib/prisma', () => ({
+  prisma: {
+    setting: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({}),
+    },
+    user: {
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
+  },
+}));
 
 describe('Authentication & Helper Utilities', () => {
   const ORIGINAL_ENV = process.env;
