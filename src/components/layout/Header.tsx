@@ -334,8 +334,8 @@ export default function Header({ initialSettings }: HeaderProps) {
           </div>
         )}
 
-        {/* ── MAIN NAVIGATION BAR (SOLID JET-BLACK LUXURY BAR) ── */}
-        <div className="bg-[#000000] border-b border-[#222222] shadow-xl transition-all">
+        {/* ── MAIN NAVIGATION BAR (ULTRA-LUXURY FROSTED GLASS BAR) ── */}
+        <div className="bg-[#0B0A09]/80 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.37)] transition-all">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -343,7 +343,7 @@ export default function Header({ initialSettings }: HeaderProps) {
               <div className="flex items-center shrink-0 lg:hidden w-10">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="p-2 -ml-2 text-[#C8C2BB] hover:text-white focus:outline-none transition-colors shrink-0"
+                  className="p-2 -ml-2 text-[#E5E0D8] hover:text-white hover:bg-white/[0.06] rounded-full focus:outline-none transition-colors shrink-0"
                   aria-label="Open sidebar menu"
                 >
                   <Menu className="w-6 h-6" />
@@ -358,7 +358,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     e.preventDefault();
                     window.location.href = "/admin";
                   }}
-                  className="flex items-center gap-2 sm:gap-3 group py-1 select-none max-w-full"
+                  className="flex items-center gap-2.5 sm:gap-3.5 group py-1 select-none max-w-full"
                   title="Tauheed Textile (Double-click for Staff Portal)"
                 >
                   <div className="relative h-9 w-7 min-[380px]:h-10 min-[380px]:w-8 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
@@ -376,84 +376,89 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </Link>
               </div>
 
-              {/* Desktop Nav Links (Clean, Uncluttered, Spaced Luxury Bar) */}
-              <nav className="hidden lg:flex items-center justify-center flex-1 space-x-6 xl:space-x-8">
+              {/* Desktop Nav Links (Refined Couture Typography & Glass Harmony) */}
+              <nav className="hidden lg:flex items-center justify-center flex-1 space-x-5 xl:space-x-7">
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs uppercase tracking-wider font-semibold border border-white/15 transition-all shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-white/90 hover:text-white text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium border border-white/10 hover:border-[#C5A059]/40 transition-all backdrop-blur-md shadow-xs active:scale-95"
                 >
-                  <Menu className="w-3.5 h-3.5" />
-                  <span>All Collections</span>
+                  <Menu className="w-3.5 h-3.5 text-[#C5A059]" />
+                  <span>Collections</span>
                 </button>
 
                 <Link
                   href="/shop"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold-500/20 text-gold-300 hover:bg-gold-500 hover:text-brand-950 text-xs uppercase tracking-wider font-extrabold border border-gold-500/40 transition-all shadow-xs"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
-                  <ShoppingBag className="w-3.5 h-3.5 text-gold-400" />
-                  <span>ALL</span>
+                  <span>All</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C5A059] transition-all duration-300 group-hover:w-full" />
                 </Link>
 
                 <Link
                   href="/shop?isNewArrival=true"
-                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
-                  New In '26
+                  <span>New In '26</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C5A059] transition-all duration-300 group-hover:w-full" />
                 </Link>
 
                 <Link
                   href="/shop?isBestSeller=true"
-                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
-                  Best Sellers
+                  <span>Best Sellers</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C5A059] transition-all duration-300 group-hover:w-full" />
                 </Link>
 
                 <Link
                   href="/shop?category=pret-ready-to-wear"
-                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
-                  Ready to Wear
+                  <span>Ready to Wear</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C5A059] transition-all duration-300 group-hover:w-full" />
                 </Link>
 
                 <Link
                   href="/shop?category=unstitched"
-                  className="text-xs uppercase tracking-wider font-semibold text-[#D4CFC9] hover:text-white transition-colors"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
-                  Unstitched
+                  <span>Unstitched</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#C5A059] transition-all duration-300 group-hover:w-full" />
                 </Link>
 
                 <Link
                   href="/shop?category=sale"
-                  className="text-xs uppercase tracking-wider font-bold text-[#E87070] hover:text-[#F08080] transition-colors"
+                  className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-bold text-[#E87070] hover:text-[#FF9999] transition-colors duration-300"
                 >
-                  Sale %
+                  <span>Sale %</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#E87070] transition-all duration-300 group-hover:w-full" />
                 </Link>
               </nav>
 
               {/* Right Action Icons (Guaranteed shrink-0 so cart is ALWAYS visible and unhidable) */}
-              <div className="flex items-center justify-end shrink-0 space-x-1 sm:space-x-3">
+              <div className="flex items-center justify-end shrink-0 space-x-1 sm:space-x-2">
                 <button
                   onClick={() => setSearchOpen(!searchOpen)}
-                  className="p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0"
+                  className="p-2 text-[#E5E0D8] hover:text-[#C5A059] hover:bg-white/[0.06] rounded-full transition-all shrink-0"
                   aria-label="Search"
                 >
                   <Search className="w-5 h-5" />
                 </button>
                 <Link
                   href="/account"
-                  className="hidden sm:block p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0"
+                  className="hidden sm:flex p-2 text-[#E5E0D8] hover:text-[#C5A059] hover:bg-white/[0.06] rounded-full transition-all shrink-0"
                   aria-label="My Account"
                 >
                   <User className="w-5 h-5" />
                 </Link>
                 <button
                   onClick={openCart}
-                  className="relative p-2 text-[#C8C2BB] hover:text-white transition-colors shrink-0 focus:outline-none"
+                  className="relative p-2 text-[#E5E0D8] hover:text-[#C5A059] hover:bg-white/[0.06] rounded-full transition-all shrink-0 focus:outline-none"
                   aria-label="Open Shopping Bag"
                 >
-                  <ShoppingBag className="w-5 h-5 text-white" />
+                  <ShoppingBag className="w-5 h-5" />
                   {mounted && cartCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#7A6652] text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#171717] shadow">
+                    <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#9B3D3D] text-white text-[10px] font-bold flex items-center justify-center border border-white/20 shadow">
                       {cartCount}
                     </span>
                   )}
@@ -464,9 +469,9 @@ export default function Header({ initialSettings }: HeaderProps) {
 
           {/* Desktop Search Bar Dropdown */}
           {searchOpen && (
-            <div className="border-t border-[#2A2626] bg-[#141414] py-4 px-4">
+            <div className="border-t border-white/[0.08] bg-[#0A0A0A]/90 backdrop-blur-2xl py-4 px-4 shadow-xl">
               <div className="max-w-3xl mx-auto flex items-center gap-3">
-                <Search className="w-5 h-5 text-[#C8C2BB] shrink-0" />
+                <Search className="w-5 h-5 text-[#C5A059] shrink-0" />
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -481,12 +486,12 @@ export default function Header({ initialSettings }: HeaderProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by fabric, collection, color..."
-                    className="w-full bg-[#171717] border border-[#2A2626] rounded-md px-4 py-2 text-sm text-white focus:outline-none focus:border-[#7A6652] placeholder-[#6B6259]"
+                    className="w-full bg-white/[0.06] border border-white/15 rounded-full px-5 py-2.5 text-xs tracking-wider text-white focus:outline-none focus:border-[#C5A059] placeholder-white/40"
                     autoFocus
                   />
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-[#7A6652] text-white text-sm font-semibold rounded-md hover:bg-[#685542] tracking-wider"
+                    className="px-6 py-2.5 bg-[#C5A059] hover:bg-[#B28A3E] text-brand-950 text-xs font-bold uppercase tracking-[0.16em] rounded-full transition-all shadow-sm"
                   >
                     SEARCH
                   </button>
