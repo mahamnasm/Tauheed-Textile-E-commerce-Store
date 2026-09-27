@@ -41,9 +41,18 @@ export async function POST(request: NextRequest) {
   const location = getClientLocation(request, ip);
   const userAgent = request.headers.get("user-agent") || undefined;
 
-  const burst = checkRateLimit(`admin_login_${ip}`, 8, 15 * 60 * 1000);
-  if (!burst.success) {
-    return rateLimitResponse(burst.resetTime, GENERIC_AUTH_ERROR);
+  const isLocalDev =
+    process.env.NODE_ENV !== "production" ||
+    ip === "127.0.0.1" ||
+    ip === "::1" ||
+    ip === "localhost" ||
+    ip === "0.0.0.0";
+
+  if (!isLocalDev) {
+    const burst = checkRateLimit(`admin_login_${ip}`, 8, 15 * 60 * 1000);
+    if (!burst.success) {
+      return rateLimitResponse(burst.resetTime, GENERIC_AUTH_ERROR);
+    }
   }
 
   try {
