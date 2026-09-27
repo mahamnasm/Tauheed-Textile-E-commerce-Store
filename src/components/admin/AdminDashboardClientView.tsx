@@ -21,14 +21,15 @@ import {
 } from "lucide-react";
 
 interface AdminDashboardClientViewProps {
-  totalRevenue: number;
-  totalOrders: number;
-  codOrdersCount: number;
-  prepaidOrdersCount: number;
-  lowStockCount: number;
-  pendingBankProofsCount: number;
-  recentOrders: any[];
+  totalRevenue?: number;
+  totalOrders?: number;
+  codOrdersCount?: number;
+  prepaidOrdersCount?: number;
+  lowStockCount?: number;
+  pendingBankProofsCount?: number;
+  recentOrders?: any[];
   latestSecurityAlert?: any;
+  dbOffline?: boolean;
 }
 
 export default function AdminDashboardClientView({
@@ -40,9 +41,36 @@ export default function AdminDashboardClientView({
   pendingBankProofsCount = 0,
   recentOrders = [],
   latestSecurityAlert,
+  dbOffline = false,
 }: AdminDashboardClientViewProps) {
   return (
     <div className="space-y-8 text-sand-950 pb-12">
+      {/* Cloud DB Cold-start / Reconnecting Banner */}
+      {dbOffline && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <span className="p-2 bg-amber-100 text-amber-700 rounded-xl shrink-0">
+              <Zap className="w-5 h-5" />
+            </span>
+            <div>
+              <p className="text-sm font-bold text-amber-900">
+                Cloud Database Resuming (Neon Cold-Start)
+              </p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                The cloud database is resuming from idle state. Real-time figures will refresh automatically.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="self-start sm:self-auto px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors shrink-0"
+          >
+            Retry Sync
+          </button>
+        </div>
+      )}
+
       {/* 1. Header with Clean Greeting */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-sand-300 pb-5">
         <div>

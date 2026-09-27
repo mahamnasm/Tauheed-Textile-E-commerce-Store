@@ -1,13 +1,19 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminReturnsPage() {
-  const returns = await prisma.returnRequest.findMany({
-    include: { order: true },
-    orderBy: { createdAt: "desc" },
-  });
+  let returns: any[] = [];
+  try {
+    returns = await prisma.returnRequest.findMany({
+      include: { order: true },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err: any) {
+    console.warn("Admin Returns: DB cold start or offline:", err?.message || err);
+  }
 
   return (
     <div className="space-y-6">

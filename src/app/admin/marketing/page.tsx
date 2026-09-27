@@ -4,13 +4,23 @@ import { Megaphone, Tag, ShoppingBag } from "lucide-react";
 import AdminAbandonedCartManager from "@/components/admin/AdminAbandonedCartManager";
 import AdminCouponManager from "@/components/admin/AdminCouponManager";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminMarketingPage() {
-  const [coupons, abandonedCarts] = await Promise.all([
-    prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.abandonedCart.findMany({ orderBy: { lastActiveAt: "desc" }, take: 50 }),
-  ]);
+  let coupons: any[] = [];
+  let abandonedCarts: any[] = [];
+
+  try {
+    const [fetchedCoupons, fetchedCarts] = await Promise.all([
+      prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }),
+      prisma.abandonedCart.findMany({ orderBy: { lastActiveAt: "desc" }, take: 50 }),
+    ]);
+    if (fetchedCoupons) coupons = fetchedCoupons;
+    if (fetchedCarts) abandonedCarts = fetchedCarts;
+  } catch (err: any) {
+    console.warn("Admin Marketing: DB cold start or offline:", err?.message || err);
+  }
 
   return (
     <div className="space-y-8">

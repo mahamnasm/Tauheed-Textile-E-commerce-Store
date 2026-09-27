@@ -7,25 +7,38 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminLayoutPage() {
-  const [settings, videos, products, categories] = await Promise.all([
-    getSiteSettings(),
-    prisma.watchBuyVideo.findMany({
-      include: { product: true },
-      orderBy: { displayOrder: "asc" },
-    }),
-    prisma.product.findMany({
-      select: { id: true, title: true, slug: true, sku: true, basePrice: true, videoUrl: true },
-      orderBy: { title: "asc" },
-    }),
-    prisma.category.findMany({
-      include: {
-        subcategories: {
-          orderBy: { displayOrder: "asc" },
+  let settings: any = {};
+  let videos: any[] = [];
+  let products: any[] = [];
+  let categories: any[] = [];
+
+  try {
+    const [fetchedSettings, fetchedVideos, fetchedProds, fetchedCats] = await Promise.all([
+      getSiteSettings().catch(() => ({})),
+      prisma.watchBuyVideo.findMany({
+        include: { product: true },
+        orderBy: { displayOrder: "asc" },
+      }),
+      prisma.product.findMany({
+        select: { id: true, title: true, slug: true, sku: true, basePrice: true, videoUrl: true },
+        orderBy: { title: "asc" },
+      }),
+      prisma.category.findMany({
+        include: {
+          subcategories: {
+            orderBy: { displayOrder: "asc" },
+          },
         },
-      },
-      orderBy: { name: "asc" },
-    }),
-  ]);
+        orderBy: { name: "asc" },
+      }),
+    ]);
+    if (fetchedSettings) settings = fetchedSettings;
+    if (fetchedVideos) videos = fetchedVideos;
+    if (fetchedProds) products = fetchedProds;
+    if (fetchedCats) categories = fetchedCats;
+  } catch (err: any) {
+    console.warn("Admin Layout: DB cold start or offline:", err?.message || err);
+  }
 
   return (
     <AdminLayoutCustomizer

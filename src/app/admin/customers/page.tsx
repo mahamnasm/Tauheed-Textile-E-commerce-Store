@@ -2,17 +2,27 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { Users, AlertOctagon, Star } from "lucide-react";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminCustomersPage() {
-  const [users, orders] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: "CUSTOMER" },
-      include: { orders: true },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.order.findMany(),
-  ]);
+  let users: any[] = [];
+  let orders: any[] = [];
+
+  try {
+    const [fetchedUsers, fetchedOrders] = await Promise.all([
+      prisma.user.findMany({
+        where: { role: "CUSTOMER" },
+        include: { orders: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.order.findMany(),
+    ]);
+    if (fetchedUsers) users = fetchedUsers;
+    if (fetchedOrders) orders = fetchedOrders;
+  } catch (err: any) {
+    console.warn("Admin Customers: DB cold start or offline:", err?.message || err);
+  }
 
   return (
     <div className="space-y-6">
