@@ -21,7 +21,11 @@ export function getAdminUsername(): string {
 }
 
 export function getAdminPassword(): string {
-  return process.env.ADMIN_PASSWORD?.trim() || "0345usama00";
+  const pass = process.env.ADMIN_PASSWORD?.trim();
+  if (!pass) {
+    throw new Error("ADMIN_PASSWORD environment variable is not configured");
+  }
+  return pass;
 }
 
 export function getDefaultMasterPin(): string {

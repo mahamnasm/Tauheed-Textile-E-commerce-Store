@@ -291,21 +291,13 @@ export async function validateAdminCredentialsWithPin(
     // If env vars not set, fallback
   }
 
-  // Primary configured credentials from environment
-  const isPrimaryUser = expectedUser ? timingSafeCompare(cleanUser, expectedUser) : false;
-  const isPrimaryPass = expectedPass ? timingSafeCompare(cleanPass, expectedPass) : false;
-
-  // Direct Owner Account credentials
-  const isOwnerUser = timingSafeCompare(cleanUser, "usamanaseem101");
-  const isOwnerPass = timingSafeCompare(cleanPass, "0345usama00");
-  const isUserValid = isPrimaryUser || isOwnerUser;
-  const isPassValid = (isPrimaryUser && isPrimaryPass) || (isOwnerUser && isOwnerPass);
+  // Authoritative configured credentials from environment / secure store
+  const isUserValid = expectedUser ? timingSafeCompare(cleanUser, expectedUser) : false;
+  const isPassValid = expectedPass ? timingSafeCompare(cleanPass, expectedPass) : false;
 
   const isPinValid =
     timingSafeCompare(cleanPin, config.masterPin) ||
-    timingSafeCompare(cleanPin, getDefaultMasterPin()) ||
-    timingSafeCompare(cleanPin, "0345") ||
-    timingSafeCompare(cleanPin, "786000");
+    timingSafeCompare(cleanPin, getDefaultMasterPin());
 
   if (config.emergencyLockdown) {
     return { valid: false, reason: "EMERGENCY_LOCKDOWN" };
