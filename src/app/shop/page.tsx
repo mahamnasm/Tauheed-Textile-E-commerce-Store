@@ -4,8 +4,7 @@ import ShopClientView from "@/components/shop/ShopClientView";
 
 import { FALLBACK_PRODUCTS, FALLBACK_CATEGORIES } from "@/lib/fallbackProducts";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface ShopPageProps {
   searchParams: {

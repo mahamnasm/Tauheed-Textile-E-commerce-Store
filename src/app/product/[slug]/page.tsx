@@ -6,8 +6,7 @@ import ProductDetailClient from "@/components/shop/ProductDetailClient";
 
 import { FALLBACK_PRODUCTS } from "@/lib/fallbackProducts";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 120;
 
 interface ProductPageProps {
   params: {

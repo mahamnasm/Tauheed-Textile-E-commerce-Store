@@ -11,8 +11,7 @@ import HomeCategoriesSection from "@/components/home/HomeCategoriesSection";
 import HomeReviewsSlider from "@/components/home/HomeReviewsSlider";
 import { FALLBACK_PRODUCTS, FALLBACK_CATEGORIES } from "@/lib/fallbackProducts";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function HomePage() {
   let settings: any = { showCategories: true, showTrending: true, showVideos: true, showReviews: true };
