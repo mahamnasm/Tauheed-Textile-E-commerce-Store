@@ -31,9 +31,9 @@ export default function CartDrawer() {
         onClick={closeCart} 
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl flex flex-col z-10 animate-slideLeft">
-        {/* Header */}
-        <div className="p-5 border-b border-[#E7E1D8] flex items-center justify-between bg-white">
+      <div className="fixed inset-y-0 right-0 max-w-md w-full bg-white/90 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.8)] border-l border-white/60 flex flex-col z-10 animate-slideLeft">
+        {/* Header (Frosted Glass) */}
+        <div className="p-5 border-b border-[#E7E1D8]/60 flex items-center justify-between bg-white/70 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-gold-600" />
             <h2 className="font-serif font-bold text-lg text-[#171717]">Your Shopping Bag</h2>
@@ -49,8 +49,8 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        {/* Free Shipping Progress Bar */}
-        <div className="bg-[#F8F5F0] px-5 py-3 border-b border-[#E7E1D8]">
+        {/* Free Shipping Progress Bar (Frosted Glass) */}
+        <div className="bg-[#F8F5F0]/70 backdrop-blur-sm px-5 py-3 border-b border-[#E7E1D8]/60">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span className="font-medium text-[#171717]">
               {diffToFree > 0 ? (
@@ -166,9 +166,9 @@ export default function CartDrawer() {
           )}
         </div>
 
-        {/* Footer / Checkout CTA */}
+        {/* Footer / Checkout CTA (Frosted Glass) */}
         {cart.length > 0 && (
-          <div className="p-5 border-t border-[#E7E1D8] bg-white space-y-4">
+          <div className="p-5 border-t border-[#E7E1D8]/60 bg-white/80 backdrop-blur-xl shadow-[0_-4px_25px_rgba(0,0,0,0.05)] space-y-4">
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs text-[#6B6259]">
                 <span>Subtotal</span>

@@ -232,17 +232,17 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
               <Sparkles className="w-3.5 h-3.5 text-[#C4A882]" />
               <span>Scroll left-to-right</span>
             </div>
-            {/* Scroll Navigation Arrows */}
+            {/* Scroll Navigation Arrows (Frosted Glass Pills) */}
             <button
               onClick={() => scroll("left")}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20 shadow-md"
+              className="w-10 h-10 rounded-full bg-white/[0.08] hover:bg-white/[0.18] backdrop-blur-xl text-white flex items-center justify-center transition-all border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95"
               aria-label="Scroll reels left"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20 shadow-md"
+              className="w-10 h-10 rounded-full bg-white/[0.08] hover:bg-white/[0.18] backdrop-blur-xl text-white flex items-center justify-center transition-all border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95"
               aria-label="Scroll reels right"
             >
               <ChevronRight className="w-5 h-5" />
@@ -312,9 +312,9 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                   {/* Gradient overlays */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
 
-                  {/* Top Badges */}
+                  {/* Top Badges (Frosted Glass Pills) */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-auto">
-                    <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/20">
+                    <span className="px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-xl text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)]">
                       <span className={`w-2 h-2 rounded-full ${playing ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"}`} />
                       Runway Reel
                     </span>
@@ -324,10 +324,10 @@ export default function RunwayReelsSection({ videos, title }: RunwayReelsSection
                       <button
                         type="button"
                         onClick={(e) => handleToggleVolume(e, v.id)}
-                        className={`p-2 rounded-full backdrop-blur-md transition-all shadow-lg flex items-center gap-1 text-[10px] font-bold ${
+                        className={`p-2 rounded-full backdrop-blur-xl transition-all shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.2)] flex items-center gap-1 text-[10px] font-bold ${
                           isMuted
-                            ? "bg-black/60 hover:bg-black/80 text-white/90 border border-white/20"
-                            : "bg-[#C4A882] text-black border border-[#D4AF37] shadow-gold-500/20"
+                            ? "bg-black/45 hover:bg-black/70 text-white/90 border border-white/20"
+                            : "bg-[#C4A882]/90 hover:bg-[#C4A882] text-black border border-[#D4AF37] shadow-gold-500/20"
                         }`}
                         aria-label={isMuted ? "Unmute Video" : "Mute Video"}
                       >

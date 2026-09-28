@@ -135,9 +135,9 @@ export default function ShopClientView({
           </p>
         </div>
 
-        {/* SUB CATEGORIES - SMALL SQUARE BUTTONS */}
+        {/* SUB CATEGORIES - SMALL SQUARE BUTTONS (Frosted Glass Bar) */}
         {activeCategoryObj && activeCategoryObj.subcategories && activeCategoryObj.subcategories.length > 0 ? (
-          <div className="mb-8 bg-white border border-[#E7E1D8] rounded-2xl p-4 sm:p-5 shadow-sm">
+          <div className="mb-8 bg-white/75 backdrop-blur-xl border border-white/80 rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.8)]">
             <div className="flex items-center justify-between mb-3 px-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-widest text-[#171717]">
@@ -319,8 +319,8 @@ export default function ShopClientView({
           </div>
         ) : null}
 
-        {/* AI Occasion & Mood Matcher Pills */}
-        <div className="mb-8 p-4 bg-white border border-[#E7E1D8] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+        {/* AI Occasion & Mood Matcher Pills (Frosted Glass Bar) */}
+        <div className="mb-8 p-4 bg-white/75 backdrop-blur-xl border border-white/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_4px_20px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.8)]">
           <div className="flex items-center gap-2 text-[#171717] text-xs font-bold uppercase tracking-wider shrink-0">
             <Sparkles className="w-4 h-4 text-[#7A6652]" />
             <span>AI Occasion Curator:</span>
@@ -357,9 +357,9 @@ export default function ShopClientView({
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Filter Sidebar */}
+          {/* Desktop Filter Sidebar (Frosted Glass Panel) */}
           <div className="hidden lg:block w-64 shrink-0">
-            <div className="bg-white border border-[#E7E1D8] rounded-xl p-5 shadow-sm sticky top-6">
+            <div className="bg-white/80 backdrop-blur-xl backdrop-saturate-150 border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] rounded-2xl p-5 sticky top-28">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#171717] mb-4">Categories</h3>
               <div className="flex flex-col space-y-3">
                 <button

@@ -77,74 +77,77 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
 
   return (
     <>
-      {/* Floating Action Buttons Dock */}
+      {/* Floating Action Buttons Glassmorphism Dock */}
       <aside 
         aria-label="Floating Storefront Actions" 
-        className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[60] flex flex-col items-end gap-2.5 sm:gap-3 select-none"
+        className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[60] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
       >
-        {/* 1. VIP WhatsApp Community Button */}
+        {/* 1. VIP WhatsApp Community Glass Pill */}
         {showCommunity && (
           <button
             type="button"
             onClick={() => setShowVipModal(true)}
             aria-label="Join VIP WhatsApp Community"
-            className="group flex items-center gap-2 bg-[#171717] hover:bg-[#252321] text-white px-3.5 py-2.5 rounded-full shadow-2xl border-2 border-[#C4A882] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
+            className="group flex items-center gap-2 bg-[#121110]/75 hover:bg-[#1A1816]/90 backdrop-blur-2xl backdrop-saturate-150 text-white px-3.5 py-2.5 rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-[#C4A882]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 text-[#C4A882]" />
+              <Users className="w-4 h-4 text-[#E5A93C]" />
               <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#B28A3E] animate-pulse" />
             </div>
             <span className="text-xs font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
               <span>VIP Community</span>
-              <span className="text-[9px] bg-[#C4A882] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs">
+              <span className="text-[9px] bg-gradient-to-r from-[#C4A882] to-[#E5A93C] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs">
                 JOIN
               </span>
             </span>
           </button>
         )}
 
-        {/* 2. Floating Quick Cart Button */}
-        <button
-          type="button"
-          onClick={openCart}
-          aria-label="Open Shopping Cart"
-          className="group flex items-center bg-[#171717] hover:bg-[#252321] text-white p-3 sm:p-3.5 rounded-full shadow-2xl border-2 border-[#C4A882] transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
-        >
-          <div className="relative flex items-center justify-center shrink-0">
-            <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#C4A882] transition-transform group-hover:scale-110" />
-            {cartCount > 0 && (
-              <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-[#9B3D3D] text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-[#171717] shadow animate-pulse">
-                {cartCount}
-              </span>
-            )}
-          </div>
+        {/* 2 & 3. Glassmorphism Floating Dock Bar */}
+        <div className="flex flex-col items-end gap-2 p-1.5 rounded-full bg-black/40 backdrop-blur-2xl backdrop-saturate-150 border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.15)]">
+          {/* Floating Quick Cart Button */}
+          <button
+            type="button"
+            onClick={openCart}
+            aria-label="Open Shopping Cart"
+            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.16] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#C4A882] transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
+          >
+            <div className="relative flex items-center justify-center shrink-0">
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#C4A882] transition-transform group-hover:scale-110" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-[#9B3D3D] text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-[#171717] shadow animate-pulse">
+                  {cartCount}
+                </span>
+              )}
+            </div>
 
-          <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide flex items-center gap-1.5">
-            <span>Cart</span>
-            {cartTotal > 0 && (
-              <span className="text-[#C4A882] font-bold">
-                • Rs. {cartTotal.toLocaleString()}
-              </span>
-            )}
-          </div>
-        </button>
+            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide flex items-center gap-1.5">
+              <span>Cart</span>
+              {cartTotal > 0 && (
+                <span className="text-[#C4A882] font-bold">
+                  • Rs. {cartTotal.toLocaleString()}
+                </span>
+              )}
+            </div>
+          </button>
 
-        {/* 3. Direct 1-on-1 WhatsApp Concierge */}
-        <a
-          href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Contact on WhatsApp"
-          className="group flex items-center bg-[#171717] hover:bg-[#252321] text-white p-3 sm:p-3.5 rounded-full shadow-2xl border-2 border-[#C4A882] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-        >
-          <div className="relative flex items-center justify-center shrink-0">
-            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#25D366] transition-transform group-hover:scale-110 fill-current" />
-          </div>
+          {/* Direct 1-on-1 WhatsApp Concierge */}
+          <a
+            href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contact on WhatsApp"
+            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.16] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#25D366] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <div className="relative flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#25D366] transition-transform group-hover:scale-110 fill-current" />
+            </div>
 
-          <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide pr-0.5">
-            Chat with Us
-          </div>
-        </a>
+            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide pr-0.5">
+              Chat with Us
+            </div>
+          </a>
+        </div>
       </aside>
 
       {/* VIP Community Interactive Modal */}

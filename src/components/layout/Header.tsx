@@ -518,10 +518,10 @@ export default function Header({ initialSettings }: HeaderProps) {
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Solid Slide-In Drawer Panel */}
-          <aside className="fixed inset-y-0 left-0 w-[310px] sm:w-[350px] max-w-[85vw] h-full bg-[#141414] shadow-2xl flex flex-col z-[101] border-r border-[#2A2626] animate-fadeIn">
-            {/* Drawer Top Header */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#2A2626] bg-[#0E0E0E] shrink-0">
+          {/* Glassmorphism Slide-In Drawer Panel */}
+          <aside className="fixed inset-y-0 left-0 w-[310px] sm:w-[350px] max-w-[85vw] h-full bg-[#121110]/90 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.7)] flex flex-col z-[101] border-r border-white/15 animate-fadeIn">
+            {/* Drawer Top Header (Frosted Glass) */}
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/10 bg-white/[0.04] backdrop-blur-xl shrink-0">
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -541,15 +541,15 @@ export default function Header({ initialSettings }: HeaderProps) {
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 -mr-2 text-[#C8C2BB] hover:text-white rounded-lg hover:bg-[#2A2626] transition-colors"
+                className="p-2 -mr-2 text-[#C8C2BB] hover:text-white rounded-lg hover:bg-white/10 transition-colors"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* In-Drawer Quick Search Form */}
-            <div className="p-3 border-b border-[#2A2626] bg-[#171717] shrink-0">
+            {/* In-Drawer Quick Search Form (Frosted Glass Bar) */}
+            <div className="p-3 border-b border-white/10 bg-black/20 backdrop-blur-md shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -558,7 +558,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     window.location.href = `/shop?search=${encodeURIComponent(drawerSearch.trim())}`;
                   }
                 }}
-                className="flex items-center gap-2 bg-[#0F0F0F] border border-[#2A2626] rounded-lg px-3 py-2"
+                className="flex items-center gap-2 bg-white/[0.06] border border-white/15 rounded-xl px-3 py-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]"
               >
                 <Search className="w-4 h-4 text-[#6B6259] shrink-0" />
                 <input

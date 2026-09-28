@@ -905,8 +905,8 @@ export default function ProductDetailClient({
         </div>
       )}
 
-      {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-[#E7E1D8] px-4 py-3 z-50 flex gap-3 shadow-lg" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
+      {/* Mobile Sticky Bar (Frosted Glass) */}
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white/85 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/80 px-4 py-3 z-50 flex gap-3 shadow-[0_-4px_25px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
         <button
           onClick={handleAddToCart}
           className={`flex-1 rounded-full py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${
