@@ -56,6 +56,19 @@ export default function ProductDetailClient({
   const [showZoomModal, setShowZoomModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Karachi");
   const [mediaMode, setMediaMode] = useState<"PHOTO" | "VIDEO">("PHOTO");
+  const [productPageUrl, setProductPageUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setProductPageUrl(window.location.href);
+    }
+  }, []);
+
+  const finalProductUrl =
+    productPageUrl ||
+    (typeof window !== "undefined" && window.location.origin
+      ? `${window.location.origin}/product/${product.slug}`
+      : `https://tauheed-textile.vercel.app/product/${product.slug}`);
 
   // Reviews state
   const [reviewsList, setReviewsList] = useState<any[]>(product.reviews || []);
@@ -439,7 +452,7 @@ export default function ProductDetailClient({
               </div>
               <a
                 href={`https://wa.me/923400262732?text=${encodeURIComponent(
-                  `Salam Tauheed Textile, I would like to order custom stitching for "${product.title}" (SKU: ${product.sku}). Please share your stitching catalog and measurement guide.`
+                  `Salam Tauheed Textile, I would like to order custom stitching for:\n"${product.title}" (SKU: ${product.sku})\n\nProduct Link:\n${finalProductUrl}\n\nPlease share your stitching catalog and measurement guide.`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -493,7 +506,7 @@ export default function ProductDetailClient({
             {/* Direct Order via WhatsApp */}
             <a
               href={`https://wa.me/923400262732?text=${encodeURIComponent(
-                `Salam Tauheed Textile, I want to order "${product.title}" (Unstitched, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
+                `Salam Tauheed Textile, I want to order:\n"${product.title}" (SKU: ${product.sku})\nPrice: Rs. ${effectivePrice.toLocaleString()}\n\nProduct Link:\n${finalProductUrl}\n\nPlease confirm availability and booking details.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -904,7 +917,7 @@ export default function ProductDetailClient({
         </button>
         <a
           href={`https://wa.me/923400262732?text=${encodeURIComponent(
-            `Salam Tauheed Textile, I want to order "${product.title}" (Unstitched, SKU: ${product.sku}) priced at Rs. ${effectivePrice}. Please confirm availability.`
+            `Salam Tauheed Textile, I want to order:\n"${product.title}" (SKU: ${product.sku})\nPrice: Rs. ${effectivePrice.toLocaleString()}\n\nProduct Link:\n${finalProductUrl}\n\nPlease confirm availability and booking details.`
           )}`}
           target="_blank"
           rel="noopener noreferrer"
