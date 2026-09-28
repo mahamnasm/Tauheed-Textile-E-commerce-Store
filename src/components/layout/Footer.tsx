@@ -226,7 +226,7 @@ export default function Footer({ initialSettings }: FooterProps) {
                   className="text-xs text-[#7A6652] hover:text-[#171717] hover:underline flex items-start gap-1 pt-1 leading-snug"
                 >
                   <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#34A853]" />
-                  <span>Shop #3, Opposite Rabi Arcade, Near Qurtaba Market, Bahadurabad, Karachi</span>
+                  <span>Shop G10, New Qurtaba Market, Opposite Qurtaba Masjid, Bahadurabad, Karachi</span>
                 </a>
               </li>
             </ul>
@@ -268,7 +268,7 @@ export default function Footer({ initialSettings }: FooterProps) {
               </li>
               <li className="pt-2">
                 <a
-                  href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c"}
+                  href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-xs hover:shadow-md hover:scale-105"

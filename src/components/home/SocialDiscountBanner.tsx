@@ -53,7 +53,7 @@ export default function SocialDiscountBanner() {
             <div className="inline-flex items-center gap-2 text-xs text-[#E8DEC8] bg-white/5 border border-white/10 rounded-xl px-3.5 py-2">
               <MapPin className="w-4 h-4 text-[#E5A93C] shrink-0" />
               <span>
-                <strong>Karachi Studio:</strong> Shop #3, Opposite Rabi Arcade, Near Qurtaba Market, Bahadurabad, Karachi.
+                <strong>Karachi Studio:</strong> Shop G10, New Qurtaba Market, Opposite Qurtaba Masjid, Bahadurabad, Karachi.
               </span>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function SocialDiscountBanner() {
             </a>
 
             <a
-              href="https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c"
+              href="https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#F0EBE3] text-xs font-semibold transition-all text-center"

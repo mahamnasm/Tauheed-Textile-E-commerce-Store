@@ -192,11 +192,11 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 7. Contact, Concierge & Physical Studio
   contactWhatsApp: "0340 0262732",
   whatsappMessage: "Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order.",
-  whatsappCommunityLink: "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c",
+  whatsappCommunityLink: "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S",
   showWhatsappCommunity: true,
   contactPhone: "0340 0262732",
   contactEmail: "care@tauheedtextile.com",
-  contactAddress: "Tauheed Textile, Shop #3, Opposite Rabi Arcade, Near Qurtaba Market, Bahadurabad, Karachi",
+  contactAddress: "Tauheed Textile, Shop G10, New Qurtaba Market, Opposite Qurtaba Masjid, Bahadurabad, Karachi",
   operatingHours: "Monday - Saturday: 1:00 PM - 9:00 PM PKT",
 
   // 8. Social Media Channels
