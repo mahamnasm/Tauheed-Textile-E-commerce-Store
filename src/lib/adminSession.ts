@@ -17,19 +17,35 @@ function requiredEnv(name: string, minLength = 1): string {
 }
 
 export function getAdminUsername(): string {
-  return process.env.ADMIN_USERNAME?.trim() || "usamanaseem101";
+  const username = process.env.ADMIN_USERNAME?.trim();
+  if (!username) {
+    throw new Error("SECURITY_ERROR: ADMIN_USERNAME environment variable is not configured.");
+  }
+  return username;
 }
 
 export function getAdminPassword(): string {
-  return process.env.ADMIN_PASSWORD?.trim() || "Tauheed#2026!UsamaSecure$9x";
+  const password = process.env.ADMIN_PASSWORD?.trim();
+  if (!password) {
+    throw new Error("SECURITY_ERROR: ADMIN_PASSWORD environment variable is not configured.");
+  }
+  return password;
 }
 
 export function getDefaultMasterPin(): string {
-  return process.env.ADMIN_MASTER_PIN?.trim() || "786000";
+  const pin = process.env.ADMIN_MASTER_PIN?.trim();
+  if (!pin) {
+    throw new Error("SECURITY_ERROR: ADMIN_MASTER_PIN environment variable is not configured.");
+  }
+  return pin;
 }
 
 function getSessionSecret(): string {
-  return process.env.ADMIN_SESSION_SECRET?.trim() || "tauheed-textile-admin-session-secret-key-32chars";
+  const secret = process.env.ADMIN_SESSION_SECRET?.trim();
+  if (!secret || secret.length < 32) {
+    throw new Error("SECURITY_ERROR: ADMIN_SESSION_SECRET environment variable is missing or shorter than 32 characters.");
+  }
+  return secret;
 }
 
 export function isSecureAdminCookie(): boolean {

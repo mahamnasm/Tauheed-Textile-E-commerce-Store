@@ -100,10 +100,18 @@ export async function POST(req: NextRequest) {
 
       const uniqueId = crypto.randomUUID();
       const filename = `media_${Date.now()}_${uniqueId}${finalExt}`;
-      const filePath = path.join(uploadDir, filename);
+      const mime = finalExt === ".webp" ? "image/webp" : finalExt === ".png" ? "image/png" : "image/jpeg";
+      const fallbackDataUrl = `data:${mime};base64,${finalBuffer.toString("base64")}`;
 
-      fs.writeFileSync(filePath, finalBuffer);
-      savedUrls.push(`/uploads/${filename}`);
+      try {
+        const filePath = path.join(uploadDir, filename);
+        fs.writeFileSync(filePath, finalBuffer);
+        savedUrls.push(`/uploads/${filename}`);
+      } catch (fsErr) {
+        // Ephemeral / read-only filesystem on serverless cloud: use persistent data URI
+        console.warn("Local disk write not permitted on serverless container, using persistent data URI fallback:", fsErr);
+        savedUrls.push(fallbackDataUrl);
+      }
     }
 
     return NextResponse.json({

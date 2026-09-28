@@ -27,30 +27,6 @@ export async function POST(req: NextRequest) {
     const cleanCode = code.trim().toUpperCase();
     const orderSubtotal = Math.max(0, subtotal);
 
-    // Hardcoded fallback coupons for instant offline testing
-    if (cleanCode === "TAUHEED10") {
-      const discount = Math.round(orderSubtotal * 0.10);
-      return NextResponse.json({
-        success: true,
-        code: "TAUHEED10",
-        discountAmount: discount,
-        discountType: "PERCENTAGE",
-        discountValue: 10,
-        message: "10% Promo discount applied successfully!",
-      });
-    }
-
-    if (cleanCode === "EIDGIFT500") {
-      return NextResponse.json({
-        success: true,
-        code: "EIDGIFT500",
-        discountAmount: 500,
-        discountType: "FIXED",
-        discountValue: 500,
-        message: "Rs. 500 Eid gift discount applied successfully!",
-      });
-    }
-
     // Lookup coupon in database
     const coupon = await prisma.coupon.findUnique({
       where: { code: cleanCode },

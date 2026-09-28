@@ -24,57 +24,6 @@ export interface LedgerFinancialSummary {
   netBusinessProfit: number;
 }
 
-const DEFAULT_SAMPLE_ENTRIES: ManualLedgerEntry[] = [
-  {
-    id: "leg_init_1",
-    date: new Date().toISOString().split("T")[0],
-    type: "EXPENSE",
-    category: "Stitching & Karigar Labor",
-    title: "Master Tailor Iqbal — Tailoring & Adda Labor (12 Suits)",
-    amount: 14500,
-    paymentMethod: "CASH",
-    reference: "VOUCH-881",
-    notes: "Stitching charges for formal chiffon batch",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: "leg_init_2",
-    date: new Date().toISOString().split("T")[0],
-    type: "INCOME",
-    category: "Direct / Walk-in Sales",
-    title: "Walk-in Cash Sale — 2x Luxury Lawn Suits (Lahore Outlet)",
-    amount: 11800,
-    paymentMethod: "CASH",
-    reference: "INV-OFFLINE-041",
-    notes: "Walk-in client payment received in cash register",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "leg_init_3",
-    date: new Date().toISOString().split("T")[0],
-    type: "EXPENSE",
-    category: "Fabric & Raw Materials",
-    title: "Azam Cloth Market — 60 Gaz Pure Egyptian Cotton Lawn",
-    amount: 28500,
-    paymentMethod: "BANK_TRANSFER",
-    reference: "Meezan-TX-9941",
-    notes: "Summer lawn fabric intake roll purchase",
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-  {
-    id: "leg_init_4",
-    date: new Date().toISOString().split("T")[0],
-    type: "EXPENSE",
-    category: "Packaging & Boxes",
-    title: "Poly-Mailers & Luxury Gold Embossed Boxes (300 pcs)",
-    amount: 6200,
-    paymentMethod: "EASYPAISA",
-    reference: "EP-441209",
-    notes: "Shipping packaging materials replenishment",
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-  },
-];
-
 export async function getManualLedgerEntries(): Promise<ManualLedgerEntry[]> {
   try {
     const record = await prisma.setting.findUnique({
@@ -88,12 +37,10 @@ export async function getManualLedgerEntries(): Promise<ManualLedgerEntry[]> {
       }
     }
 
-    // Initialize with sample entries if empty
-    await saveManualLedgerEntries(DEFAULT_SAMPLE_ENTRIES);
-    return DEFAULT_SAMPLE_ENTRIES;
+    return [];
   } catch (err) {
     console.error("Failed to read manual ledger entries from DB:", err);
-    return DEFAULT_SAMPLE_ENTRIES;
+    return [];
   }
 }
 

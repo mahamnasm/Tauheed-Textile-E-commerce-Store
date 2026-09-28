@@ -120,28 +120,22 @@ export async function POST(req: NextRequest) {
 
     if (couponCode) {
       const cleanCoupon = couponCode.trim().toUpperCase();
-      if (cleanCoupon === "TAUHEED10") {
-        discountAmount = Math.round(calculatedSubtotal * 0.1);
-      } else if (cleanCoupon === "EIDGIFT500") {
-        discountAmount = Math.min(calculatedSubtotal, 500);
-      } else {
-        const dbCoupon = await prisma.coupon.findUnique({ where: { code: cleanCoupon } });
-        if (
-          dbCoupon &&
-          dbCoupon.isActive &&
-          (!dbCoupon.usageLimit || dbCoupon.usedCount < dbCoupon.usageLimit) &&
-          (!dbCoupon.minOrderValue || calculatedSubtotal >= dbCoupon.minOrderValue)
-        ) {
-          if (dbCoupon.discountType === "PERCENTAGE") {
-            discountAmount = Math.round((calculatedSubtotal * dbCoupon.discountValue) / 100);
-            if (dbCoupon.maxDiscount && discountAmount > dbCoupon.maxDiscount) {
-              discountAmount = dbCoupon.maxDiscount;
-            }
-          } else {
-            discountAmount = Math.min(calculatedSubtotal, dbCoupon.discountValue);
+      const dbCoupon = await prisma.coupon.findUnique({ where: { code: cleanCoupon } });
+      if (
+        dbCoupon &&
+        dbCoupon.isActive &&
+        (!dbCoupon.usageLimit || dbCoupon.usedCount < dbCoupon.usageLimit) &&
+        (!dbCoupon.minOrderValue || calculatedSubtotal >= dbCoupon.minOrderValue)
+      ) {
+        if (dbCoupon.discountType === "PERCENTAGE") {
+          discountAmount = Math.round((calculatedSubtotal * dbCoupon.discountValue) / 100);
+          if (dbCoupon.maxDiscount && discountAmount > dbCoupon.maxDiscount) {
+            discountAmount = dbCoupon.maxDiscount;
           }
-          couponIdToIncrement = dbCoupon.id;
+        } else {
+          discountAmount = Math.min(calculatedSubtotal, dbCoupon.discountValue);
         }
+        couponIdToIncrement = dbCoupon.id;
       }
     }
 

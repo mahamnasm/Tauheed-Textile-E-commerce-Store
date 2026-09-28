@@ -54,24 +54,33 @@ export async function POST(req: NextRequest) {
     const rawExt = path.extname(file.name || "").toLowerCase();
     const ext = ALLOWED_EXTENSIONS.has(rawExt) ? rawExt : ".jpg";
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "receipts");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const mime = file.type || "image/jpeg";
+    const dataUrl = `data:${mime};base64,${buffer.toString("base64")}`;
 
-    // Cryptographically secure random filename
-    const uniqueId = crypto.randomUUID();
-    const filename = `receipt_${Date.now()}_${uniqueId}${ext}`;
-    const filePath = path.join(uploadDir, filename);
+    // Guarantee persistence on serverless Vercel: use dataUrl in production, local file in dev
+    let fileUrl = dataUrl;
+    let filename = `receipt_${Date.now()}_${crypto.randomUUID()}${ext}`;
 
-    fs.writeFileSync(filePath, buffer);
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "receipts");
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      const filePath = path.join(uploadDir, filename);
+      fs.writeFileSync(filePath, buffer);
+      if (process.env.NODE_ENV !== "production") {
+        fileUrl = `/uploads/receipts/${filename}`;
+      }
+    } catch (fsErr) {
+      // Ephemeral or read-only container: persistent dataUrl ensures receipt is never lost
+      fileUrl = dataUrl;
+    }
 
     return NextResponse.json({
       success: true,
-      url: `/uploads/receipts/${filename}`,
+      url: fileUrl,
       filename,
     });
   } catch (error: any) {
