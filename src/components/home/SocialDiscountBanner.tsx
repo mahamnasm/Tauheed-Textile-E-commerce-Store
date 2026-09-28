@@ -58,27 +58,27 @@ export default function SocialDiscountBanner() {
             </div>
           </div>
 
-          {/* Right Column: CTA WhatsApp Button */}
+          {/* Right Column: CTA WhatsApp Button (Animated Shimmer & Emerald Glow) */}
           <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
             <a
               href={whatsappClaimUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl bg-[#128C7E] hover:bg-[#0E7064] text-white font-bold text-sm shadow-lg hover:shadow-[#128C7E]/40 transition-all duration-300 hover:scale-105 active:scale-95 text-center"
+              className="btn-shimmer animate-glow-emerald group inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] font-black text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-center cursor-pointer"
             >
               <WhatsAppBrandIcon className="w-5 h-5 shrink-0" />
               <span>Claim 5% OFF on WhatsApp</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </a>
 
             <a
               href="https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#F0EBE3] text-xs font-semibold transition-all text-center"
+              className="group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#F0EBE3] text-xs font-bold transition-all hover:scale-105 active:scale-95 text-center cursor-pointer"
             >
               <span>Join WhatsApp VIP Community</span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              <ExternalLink className="w-3.5 h-3.5 opacity-80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </div>
         </div>

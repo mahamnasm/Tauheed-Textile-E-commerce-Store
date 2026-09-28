@@ -82,21 +82,22 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
         aria-label="Floating Storefront Actions" 
         className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[60] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
       >
-        {/* 1. VIP WhatsApp Community Glass Pill */}
+        {/* 1. VIP WhatsApp Community Glass Pill (Animated Breathing Shimmer) */}
         {showCommunity && (
           <button
             type="button"
             onClick={() => setShowVipModal(true)}
             aria-label="Join VIP WhatsApp Community"
-            className="group flex items-center gap-2 bg-[#121110]/75 hover:bg-[#1A1816]/90 backdrop-blur-2xl backdrop-saturate-150 text-white px-3.5 py-2.5 rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-[#C4A882]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
+            className="btn-shimmer animate-glow-gold animate-float-gentle group flex items-center gap-2 bg-[#121110]/85 hover:bg-[#1A1816] backdrop-blur-2xl backdrop-saturate-150 text-white px-4 py-2.5 rounded-full border border-[#E5A93C]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 text-[#E5A93C]" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#B28A3E] animate-pulse" />
+              <Users className="w-4 h-4 text-[#E5A93C] transition-transform group-hover:scale-110" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#E5A93C] animate-ping" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#B28A3E]" />
             </div>
             <span className="text-xs font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
               <span>VIP Community</span>
-              <span className="text-[9px] bg-gradient-to-r from-[#C4A882] to-[#E5A93C] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs">
+              <span className="text-[9px] bg-gradient-to-r from-[#C4A882] via-[#E5A93C] to-[#C4A882] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs animate-pulse">
                 JOIN
               </span>
             </span>
@@ -110,12 +111,12 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
             type="button"
             onClick={openCart}
             aria-label="Open Shopping Cart"
-            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.16] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#C4A882] transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
+            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.18] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#C4A882] transition-all duration-300 hover:scale-110 active:scale-90 focus:outline-none cursor-pointer"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#C4A882] transition-transform group-hover:scale-110" />
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#C4A882] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />
               {cartCount > 0 && (
-                <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-[#9B3D3D] text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-[#171717] shadow animate-pulse">
+                <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-[#9B3D3D] text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-[#171717] shadow animate-bounce">
                   {cartCount}
                 </span>
               )}
@@ -131,16 +132,16 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
             </div>
           </button>
 
-          {/* Direct 1-on-1 WhatsApp Concierge */}
+          {/* Direct 1-on-1 WhatsApp Concierge (Pulsing Glow Animation) */}
           <a
             href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contact on WhatsApp"
-            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.16] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#25D366] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+            className="animate-glow-emerald group flex items-center bg-white/[0.08] hover:bg-white/[0.18] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#25D366] transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#25D366] transition-transform group-hover:scale-110 fill-current" />
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#25D366] transition-transform duration-300 group-hover:scale-115 fill-current" />
             </div>
 
             <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide pr-0.5">
@@ -213,7 +214,7 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
                   href={vipCommunityUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] font-black text-sm tracking-wide shadow-lg hover:shadow-[#25D366]/30 transition-all hover:scale-[1.02] active:scale-[0.98] text-center"
+                  className="btn-shimmer animate-glow-emerald w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] font-black text-sm tracking-wide shadow-lg transition-all hover:scale-[1.02] active:scale-95 text-center"
                 >
                   <WhatsAppBrandIcon className="w-5 h-5 shrink-0" />
                   <span>👉 Join WhatsApp Community Directly</span>

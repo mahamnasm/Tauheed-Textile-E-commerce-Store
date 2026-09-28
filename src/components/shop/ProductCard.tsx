@@ -147,17 +147,17 @@ export default function ProductCard({
           )}
         </div>
 
-        {/* Wishlist Button */}
+        {/* Wishlist Button (Animated Pulse & Tactile Scale) */}
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleWishlist(id);
           }}
-          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 shadow-sm z-10 ${
+          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 shadow-sm z-10 active:scale-75 ${
             wishlisted
-              ? "bg-[#9B3D3D] text-white"
-              : "bg-white/90 text-[#6B6259] hover:text-[#9B3D3D]"
+              ? "bg-[#9B3D3D] text-white scale-110"
+              : "bg-white/90 text-[#6B6259] hover:text-[#9B3D3D] hover:scale-105"
           }`}
           aria-label="Wishlist"
         >
@@ -242,19 +242,19 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* Mobile Quick Add Button */}
+      {/* Mobile Quick Add Button (Tactile Animated Touch) */}
       <button
         onClick={handleQuickAdd}
-        className={`sm:hidden w-full py-2.5 text-xs font-semibold rounded-b-xl flex items-center justify-center gap-1.5 ${
-          justAdded ? "bg-[#2D6A4F] text-white" : "bg-[#171717] text-white"
+        className={`sm:hidden w-full py-2.5 text-xs font-bold rounded-b-xl flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-95 cursor-pointer ${
+          justAdded ? "bg-[#2D6A4F] text-white shadow-inner" : "bg-[#171717] hover:bg-black text-white"
         }`}
       >
         {justAdded ? (
-          <Check className="w-4 h-4" />
+          <Check className="w-4 h-4 animate-bounce" />
         ) : (
-          <ShoppingBag className="w-4 h-4" />
+          <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
         )}
-        {justAdded ? "Added" : "Quick Add"}
+        <span>{justAdded ? "Added" : "Quick Add"}</span>
       </button>
     </div>
   );

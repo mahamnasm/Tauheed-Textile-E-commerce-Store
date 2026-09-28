@@ -485,34 +485,34 @@ export default function ProductDetailClient({
 
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 py-4 px-6 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all ${
+                className={`btn-shimmer flex-1 py-4 px-6 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all duration-200 active:scale-95 cursor-pointer ${
                   added
-                    ? "bg-[#1A6B3C] text-white"
-                    : "bg-[#171717] text-white hover:bg-black"
+                    ? "bg-[#1A6B3C] text-white shadow-[#1A6B3C]/30"
+                    : "bg-[#171717] hover:bg-black text-white hover:scale-[1.01]"
                 }`}
               >
                 {added ? (
                   <>
-                    <Check className="w-5 h-5" /> Added to Bag
+                    <Check className="w-5 h-5 animate-bounce" /> Added to Bag
                   </>
                 ) : (
                   <>
-                    <ShoppingBag className="w-5 h-5" /> Add to Bag
+                    <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" /> Add to Bag
                   </>
                 )}
               </button>
             </div>
 
-            {/* Direct Order via WhatsApp */}
+            {/* Direct Order via WhatsApp (Animated Shimmer & Pulse Glow) */}
             <a
               href={`https://wa.me/923400262732?text=${encodeURIComponent(
                 `Salam Tauheed Textile, I want to order:\n"${product.title}" (SKU: ${product.sku})\nPrice: Rs. ${effectivePrice.toLocaleString()}\n\nProduct Link:\n${finalProductUrl}\n\nPlease confirm availability and booking details.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3.5 bg-[#128C7E] hover:bg-[#075E54] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow transition-all"
+              className="btn-shimmer animate-glow-emerald w-full py-3.5 bg-[#128C7E] hover:bg-[#0E7064] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all duration-200 hover:scale-[1.01] active:scale-95 cursor-pointer"
             >
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5 transition-transform group-hover:scale-110" />
               Order Instant via WhatsApp
             </a>
           </div>
@@ -905,15 +905,16 @@ export default function ProductDetailClient({
         </div>
       )}
 
-      {/* Mobile Sticky Bar (Frosted Glass) */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white/85 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/80 px-4 py-3 z-50 flex gap-3 shadow-[0_-4px_25px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
+      {/* Mobile Sticky Bar (Frosted Glass with Animated Touch Buttons) */}
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white/90 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/80 px-4 py-3 z-50 flex gap-3 shadow-[0_-4px_25px_rgba(0,0,0,0.08),inset_0_1px_1px_rgba(255,255,255,0.9)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}>
         <button
           onClick={handleAddToCart}
-          className={`flex-1 rounded-full py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${
-            added ? "bg-[#1A6B3C] text-white" : "bg-[#171717] text-white"
+          className={`btn-shimmer flex-1 rounded-full py-3.5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all active:scale-90 cursor-pointer ${
+            added ? "bg-[#1A6B3C] text-white shadow-[#1A6B3C]/30" : "bg-[#171717] text-white"
           }`}
         >
-          {added ? <Check className="w-4 h-4" /> : "ADD TO BAG"}
+          {added ? <Check className="w-4 h-4 animate-bounce" /> : <ShoppingBag className="w-4 h-4" />}
+          <span>{added ? "ADDED TO BAG" : "ADD TO BAG"}</span>
         </button>
         <a
           href={`https://wa.me/923400262732?text=${encodeURIComponent(
@@ -921,10 +922,10 @@ export default function ProductDetailClient({
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-shrink-0 bg-[#128C7E] text-white rounded-full py-3 px-4 text-xs font-bold flex items-center justify-center gap-1.5"
+          className="btn-shimmer animate-glow-emerald flex-shrink-0 bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] rounded-full py-3.5 px-5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-90 cursor-pointer"
           aria-label="Order via WhatsApp"
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4 fill-current" />
           <span>WhatsApp</span>
         </a>
       </div>

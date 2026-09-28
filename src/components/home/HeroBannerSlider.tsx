@@ -169,14 +169,14 @@ export default function HeroBannerSlider({ settings }: HeroBannerSliderProps) {
                       {banner.subtitle}
                     </p>
 
-                    {/* CTA Button */}
+                    {/* CTA Button (Animated Shimmer & Tactile Touch) */}
                     <div className="pt-2">
                       <Link
                         href={banner.link}
-                        className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white text-[#171717] hover:bg-[#F8F5F0] text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-lg hover:scale-105"
+                        className="btn-shimmer group/btn inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white text-[#171717] hover:bg-[#F8F5F0] text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                       >
                         <span>{banner.btnText}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
                       </Link>
                     </div>
                   </div>
