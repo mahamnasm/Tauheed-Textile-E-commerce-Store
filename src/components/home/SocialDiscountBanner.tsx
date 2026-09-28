@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Sparkles,
@@ -10,6 +10,9 @@ import {
   MapPin,
   Flame,
   ArrowRight,
+  X,
+  ChevronDown,
+  Gift,
 } from "lucide-react";
 import {
   InstagramBrandIcon,
@@ -20,20 +23,100 @@ import {
 } from "@/components/common/SocialBrandIcons";
 
 export default function SocialDiscountBanner() {
+  const [isClosed, setIsClosed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("tauheed_social_discount_closed");
+      if (saved === "true") {
+        setIsClosed(true);
+      }
+    } catch {
+      // ignore in environments without sessionStorage
+    }
+  }, []);
+
+  const handleClose = () => {
+    setIsClosed(true);
+    try {
+      sessionStorage.setItem("tauheed_social_discount_closed", "true");
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleOpen = () => {
+    setIsClosed(false);
+    try {
+      sessionStorage.removeItem("tauheed_social_discount_closed");
+    } catch {
+      // ignore
+    }
+  };
+
   const whatsappClaimUrl =
     "https://wa.me/923400262732?text=" +
     encodeURIComponent(
       "Assalam-o-Alaikum Tauheed Textile! 🎉 I have followed on Instagram, Facebook, TikTok, subscribed on YouTube and left a Google review. Here is my screenshot to unlock my Flat 5% OFF discount code!"
     );
 
+  // If closed by the customer so they can move forward, render the sleek compact popup bar
+  if (isClosed) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 transition-all duration-300">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#1F1D1B] via-[#2A241E] to-[#141312] border border-[#C4A882]/40 text-white px-4 py-3 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#E5A93C]/20 border border-[#E5A93C]/40 flex items-center justify-center shrink-0">
+              <Gift className="w-4 h-4 text-[#E5A93C]" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-semibold text-[#E8DEC8]">
+                Get Flat <span className="text-[#E5A93C] font-bold">5% OFF</span> – It’s Super Easy! 🎉
+              </p>
+              <p className="text-[11px] text-[#A89F95] hidden sm:block">
+                Follow our 4 social steps, send screenshot on WhatsApp & claim instant discount.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleOpen}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-[#B28A3E] to-[#E5A93C] hover:from-[#C4A882] hover:to-[#F3BA54] text-[#171717] font-extrabold text-xs shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <span>View 5% OFF Offer</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Full Signature Old Design with Easy Close Button
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 transition-all duration-300">
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1F1D1B] via-[#171717] to-[#0D0D0D] border-2 border-[#C4A882]/40 text-white p-6 sm:p-10 shadow-2xl">
+        {/* Easy Close Button at Top-Right */}
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute top-3.5 sm:top-5 right-3.5 sm:right-5 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/80 hover:text-white border border-white/20 transition-all duration-200 shadow-md cursor-pointer group"
+          aria-label="Close discount offer and move forward"
+          title="Close and move forward"
+        >
+          <span className="text-[11px] font-bold tracking-wider uppercase text-[#E5A93C] group-hover:text-white transition-colors">
+            Close
+          </span>
+          <X className="w-4 h-4 text-white transition-transform group-hover:rotate-90 duration-200" />
+        </button>
+
         {/* Glow ambient background elements */}
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 rounded-full bg-[#B28A3E]/15 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-72 h-72 rounded-full bg-[#9B3D3D]/15 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 pr-12 lg:pr-16">
           {/* Left Column: Heading & Hook */}
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#B28A3E]/20 border border-[#B28A3E]/40 text-[#E8DEC8] text-xs font-bold tracking-wider uppercase">
@@ -194,6 +277,21 @@ export default function SocialDiscountBanner() {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* Move Forward / Dismiss Footer Bar */}
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 mt-6 border-t border-white/10 text-xs text-[#A89F95]">
+          <span className="text-center sm:text-left">
+            Complete the steps anytime to claim your discount before ordering.
+          </span>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#E8DEC8] hover:text-white transition-all cursor-pointer font-semibold text-xs active:scale-95"
+          >
+            <span>Close & Move Forward</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </section>
