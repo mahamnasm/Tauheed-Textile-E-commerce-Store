@@ -1003,7 +1003,7 @@ export default function CheckoutPage() {
 
             <div className="text-center pt-2 space-y-1">
               <p className="text-[10px] text-[#6B6259]">
-                By placing this order, you agree to Tauheed Textile's 7-Day Exchange Policy (No Returns, Exchange Only).
+                By placing this order, you agree to Tauheed Textile's <Link href="/policies/returns" className="underline hover:text-[#171717]">7-Day Exchange Policy</Link>.
               </p>
             </div>
           </div>

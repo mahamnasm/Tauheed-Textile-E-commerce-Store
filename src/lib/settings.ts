@@ -184,7 +184,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   trustPerk2Title: "Cash On Delivery & Advance Pay",
   trustPerk2Desc: "Pay COD or save 5% on Advance Bank Transfer / Wallet",
   trustPerk3Title: "7-Day Exchange Policy",
-  trustPerk3Desc: "Hassle-free 7-day exchange (No returns accepted)",
+  trustPerk3Desc: "Hassle-free 7-day exchange service",
   trustPerk4Title: "100% Authentic Fabric",
   trustPerk4Desc: "Pure Swiss lawn, genuine chiffon and luxury unstitched",
 

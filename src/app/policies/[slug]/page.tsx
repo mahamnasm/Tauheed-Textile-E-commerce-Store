@@ -85,23 +85,24 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
       ),
     },
     returns: {
-      title: "7-Day Exchange Policy (No Returns)",
-      subtitle: "Customer satisfaction and quality assurance commitment",
+      title: "7-Day Exchange Policy",
+      subtitle: "Customer satisfaction and easy size or article exchange commitment",
       content: (
         <div className="space-y-6 text-xs text-[#6B6259] leading-relaxed">
           <p>
-            Tauheed Textile guarantees the finest craftsmanship and pure authentic fabrics. To maintain luxury hygiene and fair pricing, we operate under a strict <strong>7-Day Exchange Policy</strong>.
+            Tauheed Textile guarantees the finest craftsmanship and pure authentic fabrics. To ensure you are completely satisfied with your purchase, we provide a smooth <strong>7-Day Exchange Service</strong>.
           </p>
 
-          <div className="p-4 rounded-xl bg-[#FDF2F2] border border-[#F2BDBD] text-[#9B3D3D] font-medium">
-            <strong>Important:</strong> We offer exchanges only. Cash returns and refunds are not accepted.
+          <div className="p-4 rounded-xl bg-[#F8F5F0] border border-[#E7E1D8] text-[#7A6652] font-medium">
+            <strong>Customer Commitment:</strong> If you receive an item with any defect, damage, or sizing concern, our team will gladly exchange it for you within 7 days of delivery.
           </div>
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">Exchange Eligibility Guidelines</h3>
           <ul className="list-disc pl-5 space-y-2">
             <li>Articles must be unwashed, uncut, and in their original packaging with all designer seal tags intact.</li>
             <li>Exchange requests must be submitted within <strong>7 calendar days</strong> from the parcel delivery date.</li>
-            <li>Items purchased on seasonal clearance or final sale are eligible for exchange only in the case of manufacturing or fabric defects.</li>
+            <li>In compliance with luxury apparel hygiene standards, items are eligible for exchange of equal value or store credit.</li>
+            <li>Items purchased on seasonal clearance or final sale are eligible for exchange in case of manufacturing or fabric defects.</li>
           </ul>
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">How to Initiate an Exchange</h3>
@@ -160,7 +161,7 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">5. What is your exchange policy?</h3>
           <p>
-            We offer a 7-day exchange window for unstitched garments in original condition. We do not accept cash returns or refunds.
+            We offer a hassle-free 7-day exchange window for unstitched and stitched garments in their original packaging and condition.
           </p>
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">6. What are your customer support hours?</h3>
