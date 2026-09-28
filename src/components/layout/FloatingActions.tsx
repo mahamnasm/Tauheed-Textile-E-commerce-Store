@@ -139,48 +139,52 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
           </button>
         )}
 
-        {/* 2 & 3. Glassmorphism Floating Dock Bar */}
-        <div className="flex flex-col items-end gap-2 p-1.5 rounded-full bg-black/40 backdrop-blur-2xl backdrop-saturate-150 border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.15)]">
-          {/* Floating Quick Cart Button */}
+        {/* 2 & 3. High-Contrast Floating Dock Bar */}
+        <div className="flex flex-col items-end gap-2.5 p-2 rounded-full bg-[#141312] border-2 border-[#C4A882]/70 shadow-[0_10px_35px_rgba(0,0,0,0.55)]">
+          {/* Floating Quick Cart Button (High Contrast Solid Gold & Onyx) */}
           <button
             type="button"
             onClick={openCart}
             aria-label="Open Shopping Cart"
-            className="group flex items-center bg-white/[0.08] hover:bg-white/[0.18] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#C4A882] transition-all duration-300 hover:scale-110 active:scale-90 focus:outline-none cursor-pointer"
+            className="group relative flex items-center bg-[#24211D] hover:bg-[#332D27] text-white p-3.5 sm:p-4 rounded-full shadow-lg border-2 border-[#E5A93C] transition-all duration-300 hover:scale-110 active:scale-90 focus:outline-none cursor-pointer"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#C4A882] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" />
-              {cartCount > 0 && (
-                <span className="absolute -top-2.5 -right-2.5 min-w-[20px] h-5 px-1 rounded-full bg-[#9B3D3D] text-white text-[11px] font-extrabold flex items-center justify-center border-2 border-[#171717] shadow animate-bounce">
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#E5A93C] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" strokeWidth={2.5} />
+              {cartCount > 0 ? (
+                <span className="absolute -top-3 -right-3 min-w-[22px] h-[22px] px-1 rounded-full bg-[#C23535] text-white text-[11px] font-black flex items-center justify-center border-2 border-[#141312] shadow-lg animate-bounce">
                   {cartCount}
+                </span>
+              ) : (
+                <span className="absolute -top-2.5 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#38332E] text-[#E5A93C] text-[10px] font-black flex items-center justify-center border border-[#E5A93C]/50 shadow">
+                  0
                 </span>
               )}
             </div>
 
-            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide flex items-center gap-1.5">
+            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-bold tracking-wide flex items-center gap-1.5 text-white">
               <span>Cart</span>
               {cartTotal > 0 && (
-                <span className="text-[#C4A882] font-bold">
+                <span className="text-[#E5A93C] font-black">
                   • Rs. {cartTotal.toLocaleString()}
                 </span>
               )}
             </div>
           </button>
 
-          {/* Direct 1-on-1 WhatsApp Concierge (Pulsing Glow Animation) */}
+          {/* Direct 1-on-1 WhatsApp Concierge (High Contrast Solid Emerald & Onyx) */}
           <a
             href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contact on WhatsApp"
-            className="animate-glow-emerald group flex items-center bg-white/[0.08] hover:bg-white/[0.18] text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/15 hover:border-[#25D366] transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer"
+            className="animate-glow-emerald group flex items-center bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] p-3.5 sm:p-4 rounded-full shadow-lg border-2 border-white/40 transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer"
           >
             <div className="relative flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#25D366] transition-transform duration-300 group-hover:scale-115 fill-current" />
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A2612] transition-transform duration-300 group-hover:scale-115 fill-current" />
             </div>
 
-            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-semibold tracking-wide pr-0.5">
-              Chat with Us
+            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-black tracking-wide pr-0.5">
+              WhatsApp
             </div>
           </a>
         </div>

@@ -453,15 +453,14 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </Link>
                 <button
                   onClick={openCart}
-                  className="relative p-2 text-[#E5E0D8] hover:text-[#C5A059] hover:bg-white/[0.06] rounded-full transition-all shrink-0 focus:outline-none"
+                  className="relative flex items-center gap-1.5 px-3 py-1.5 bg-[#25221F] hover:bg-[#322D27] text-[#E5A93C] hover:text-white rounded-full border border-[#E5A93C]/70 shadow-sm transition-all shrink-0 focus:outline-none hover:scale-105 active:scale-95"
                   aria-label="Open Shopping Bag"
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  {mounted && cartCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#9B3D3D] text-white text-[10px] font-bold flex items-center justify-center border border-white/20 shadow">
-                      {cartCount}
-                    </span>
-                  )}
+                  <ShoppingBag className="w-4 h-4 text-[#E5A93C]" strokeWidth={2.4} />
+                  <span className="text-xs font-bold text-white hidden sm:inline-block">Bag</span>
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#C23535] text-white text-[10px] font-black flex items-center justify-center border border-white/20 shadow">
+                    {mounted ? cartCount : 0}
+                  </span>
                 </button>
               </div>
             </div>
