@@ -139,7 +139,7 @@ export default function Footer({ initialSettings }: FooterProps) {
               </li>
               <li>
                 <Link href="/shop?category=saries" className="text-[#2D2620] hover:text-[#B28A3E] transition-colors block">
-                  Saries
+                  Sarees
                 </Link>
               </li>
               <li>

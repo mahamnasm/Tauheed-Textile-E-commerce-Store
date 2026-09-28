@@ -86,7 +86,7 @@ export const STORE_FEATURED_COLLECTIONS = [
   },
   {
     id: "col-saries",
-    name: "Saries",
+    name: "Sarees",
     slug: "saries",
     href: "/shop?category=saries",
     image: "/assets/prod-nafasat.jpg",

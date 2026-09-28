@@ -155,7 +155,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 4. Section Controls & Headings
   showCategories: true,
   categoriesTitle: "Curated Designer Collections",
-  categoriesSubtitle: "From effortless daily lawn to breathtaking bridal maxies and saries, discover unstitched luxury woven with Pakistani elegance.",
+  categoriesSubtitle: "From effortless daily lawn to breathtaking bridal maxies and sarees, discover unstitched luxury woven with Pakistani elegance.",
   showTrending: true,
   trendingTitle: "Trending & New Arrivals",
   trendingSubtitle: "The season's most sought-after silhouettes, crafted in limited boutique batches.",

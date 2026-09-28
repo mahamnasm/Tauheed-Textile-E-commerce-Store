@@ -67,7 +67,7 @@ const FALLBACK_CATEGORIES = [
   { name: "Net Formals", slug: "net-formals" },
   { name: "Organza Formals", slug: "organza-formals" },
   { name: "Bridal Maxies & Barat", slug: "bridal-maxies" },
-  { name: "Designer Saries", slug: "saries" },
+  { name: "Designer Sarees", slug: "saries" },
   { name: "Winter Collection", slug: "winter-collection" },
   { name: "Ready to Wear / Pret", slug: "pret-ready-to-wear" },
   { name: "Unstitched Collection", slug: "unstitched" },

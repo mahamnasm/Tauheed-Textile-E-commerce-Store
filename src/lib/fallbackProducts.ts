@@ -146,15 +146,15 @@ export const FALLBACK_CATEGORIES: FallbackCategory[] = [
   },
   {
     id: "cat-saries",
-    name: "Saries",
+    name: "Sarees",
     slug: "saries",
     image: "/assets/subcategories/sub-saree.jpg",
     displayOrder: 8,
     subcategories: [
-      { id: "sub-sari-chiffon", name: "Chiffon Saries", slug: "saries-chiffon", image: "/assets/subcategories/sub-saree.jpg" },
-      { id: "sub-sari-silk", name: "Silk Saries", slug: "saries-silk", image: "/assets/subcategories/sub-silk.jpg" },
-      { id: "sub-sari-organza", name: "Organza Saries", slug: "saries-organza", image: "/assets/subcategories/sub-saree.jpg" },
-      { id: "sub-sari-banarsi", name: "Banarsi Saries", slug: "saries-banarsi", image: "/assets/prod-nafasat.jpg" },
+      { id: "sub-sari-chiffon", name: "Chiffon Sarees", slug: "saries-chiffon", image: "/assets/subcategories/sub-saree.jpg" },
+      { id: "sub-sari-silk", name: "Silk Sarees", slug: "saries-silk", image: "/assets/subcategories/sub-silk.jpg" },
+      { id: "sub-sari-organza", name: "Organza Sarees", slug: "saries-organza", image: "/assets/subcategories/sub-saree.jpg" },
+      { id: "sub-sari-banarsi", name: "Banarsi Sarees", slug: "saries-banarsi", image: "/assets/prod-nafasat.jpg" },
     ],
   },
   {

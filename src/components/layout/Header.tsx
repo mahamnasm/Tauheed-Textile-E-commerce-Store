@@ -219,15 +219,15 @@ export default function Header({ initialSettings }: HeaderProps) {
       ],
     },
     {
-      name: "SARIES",
+      name: "SAREES",
       href: "/shop?category=saries",
       badge: "Drapes",
       children: [
-        { name: "All Saries", href: "/shop?category=saries" },
-        { name: "Chiffon Saries", href: "/shop?category=saries&subcategory=saries-chiffon" },
-        { name: "Silk Saries", href: "/shop?category=saries&subcategory=saries-silk" },
-        { name: "Organza Saries", href: "/shop?category=saries&subcategory=saries-organza" },
-        { name: "Banarsi Saries", href: "/shop?category=saries&subcategory=saries-banarsi" },
+        { name: "All Sarees", href: "/shop?category=saries" },
+        { name: "Chiffon Sarees", href: "/shop?category=saries&subcategory=saries-chiffon" },
+        { name: "Silk Sarees", href: "/shop?category=saries&subcategory=saries-silk" },
+        { name: "Organza Sarees", href: "/shop?category=saries&subcategory=saries-organza" },
+        { name: "Banarsi Sarees", href: "/shop?category=saries&subcategory=saries-banarsi" },
       ],
     },
     {
@@ -286,7 +286,7 @@ export default function Header({ initialSettings }: HeaderProps) {
         { name: "Net Formals", href: "/shop?category=net-formals" },
         { name: "Organza Formals", href: "/shop?category=organza-formals" },
         { name: "Bridal Maxies", href: "/shop?category=bridal-maxies" },
-        { name: "Saries Collection", href: "/shop?category=saries" },
+        { name: "Sarees Collection", href: "/shop?category=saries" },
       ],
     },
     {

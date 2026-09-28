@@ -23,7 +23,7 @@ export default async function HomePage() {
     { id: "4", name: "Net Formals", slug: "net-formals", image: "/assets/cat-wedding-luxury.jpg" },
     { id: "5", name: "Organza Formals", slug: "organza-formals", image: "/assets/cat-chiffon-formal.jpg" },
     { id: "6", name: "Bridal Maxies", slug: "bridal-maxies", image: "/assets/cat-wedding-luxury.jpg" },
-    { id: "7", name: "Saries", slug: "saries", image: "/assets/cat-chiffon-formal.jpg" },
+    { id: "7", name: "Sarees", slug: "saries", image: "/assets/cat-chiffon-formal.jpg" },
     { id: "8", name: "Lawn Formals", slug: "lawn-formals", image: "/assets/cat-lawn-summer.jpg" },
     { id: "9", name: "Winter Collection", slug: "winter-collection", image: "/assets/cat-lawn-summer.jpg" },
   ];
