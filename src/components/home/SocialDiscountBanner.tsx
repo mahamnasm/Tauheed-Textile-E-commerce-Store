@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useEffect } from "react";
 import {
   Sparkles,
   CheckCircle2,
@@ -11,8 +10,6 @@ import {
   Flame,
   ArrowRight,
   X,
-  ChevronDown,
-  Gift,
 } from "lucide-react";
 import {
   InstagramBrandIcon,
@@ -22,37 +19,24 @@ import {
   WhatsAppBrandIcon,
 } from "@/components/common/SocialBrandIcons";
 
-export default function SocialDiscountBanner() {
-  const [isClosed, setIsClosed] = useState(false);
+interface SocialDiscountModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
+export default function SocialDiscountBanner({ isOpen, onClose }: SocialDiscountModalProps) {
+  // Close on Escape key
   useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem("tauheed_social_discount_closed");
-      if (saved === "true") {
-        setIsClosed(true);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
       }
-    } catch {
-      // ignore in environments without sessionStorage
-    }
-  }, []);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
-  const handleClose = () => {
-    setIsClosed(true);
-    try {
-      sessionStorage.setItem("tauheed_social_discount_closed", "true");
-    } catch {
-      // ignore
-    }
-  };
-
-  const handleOpen = () => {
-    setIsClosed(false);
-    try {
-      sessionStorage.removeItem("tauheed_social_discount_closed");
-    } catch {
-      // ignore
-    }
-  };
+  if (!isOpen) return null;
 
   const whatsappClaimUrl =
     "https://wa.me/923400262732?text=" +
@@ -60,51 +44,22 @@ export default function SocialDiscountBanner() {
       "Assalam-o-Alaikum Tauheed Textile! 🎉 I have followed on Instagram, Facebook, TikTok, subscribed on YouTube and left a Google review. Here is my screenshot to unlock my Flat 5% OFF discount code!"
     );
 
-  // If closed by the customer so they can move forward, render the sleek compact popup bar
-  if (isClosed) {
-    return (
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 transition-all duration-300">
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#1F1D1B] via-[#2A241E] to-[#141312] border border-[#C4A882]/40 text-white px-4 py-3 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#E5A93C]/20 border border-[#E5A93C]/40 flex items-center justify-center shrink-0">
-              <Gift className="w-4 h-4 text-[#E5A93C]" />
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm font-semibold text-[#E8DEC8]">
-                Get Flat <span className="text-[#E5A93C] font-bold">5% OFF</span> – It’s Super Easy! 🎉
-              </p>
-              <p className="text-[11px] text-[#A89F95] hidden sm:block">
-                Follow our 4 social steps, send screenshot on WhatsApp & claim instant discount.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handleOpen}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-[#B28A3E] to-[#E5A93C] hover:from-[#C4A882] hover:to-[#F3BA54] text-[#171717] font-extrabold text-xs shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <span>View 5% OFF Offer</span>
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // Full Signature Old Design with Easy Close Button
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 transition-all duration-300">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1F1D1B] via-[#171717] to-[#0D0D0D] border-2 border-[#C4A882]/40 text-white p-6 sm:p-10 shadow-2xl">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-[#1F1D1B] via-[#171717] to-[#0D0D0D] border-2 border-[#C4A882]/50 text-white p-6 sm:p-10 shadow-2xl animate-zoomIn my-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Easy Close Button at Top-Right */}
         <button
           type="button"
-          onClick={handleClose}
-          className="absolute top-3.5 sm:top-5 right-3.5 sm:right-5 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/80 hover:text-white border border-white/20 transition-all duration-200 shadow-md cursor-pointer group"
-          aria-label="Close discount offer and move forward"
-          title="Close and move forward"
+          onClick={onClose}
+          className="absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/80 hover:text-white border border-white/20 transition-all duration-200 shadow-md cursor-pointer group"
+          aria-label="Close discount popup"
+          title="Close window"
         >
           <span className="text-[11px] font-bold tracking-wider uppercase text-[#E5A93C] group-hover:text-white transition-colors">
             Close
@@ -141,7 +96,7 @@ export default function SocialDiscountBanner() {
             </div>
           </div>
 
-          {/* Right Column: CTA WhatsApp Button (Animated Shimmer & Emerald Glow) */}
+          {/* Right Column: CTA WhatsApp Button */}
           <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
             <a
               href={whatsappClaimUrl}
@@ -286,14 +241,14 @@ export default function SocialDiscountBanner() {
           </span>
           <button
             type="button"
-            onClick={handleClose}
+            onClick={onClose}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#E8DEC8] hover:text-white transition-all cursor-pointer font-semibold text-xs active:scale-95"
           >
-            <span>Close & Move Forward</span>
+            <span>Close & Continue Shopping</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

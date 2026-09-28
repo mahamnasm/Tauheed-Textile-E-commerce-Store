@@ -12,7 +12,8 @@ import {
   MapPin, 
   Sparkles, 
   ExternalLink,
-  PhoneCall
+  PhoneCall,
+  Gift
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { SiteLayoutSettings } from "@/lib/settings";
@@ -23,6 +24,7 @@ import {
   YouTubeBrandIcon,
   WhatsAppBrandIcon,
 } from "@/components/common/SocialBrandIcons";
+import SocialDiscountBanner from "@/components/home/SocialDiscountBanner";
 
 interface FloatingActionsProps {
   initialSettings?: SiteLayoutSettings;
@@ -33,10 +35,23 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
   const { cartCount, cartTotal, openCart } = useCart();
   const [mounted, setMounted] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    try {
+      const seen = sessionStorage.getItem("tauheed_discount_popup_seen");
+      if (!seen) {
+        const timer = setTimeout(() => {
+          setShowDiscountModal(true);
+          sessionStorage.setItem("tauheed_discount_popup_seen", "true");
+        }, 3500);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   if (!mounted || pathname?.startsWith("/admin")) return null;
@@ -82,6 +97,26 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
         aria-label="Floating Storefront Actions" 
         className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[60] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
       >
+        {/* 0. Flat 5% OFF Viral Community Offer Pill */}
+        <button
+          type="button"
+          onClick={() => setShowDiscountModal(true)}
+          aria-label="Unlock Flat 5% OFF Discount"
+          className="btn-shimmer animate-glow-gold group flex items-center gap-2 bg-[#121110]/85 hover:bg-[#1A1816] backdrop-blur-2xl backdrop-saturate-150 text-white px-3.5 py-2.5 rounded-full border border-[#E5A93C]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
+        >
+          <div className="relative flex items-center justify-center shrink-0">
+            <Gift className="w-4 h-4 text-[#E5A93C] transition-transform group-hover:scale-110" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#E5A93C] animate-ping" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#B28A3E]" />
+          </div>
+          <span className="text-xs font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
+            <span>Flat 5% OFF</span>
+            <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs">
+              CLAIM
+            </span>
+          </span>
+        </button>
+
         {/* 1. VIP WhatsApp Community Glass Pill (Animated Breathing Shimmer) */}
         {showCommunity && (
           <button
@@ -323,6 +358,12 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
           </div>
         </div>
       )}
+
+      {/* 5% OFF Viral Community Popup Window Modal */}
+      <SocialDiscountBanner
+        isOpen={showDiscountModal}
+        onClose={() => setShowDiscountModal(false)}
+      />
     </>
   );
 }
