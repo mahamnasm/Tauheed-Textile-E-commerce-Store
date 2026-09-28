@@ -773,15 +773,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <a
-                    href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2626] text-[#E8E3DC] hover:text-[#C4302B] transition-colors"
-                  >
-                    <span>▶️</span> YouTube
-                  </a>
-                  <a
-                    href={initialSettings?.socialInstagram || "https://instagram.com/tauheedtextile"}
+                    href={initialSettings?.socialInstagram || "https://www.instagram.com/tauheedtextile?igsh=MXhmZXYxdHQ4bmRqMw=="}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2626] text-[#E8E3DC] hover:text-[#E1306C] transition-colors"
@@ -789,7 +781,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                     <span>📸</span> Instagram
                   </a>
                   <a
-                    href={initialSettings?.socialFacebook || "https://facebook.com/tauheedtextile"}
+                    href={initialSettings?.socialFacebook || "https://www.facebook.com/share/1AP8TutLtK/"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2626] text-[#E8E3DC] hover:text-[#1877F2] transition-colors"
@@ -797,12 +789,20 @@ export default function Header({ initialSettings }: HeaderProps) {
                     <span>📘</span> Facebook
                   </a>
                   <a
-                    href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"}
+                    href={initialSettings?.socialTikTok || "https://www.tiktok.com/@tauheedtextile?_t=ZS-8zWsIAB7SWP&_r=1"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2626] text-[#E8E3DC] hover:text-white transition-colors"
                   >
                     <span>🎵</span> TikTok
+                  </a>
+                  <a
+                    href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile?si=-Em9yFuBLQcyJEYF"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2626] text-[#E8E3DC] hover:text-[#C4302B] transition-colors"
+                  >
+                    <span>▶️</span> YouTube
                   </a>
                 </div>
               </div>

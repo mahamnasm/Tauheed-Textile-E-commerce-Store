@@ -84,6 +84,7 @@ export interface SiteLayoutSettings {
   socialFacebook: string;
   socialTikTok: string;
   socialYouTube: string;
+  googleMapsUrl?: string;
 
   // 9. Footer & Copyright
   footerAboutText: string;
@@ -191,18 +192,19 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 7. Contact, Concierge & Physical Studio
   contactWhatsApp: "0340 0262732",
   whatsappMessage: "Assalam-o-Alaikum Tauheed Textile, I would like assistance with my order.",
-  whatsappCommunityLink: "https://chat.whatsapp.com/TauheedVIP",
+  whatsappCommunityLink: "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c",
   showWhatsappCommunity: true,
   contactPhone: "0340 0262732",
   contactEmail: "care@tauheedtextile.com",
-  contactAddress: "Tauheed Textile Flagship Studio, M.M. Alam Road, Gulberg III, Lahore, Pakistan",
+  contactAddress: "Tauheed Textile, Shop #3, Opposite Rabi Arcade, Near Qurtaba Market, Bahadurabad, Karachi",
   operatingHours: "Monday - Saturday: 1:00 PM - 9:00 PM PKT",
 
   // 8. Social Media Channels
-  socialInstagram: "https://instagram.com/tauheedtextile",
-  socialFacebook: "https://facebook.com/tauheedtextile",
-  socialTikTok: "https://tiktok.com/@tauheedtextile",
-  socialYouTube: "https://youtube.com/@tauheedtextile",
+  socialInstagram: "https://www.instagram.com/tauheedtextile?igsh=MXhmZXYxdHQ4bmRqMw==",
+  socialFacebook: "https://www.facebook.com/share/1AP8TutLtK/",
+  socialTikTok: "https://www.tiktok.com/@tauheedtextile?_t=ZS-8zWsIAB7SWP&_r=1",
+  socialYouTube: "https://youtube.com/@tauheedtextile?si=-Em9yFuBLQcyJEYF",
+  googleMapsUrl: "https://maps.app.goo.gl/TnVAWrMxufUUpv3h8",
 
   // 9. Footer & Copyright
   footerAboutText: "Tauheed Textile celebrates the enduring heritage of Pakistani luxury fashion. Crafting breath-taking lawn, royal formal chiffons, bespoke bridal wear, and effortless pret with unrivaled attention to fabric purity and needlework artistry.",

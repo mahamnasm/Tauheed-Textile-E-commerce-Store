@@ -12,6 +12,7 @@ import {
   TikTokBrandIcon,
   WhatsAppBrandIcon,
 } from "@/components/common/SocialBrandIcons";
+import { MapPin } from "lucide-react";
 
 interface FooterProps {
   initialSettings?: SiteLayoutSettings;
@@ -216,10 +217,17 @@ export default function Footer({ initialSettings }: FooterProps) {
                   Email: {initialSettings?.contactEmail || "care@tauheedtextile.com"}
                 </a>
               </li>
-              <li>
-                <span className="text-xs text-[#6B6259] block pt-2">
-                  Custom stitching available via WhatsApp.
-                </span>
+              <li className="pt-2">
+                <span className="text-[#171717] font-semibold block text-xs">Flagship Outlet (Karachi):</span>
+                <a
+                  href="https://maps.app.goo.gl/TnVAWrMxufUUpv3h8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-[#7A6652] hover:text-[#171717] hover:underline flex items-start gap-1 pt-1 leading-snug"
+                >
+                  <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#34A853]" />
+                  <span>Shop #3, Opposite Rabi Arcade, Near Qurtaba Market, Bahadurabad, Karachi</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -229,32 +237,38 @@ export default function Footer({ initialSettings }: FooterProps) {
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#171717] mb-4">Connect With Us</h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <a href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#C4302B] transition-colors flex items-center gap-2.5 group">
-                  <span className="shrink-0 group-hover:scale-110 transition-transform"><YouTubeBrandIcon className="w-5 h-5" /></span>
-                  <span>YouTube Channel</span>
-                </a>
-              </li>
-              <li>
-                <a href={initialSettings?.socialInstagram || "https://instagram.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#E1306C] transition-colors flex items-center gap-2.5 group">
+                <a href={initialSettings?.socialInstagram || "https://www.instagram.com/tauheedtextile?igsh=MXhmZXYxdHQ4bmRqMw=="} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#E1306C] transition-colors flex items-center gap-2.5 group">
                   <span className="shrink-0 group-hover:scale-110 transition-transform"><InstagramBrandIcon className="w-5 h-5" /></span>
                   <span>Instagram</span>
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialFacebook || "https://facebook.com/tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#1877F2] transition-colors flex items-center gap-2.5 group">
+                <a href={initialSettings?.socialFacebook || "https://www.facebook.com/share/1AP8TutLtK/"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#1877F2] transition-colors flex items-center gap-2.5 group">
                   <span className="shrink-0 group-hover:scale-110 transition-transform"><FacebookBrandIcon className="w-5 h-5" /></span>
-                  <span>Facebook</span>
+                  <span>Facebook Profile</span>
                 </a>
               </li>
               <li>
-                <a href={initialSettings?.socialTikTok || "https://tiktok.com/@tauheedtextile"} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#000000] transition-colors flex items-center gap-2.5 group">
+                <a href={initialSettings?.socialTikTok || "https://www.tiktok.com/@tauheedtextile?_t=ZS-8zWsIAB7SWP&_r=1"} target="_blank" rel="noopener noreferrer" className="text-[#2D2620] hover:text-[#000000] transition-colors flex items-center gap-2.5 group">
                   <span className="shrink-0 group-hover:scale-110 transition-transform"><TikTokBrandIcon className="w-5 h-5" /></span>
                   <span>TikTok</span>
                 </a>
               </li>
+              <li>
+                <a href={initialSettings?.socialYouTube || "https://youtube.com/@tauheedtextile?si=-Em9yFuBLQcyJEYF"} target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#C4302B] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><YouTubeBrandIcon className="w-5 h-5" /></span>
+                  <span>YouTube Channel</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://maps.app.goo.gl/TnVAWrMxufUUpv3h8" target="_blank" rel="noopener noreferrer" className="text-[#6B6259] hover:text-[#34A853] transition-colors flex items-center gap-2.5 group">
+                  <span className="shrink-0 group-hover:scale-110 transition-transform"><MapPin className="w-4 h-4 text-[#34A853]" /></span>
+                  <span>Google Maps Reviews</span>
+                </a>
+              </li>
               <li className="pt-2">
                 <a
-                  href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/TauheedVIP"}
+                  href={initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all shadow-xs hover:shadow-md hover:scale-105"

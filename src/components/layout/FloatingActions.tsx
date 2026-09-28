@@ -34,7 +34,7 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
   );
 
   const showCommunity = initialSettings?.showWhatsappCommunity !== false && !!initialSettings?.whatsappCommunityLink;
-  const communityLink = initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/TauheedVIP";
+  const communityLink = initialSettings?.whatsappCommunityLink || "https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S?mode=ems_copy_c";
 
   return (
     <aside 

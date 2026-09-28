@@ -9,6 +9,7 @@ import HeroBannerSlider from "@/components/home/HeroBannerSlider";
 import RunwayReelsSection from "@/components/home/RunwayReelsSection";
 import HomeCategoriesSection from "@/components/home/HomeCategoriesSection";
 import HomeReviewsSlider from "@/components/home/HomeReviewsSlider";
+import SocialDiscountBanner from "@/components/home/SocialDiscountBanner";
 import { FALLBACK_PRODUCTS, FALLBACK_CATEGORIES } from "@/lib/fallbackProducts";
 
 export const revalidate = 60;
@@ -308,7 +309,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. CUSTOMER REVIEWS (SLIDABLE LEFT TO RIGHT) */}
+      {/* 6. VIRAL FLAT 5% OFF SOCIAL PROMO BANNER */}
+      <SocialDiscountBanner />
+
+      {/* 7. CUSTOMER REVIEWS (SLIDABLE LEFT TO RIGHT) */}
       {settings.showReviews && reviews.length > 0 && (
         <HomeReviewsSlider
           reviews={reviews}
