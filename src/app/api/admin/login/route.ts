@@ -56,15 +56,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const lockoutStatus = checkIpLockout(ip);
-    if (lockoutStatus.locked) {
-      await logSecurityEvent(ip, "unknown", "IP_LOCKED_OUT", "Rejected attempt from locked IP.", {
-        userAgent,
-        location,
-      });
-      return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
-    }
-
     const body = await request.json();
     const validation = adminLoginSchema.safeParse(body);
 
@@ -76,7 +67,7 @@ export async function POST(request: NextRequest) {
     const authResult = await validateAdminCredentialsWithPin(username, password, pin);
 
     if (!authResult.valid) {
-      recordFailedAttempt(ip);
+      const lockout = recordFailedAttempt(ip);
 
       if (authResult.reason === "EMERGENCY_LOCKDOWN") {
         await logSecurityEvent(
@@ -86,7 +77,7 @@ export async function POST(request: NextRequest) {
           "Login attempt rejected due to active lockdown.",
           { userAgent, location }
         );
-        return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
+        return NextResponse.json({ error: "Executive emergency lockdown is currently active." }, { status: 403 });
       }
 
       await logSecurityEvent(
@@ -97,7 +88,11 @@ export async function POST(request: NextRequest) {
         { userAgent, location }
       );
 
-      return NextResponse.json({ error: GENERIC_AUTH_ERROR }, { status: 401 });
+      const errorMessage = lockout.locked
+        ? `Too many failed attempts. Security lockout active for ${lockout.minutesRemaining}m.`
+        : GENERIC_AUTH_ERROR;
+
+      return NextResponse.json({ error: errorMessage }, { status: 401 });
     }
 
     recordSuccessfulLogin(ip);

@@ -54,3 +54,6 @@ Thumbs.db
 public/uploads/receipts/*
 public/uploads/tmp/*
 
+
+.vercel
+.env*
