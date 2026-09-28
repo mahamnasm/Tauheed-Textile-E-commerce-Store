@@ -98,11 +98,45 @@ export async function PUT(req: NextRequest) {
     }
 
     if (type === "EMAIL") {
-      const emailConfig = await getBusinessEmailConfig();
+      const { sendAdminOrderEmail } = await import("@/lib/adminOrderEmailService");
+      const target = testEmail || "usama.buisness.usama@gmail.com";
+      const emailRes = await sendAdminOrderEmail({
+        orderNumber: "TT-TEST-2026",
+        customerName: "Ayesha Bilal",
+        guestPhone: "0340 0262732",
+        guestEmail: target,
+        total: 8900,
+        subtotal: 8900,
+        shippingFee: 0,
+        discount: 0,
+        paymentMethod: "BANK_TRANSFER",
+        paymentStatus: "VERIFICATION_PENDING",
+        city: "Lahore",
+        address: "House 14-B, Sector Z, Phase 3, DHA",
+        landmark: "Near Y Block Market",
+        staffNotes: "Please deliver before Friday afternoon",
+        items: [
+          {
+            title: "Royal Chiffon Festive 3-Piece",
+            sku: "TT-CHIF-009",
+            fabric: "Pure Royal Chiffon",
+            variantDetails: "Size: Medium | Color: Ivory Gold | Stitched",
+            quantity: 1,
+            price: 8900,
+            total: 8900,
+          },
+        ],
+        bankTransferDetails: {
+          bankName: "Meezan Bank",
+          transactionRef: "MEEZAN-FT-9912048",
+          proofImage: "https://images.unsplash.com/photo-1556742049-0a67c5574f73?w=500&q=80",
+        },
+      });
+
       return NextResponse.json({
         success: true,
-        message: `Business Email test queued for ${testEmail || emailConfig.senderEmail}. Note: SMTP status is ${emailConfig.enabled ? "ACTIVE" : "PENDING_CREDENTIALS"}.`,
-        emailConfig,
+        message: `Dispatch notification test triggered for ${target} via ${emailRes.method}!`,
+        result: emailRes,
       });
     }
 

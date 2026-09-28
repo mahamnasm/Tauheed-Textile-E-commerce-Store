@@ -71,10 +71,17 @@ export async function POST(req: NextRequest) {
       where: { id: { in: uniqueProductIds } },
       select: {
         id: true,
+        title: true,
+        sku: true,
+        fabric: true,
         salePrice: true,
         basePrice: true,
         costPrice: true,
         inStock: true,
+        images: {
+          select: { url: true },
+          take: 1,
+        },
       },
     });
     const dbProductMap = new Map(dbProducts.map((p) => [p.id, p]));
@@ -186,10 +193,12 @@ export async function POST(req: NextRequest) {
                 ? {
                     bankTransferProof: {
                       create: {
-                        transactionRef: bankTransferDetails.referenceNumber || "PENDING_PROOF",
+                        transactionRef: bankTransferDetails.transactionRef || bankTransferDetails.referenceNumber || "PENDING_PROOF",
                         proofImage: bankTransferDetails.proofImage || "",
                         status: "PENDING",
-                        adminNotes: `Method: ${paymentMethod}`,
+                        adminNotes: bankTransferDetails.bankName
+                          ? `Method: ${paymentMethod} (${bankTransferDetails.bankName})`
+                          : `Method: ${paymentMethod}`,
                       },
                     },
                   }
@@ -212,10 +221,22 @@ export async function POST(req: NextRequest) {
 
     let notificationStatus = null;
     try {
+      const richNotificationItems = orderItemsData.map((oi) => {
+        const dbProd = dbProductMap.get(oi.productId);
+        return {
+          ...oi,
+          title: dbProd?.title || "Luxury Dress",
+          sku: dbProd?.sku || "",
+          fabric: dbProd?.fabric || "",
+          imageUrl: dbProd?.images?.[0]?.url || "",
+        };
+      });
+
       const { triggerOrderConfirmationNotifications } = await import("@/lib/orderNotificationService");
       notificationStatus = await triggerOrderConfirmationNotifications({
         ...order,
-        items: orderItemsData,
+        items: richNotificationItems,
+        bankTransferDetails: bankTransferDetails || null,
       });
     } catch (notifErr) {
       console.error("Automated notification warning:", notifErr);

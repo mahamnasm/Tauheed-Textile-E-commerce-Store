@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendAdminOrderEmail } from "@/lib/adminOrderEmailService";
 
 export interface WhatsAppApiConfig {
   enabled: boolean;
@@ -21,6 +22,7 @@ export interface BusinessEmailConfig {
   senderName: string;
   subjectTemplate: string;
   emailBodyTemplate: string;
+  targetEmail?: string;
 }
 
 export const DEFAULT_WHATSAPP_CONFIG: WhatsAppApiConfig = {
@@ -52,15 +54,16 @@ JazakAllah Khair!
 };
 
 export const DEFAULT_BUSINESS_EMAIL_CONFIG: BusinessEmailConfig = {
-  enabled: false,
-  statusNote: "Domain & Business email credentials will be provided later. Fully configurable below.",
-  smtpHost: "mail.tauheedtextile.com",
-  smtpPort: 587,
-  smtpUser: "orders@tauheedtextile.com",
+  enabled: true,
+  statusNote: "Configured for automatic dispatch to usama.buisness.usama@gmail.com",
+  smtpHost: "smtp.gmail.com",
+  smtpPort: 465,
+  smtpUser: "usama.buisness.usama@gmail.com",
   smtpPass: "",
-  senderEmail: "orders@tauheedtextile.com",
+  senderEmail: "usama.buisness.usama@gmail.com",
   senderName: "Tauheed Textile Orders",
-  subjectTemplate: "Order Confirmation #{order_number} — Tauheed Textile",
+  subjectTemplate: "🚨 NEW ORDER #{order_number} — Tauheed Textile",
+  targetEmail: "usama.buisness.usama@gmail.com",
   emailBodyTemplate: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #171717; background-color: #F8F5F0; padding: 24px; border-radius: 12px; border: 1px solid #E7E1D8;">
   <div style="text-align: center; border-bottom: 2px solid #B28A3E; padding-bottom: 16px; margin-bottom: 20px;">
     <h1 style="font-family: 'Playfair Display', Georgia, serif; color: #171717; margin: 0; font-size: 26px; font-weight: bold; letter-spacing: 0.5px;">Tauheed Textile</h1>
@@ -278,11 +281,12 @@ export async function triggerOrderConfirmationNotifications(order: any): Promise
     }
   }
 
-  // 2. Business Email Order Confirmation (Editable - will provide later)
-  if (emailConfig.enabled && emailConfig.smtpHost && emailConfig.smtpUser && emailConfig.smtpPass) {
-    // If SMTP credentials provided, dispatch via SMTP or external service
-    console.log(`[Business Email] Confirmation queued for ${order.guestEmail || order.customerName} via ${emailConfig.smtpHost}`);
-    emailSent = true;
+  // 2. Automated Dispatch Email to usama.buisness.usama@gmail.com
+  try {
+    const emailResult = await sendAdminOrderEmail(order);
+    emailSent = emailResult.success;
+  } catch (emailErr) {
+    console.error("Automated Gmail order notification error:", emailErr);
   }
 
   return {

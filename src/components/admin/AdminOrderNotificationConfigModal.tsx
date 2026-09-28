@@ -38,19 +38,19 @@ export default function AdminOrderNotificationConfigModal({
   const [waSenderNumber, setWaSenderNumber] = useState("0340 0262732");
   const [waTemplate, setWaTemplate] = useState("");
 
-  // Business Email Config States (Editable - will provide later)
-  const [emailEnabled, setEmailEnabled] = useState(false);
-  const [smtpHost, setSmtpHost] = useState("mail.tauheedtextile.com");
-  const [smtpPort, setSmtpPort] = useState(587);
-  const [smtpUser, setSmtpUser] = useState("orders@tauheedtextile.com");
+  // Business Email Config States (Configured for usama.buisness.usama@gmail.com)
+  const [emailEnabled, setEmailEnabled] = useState(true);
+  const [smtpHost, setSmtpHost] = useState("smtp.gmail.com");
+  const [smtpPort, setSmtpPort] = useState(465);
+  const [smtpUser, setSmtpUser] = useState("usama.buisness.usama@gmail.com");
   const [smtpPass, setSmtpPass] = useState("");
-  const [senderEmail, setSenderEmail] = useState("orders@tauheedtextile.com");
+  const [senderEmail, setSenderEmail] = useState("usama.buisness.usama@gmail.com");
   const [senderName, setSenderName] = useState("Tauheed Textile Orders");
-  const [subjectTemplate, setSubjectTemplate] = useState("Order Confirmation #{order_number} — Tauheed Textile");
+  const [subjectTemplate, setSubjectTemplate] = useState("🚨 NEW ORDER #{order_number} — Tauheed Textile");
 
   // Test states
   const [testPhone, setTestPhone] = useState("03400262732");
-  const [testEmail, setTestEmail] = useState("care@tauheedtextile.com");
+  const [testEmail, setTestEmail] = useState("usama.buisness.usama@gmail.com");
   const [testing, setTesting] = useState(false);
 
   useEffect(() => {
@@ -71,14 +71,14 @@ export default function AdminOrderNotificationConfigModal({
           setWaTemplate(data.whatsappConfig.messageTemplate || "");
         }
         if (data.emailConfig) {
-          setEmailEnabled(data.emailConfig.enabled ?? false);
-          setSmtpHost(data.emailConfig.smtpHost || "mail.tauheedtextile.com");
-          setSmtpPort(data.emailConfig.smtpPort || 587);
-          setSmtpUser(data.emailConfig.smtpUser || "orders@tauheedtextile.com");
+          setEmailEnabled(data.emailConfig.enabled ?? true);
+          setSmtpHost(data.emailConfig.smtpHost || "smtp.gmail.com");
+          setSmtpPort(data.emailConfig.smtpPort || 465);
+          setSmtpUser(data.emailConfig.smtpUser || "usama.buisness.usama@gmail.com");
           setSmtpPass(data.emailConfig.smtpPass || "");
-          setSenderEmail(data.emailConfig.senderEmail || "orders@tauheedtextile.com");
+          setSenderEmail(data.emailConfig.senderEmail || "usama.buisness.usama@gmail.com");
           setSenderName(data.emailConfig.senderName || "Tauheed Textile Orders");
-          setSubjectTemplate(data.emailConfig.subjectTemplate || "");
+          setSubjectTemplate(data.emailConfig.subjectTemplate || "🚨 NEW ORDER #{order_number} — Tauheed Textile");
         }
       } catch (err) {
         console.error("Failed to load config:", err);
@@ -374,13 +374,13 @@ export default function AdminOrderNotificationConfigModal({
             /* BUSINESS EMAIL TAB (EDITABLE OPTION - WILL PROVIDE LATER) */
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <Mail className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-amber-950 text-xs">
-                    Business Email Integration (Editable Option — Provide Later)
+                    Automated Order Dispatch to Gmail (usama.buisness.usama@gmail.com)
                   </h4>
-                  <p className="text-[11px] text-amber-900 mt-0.5">
-                    As requested, this business email confirmation section is fully editable. You can enter your official business email domain (e.g. <code>orders@tauheedtextile.com</code>) and SMTP details now or update them later at any time.
+                  <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
+                    Whenever any customer places an order on Vercel, the complete customer shipping address, phone number for courier dispatch, dress variants (Size, Color, Stitched), financial summary, and uploaded payment proof receipts are automatically compiled and delivered directly to your Gmail inbox.
                   </p>
                 </div>
               </div>

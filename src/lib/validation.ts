@@ -48,8 +48,9 @@ export const createOrderSchema = z.object({
   notes: z.string().max(500).optional().or(z.literal("")),
   bankTransferDetails: z
     .object({
-        proofImage: z.string().max(500).regex(/^(\/uploads\/|https:\/\/)/, "Invalid receipt path").optional(),
+      proofImage: z.string().optional(),
       referenceNumber: z.string().max(100).optional(),
+      transactionRef: z.string().max(100).optional(),
       bankName: z.string().max(100).optional(),
     })
     .optional(),
