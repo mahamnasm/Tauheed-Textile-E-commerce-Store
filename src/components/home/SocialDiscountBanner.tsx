@@ -3,11 +3,8 @@
 import React, { useEffect } from "react";
 import {
   Sparkles,
-  CheckCircle2,
   ExternalLink,
-  MessageCircle,
   MapPin,
-  Flame,
   ArrowRight,
   X,
 } from "lucide-react";
@@ -41,211 +38,138 @@ export default function SocialDiscountBanner({ isOpen, onClose }: SocialDiscount
   const whatsappClaimUrl =
     "https://wa.me/923400262732?text=" +
     encodeURIComponent(
-      "Assalam-o-Alaikum Tauheed Textile! 🎉 I have followed on Instagram, Facebook, TikTok, subscribed on YouTube and left a Google review. Here is my screenshot to unlock my Flat 5% OFF discount code!"
+      "Assalam-o-Alaikum Tauheed Textile! 🎉 I followed your official socials. Here is my screenshot to unlock my Flat 5% OFF discount code!"
     );
+
+  const socialChannels = [
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/tauheedtextile?igsh=MXhmZXYxdHQ4bmRqMw==",
+      icon: InstagramBrandIcon,
+      hoverBg: "hover:bg-[#E1306C]",
+    },
+    {
+      name: "Facebook",
+      href: "https://www.facebook.com/share/1AP8TutLtK/",
+      icon: FacebookBrandIcon,
+      hoverBg: "hover:bg-[#1877F2]",
+    },
+    {
+      name: "TikTok",
+      href: "https://www.tiktok.com/@tauheedtextile?_t=ZS-8zWsIAB7SWP&_r=1",
+      icon: TikTokBrandIcon,
+      hoverBg: "hover:bg-black",
+    },
+    {
+      name: "YouTube",
+      href: "https://youtube.com/@tauheedtextile?si=-Em9yFuBLQcyJEYF",
+      icon: YouTubeBrandIcon,
+      hoverBg: "hover:bg-[#FF0000]",
+    },
+    {
+      name: "Review",
+      href: "https://maps.app.goo.gl/TnVAWrMxufUUpv3h8",
+      icon: MapPin,
+      hoverBg: "hover:bg-[#34A853]",
+    },
+  ];
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-[#1F1D1B] via-[#171717] to-[#0D0D0D] border-2 border-[#C4A882]/50 text-white p-6 sm:p-10 shadow-2xl animate-zoomIn my-auto"
+        className="relative w-full max-w-sm sm:max-w-md rounded-2xl bg-gradient-to-b from-[#1E1B18] via-[#151412] to-[#0D0C0B] border border-[#B28A3E]/40 text-white p-5 sm:p-6 shadow-2xl animate-scaleUp my-auto select-none"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Easy Close Button at Top-Right */}
+        {/* Subtle Ambient Gold Glow */}
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-[#B28A3E]/15 blur-2xl pointer-events-none" />
+
+        {/* Easy Circular Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/80 hover:text-white border border-white/20 transition-all duration-200 shadow-md cursor-pointer group"
+          className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/80 hover:text-white flex items-center justify-center transition-all cursor-pointer"
           aria-label="Close discount popup"
-          title="Close window"
         >
-          <span className="text-[11px] font-bold tracking-wider uppercase text-[#E5A93C] group-hover:text-white transition-colors">
-            Close
-          </span>
-          <X className="w-4 h-4 text-white transition-transform group-hover:rotate-90 duration-200" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Glow ambient background elements */}
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 rounded-full bg-[#B28A3E]/15 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-72 h-72 rounded-full bg-[#9B3D3D]/15 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 pr-12 lg:pr-16">
-          {/* Left Column: Heading & Hook */}
-          <div className="max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#B28A3E]/20 border border-[#B28A3E]/40 text-[#E8DEC8] text-xs font-bold tracking-wider uppercase">
-              <Flame className="w-3.5 h-3.5 text-[#E5A93C] animate-pulse" />
-              <span>Viral Community Offer</span>
-            </div>
-
-            <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
-              Get Flat <span className="text-[#E5A93C] underline decoration-[#B28A3E]/50">5% OFF</span> – It’s Super Easy! 🎉
-            </h2>
-
-            <p className="text-[#C8C2BB] text-sm sm:text-base leading-relaxed">
-              Want an instant discount on your next luxury outfit? 💃✨ Complete 4 simple steps, share your screenshot on WhatsApp, and unlock your exclusive savings!
-            </p>
-
-            {/* Shop Address Badge */}
-            <div className="inline-flex items-center gap-2 text-xs text-[#E8DEC8] bg-white/5 border border-white/10 rounded-xl px-3.5 py-2">
-              <MapPin className="w-4 h-4 text-[#E5A93C] shrink-0" />
-              <span>
-                <strong>Karachi Studio:</strong> Shop G10, New Qurtaba Market, Opposite Qurtaba Masjid, Bahadurabad, Karachi.
-              </span>
-            </div>
+        {/* Header Badge */}
+        <div className="text-center pt-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B28A3E]/20 border border-[#B28A3E]/40 text-[#E5A93C] text-[11px] font-bold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-[#E5A93C]" />
+            <span>VIP Community Offer</span>
           </div>
 
-          {/* Right Column: CTA WhatsApp Button */}
-          <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
-            <a
-              href={whatsappClaimUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-shimmer animate-glow-emerald group inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] font-black text-sm shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 text-center cursor-pointer"
-            >
-              <WhatsAppBrandIcon className="w-5 h-5 shrink-0" />
-              <span>Claim 5% OFF on WhatsApp</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </a>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2.5">
+            Get Flat <span className="text-[#E5A93C]">5% OFF</span>
+          </h2>
 
-            <a
-              href="https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#F0EBE3] text-xs font-bold transition-all hover:scale-105 active:scale-95 text-center cursor-pointer"
-            >
-              <span>Join WhatsApp VIP Community</span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-          </div>
+          <p className="text-[#C8C2BB] text-xs sm:text-[13px] leading-relaxed mt-1.5 px-2">
+            Follow our channels, share a screenshot on WhatsApp, and receive your instant discount voucher!
+          </p>
         </div>
 
-        {/* 4 Interactive Steps Grid */}
-        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/10">
-          {/* Step 1: Follow Socials */}
-          <div className="bg-white/5 backdrop-blur-xs border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black tracking-widest uppercase text-[#E5A93C]">Step 1</span>
-                <CheckCircle2 className="w-4 h-4 text-[#B28A3E]" />
-              </div>
-              <h3 className="font-semibold text-sm text-white mt-1">Follow on Social Media</h3>
-              <p className="text-[11px] text-[#A89F95] mt-1">Follow our official channels for daily reel updates:</p>
-            </div>
-            <div className="flex items-center gap-2 pt-2">
-              <a
-                href="https://www.instagram.com/tauheedtextile?igsh=MXhmZXYxdHQ4bmRqMw=="
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Follow Instagram"
-                className="p-2 rounded-lg bg-white/10 hover:bg-[#E1306C] text-white transition-colors"
-              >
-                <InstagramBrandIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.facebook.com/share/1AP8TutLtK/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Follow Facebook Profile"
-                className="p-2 rounded-lg bg-white/10 hover:bg-[#1877F2] text-white transition-colors"
-              >
-                <FacebookBrandIcon className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.tiktok.com/@tauheedtextile?_t=ZS-8zWsIAB7SWP&_r=1"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Follow TikTok"
-                className="p-2 rounded-lg bg-white/10 hover:bg-black text-white transition-colors"
-              >
-                <TikTokBrandIcon className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-          {/* Step 2: Subscribe YouTube */}
-          <div className="bg-white/5 backdrop-blur-xs border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black tracking-widest uppercase text-[#E5A93C]">Step 2</span>
-                <CheckCircle2 className="w-4 h-4 text-[#B28A3E]" />
-              </div>
-              <h3 className="font-semibold text-sm text-white mt-1">Subscribe on YouTube</h3>
-              <p className="text-[11px] text-[#A89F95] mt-1">Watch 4K runway showcases & fabric close-ups:</p>
-            </div>
-            <div className="pt-2">
-              <a
-                href="https://youtube.com/@tauheedtextile?si=-Em9yFuBLQcyJEYF"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#C4302B] hover:bg-[#A82622] text-white text-xs font-semibold transition-all w-full justify-center"
-              >
-                <YouTubeBrandIcon className="w-4 h-4" />
-                <span>Subscribe Channel</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Step 3: Google Maps & Facebook Review */}
-          <div className="bg-white/5 backdrop-blur-xs border border-white/10 rounded-xl p-4 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black tracking-widest uppercase text-[#E5A93C]">Step 3</span>
-                <CheckCircle2 className="w-4 h-4 text-[#B28A3E]" />
-              </div>
-              <h3 className="font-semibold text-sm text-white mt-1">Leave Us a Review</h3>
-              <p className="text-[11px] text-[#A89F95] mt-1">Share your 5-star love on Google Maps:</p>
-            </div>
-            <div className="pt-2">
-              <a
-                href="https://maps.app.goo.gl/TnVAWrMxufUUpv3h8"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#F0EBE3] border border-white/20 text-xs font-semibold transition-all w-full justify-center"
-              >
-                <MapPin className="w-4 h-4 text-[#34A853]" />
-                <span>Review on Google Maps</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Step 4: WhatsApp Screenshot */}
-          <div className="bg-[#B28A3E]/10 border border-[#B28A3E]/40 rounded-xl p-4 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black tracking-widest uppercase text-[#E5A93C]">Step 4</span>
-                <Sparkles className="w-4 h-4 text-[#E5A93C]" />
-              </div>
-              <h3 className="font-semibold text-sm text-white mt-1">Send Screenshot</h3>
-              <p className="text-[11px] text-[#C8C2BB] mt-1">Share proof to WhatsApp: <strong>0340-0262732</strong></p>
-            </div>
-            <div className="pt-2">
-              <a
-                href={whatsappClaimUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#128C7E] hover:bg-[#0E7064] text-white text-xs font-bold transition-all w-full justify-center"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Send on WhatsApp</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Move Forward / Dismiss Footer Bar */}
-        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 mt-6 border-t border-white/10 text-xs text-[#A89F95]">
-          <span className="text-center sm:text-left">
-            Complete the steps anytime to claim your discount before ordering.
+        {/* 1-Tap Social Icons Strip */}
+        <div className="mt-4 pt-3 border-t border-white/10">
+          <span className="block text-[10px] font-bold uppercase tracking-wider text-[#A89F95] text-center mb-2.5">
+            Step 1: Follow & Subscribe
           </span>
+          <div className="flex items-center justify-center gap-2">
+            {socialChannels.map((ch) => {
+              const Icon = ch.icon;
+              return (
+                <a
+                  key={ch.name}
+                  href={ch.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/10 ${ch.hoverBg} text-white/90 hover:text-white transition-all hover:scale-105 active:scale-95 text-center min-w-[54px]`}
+                  title={`Open ${ch.name}`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="text-[9px] font-semibold">{ch.name}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Primary CTA: Claim on WhatsApp */}
+        <div className="mt-4 space-y-2">
+          <a
+            href={whatsappClaimUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center justify-center gap-2 w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] font-black text-xs sm:text-sm shadow-lg transition-all hover:scale-[1.02] active:scale-95 text-center cursor-pointer"
+          >
+            <WhatsAppBrandIcon className="w-4 h-4 shrink-0" />
+            <span>Claim 5% OFF on WhatsApp</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+          </a>
+
+          {/* Secondary Link: VIP Community */}
+          <a
+            href="https://chat.whatsapp.com/BUymI7Xr1yo4v71rFczs8S"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 w-full py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[#C8C2BB] hover:text-white text-xs font-semibold transition-all text-center cursor-pointer"
+          >
+            <span>Join WhatsApp VIP Community</span>
+            <ExternalLink className="w-3 h-3 opacity-70" />
+          </a>
+        </div>
+
+        {/* Dismiss Link */}
+        <div className="text-center mt-3 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#E8DEC8] hover:text-white transition-all cursor-pointer font-semibold text-xs active:scale-95"
+            className="text-[11px] text-[#8A7E73] hover:text-[#C8C2BB] transition-colors cursor-pointer"
           >
-            <span>Close & Continue Shopping</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            No thanks, continue shopping →
           </button>
         </div>
       </div>
