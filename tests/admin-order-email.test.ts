@@ -135,6 +135,7 @@ describe("Admin Gmail Order Dispatch Service", () => {
           quantity: 1,
           price: 9500,
           total: 9500,
+          imageUrl: "/assets/products/velvet-shawl-suit.jpg",
         },
       ],
       bankTransferDetails: null,
@@ -149,6 +150,52 @@ describe("Admin Gmail Order Dispatch Service", () => {
     expect(customerEmail.html).toContain("Rs. 9,500");
     expect(customerEmail.html).toContain("/order-confirmation/TT-2026-7711");
     expect(customerEmail.html).toContain("0340 0262732");
+
+    // Verify Dress photo is rendered with full absolute URL in customer confirmation
+    expect(customerEmail.html).toContain("Dress");
+    expect(customerEmail.html).toContain('<img src="https://tauheed-textile.vercel.app/assets/products/velvet-shawl-suit.jpg"');
+    expect(customerEmail.html).toContain('alt="Embroidered Velvet Shawl Suit"');
+  });
+
+  it("should convert relative dress image URLs to absolute HTTPS URLs and render fallback when empty", async () => {
+    const { toAbsoluteImageUrl, buildAdminOrderHtmlEmail } = await import("../src/lib/adminOrderEmailService");
+
+    expect(toAbsoluteImageUrl("/assets/products/prod-aira.jpg")).toBe(
+      "https://tauheed-textile.vercel.app/assets/products/prod-aira.jpg"
+    );
+    expect(toAbsoluteImageUrl("https://res.cloudinary.com/demo/image/upload/sample.jpg")).toBe(
+      "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+    );
+    expect(toAbsoluteImageUrl("")).toBe("");
+    expect(toAbsoluteImageUrl(null)).toBe("");
+
+    const payloadWithImg: AdminOrderEmailPayload = {
+      orderNumber: "TT-2026-8800",
+      customerName: "Ayesha Khan",
+      guestPhone: "0300 9876543",
+      address: "Phase 5, DHA",
+      city: "Lahore",
+      paymentMethod: "COD",
+      subtotal: 6500,
+      shippingFee: 0,
+      discount: 0,
+      total: 6500,
+      items: [
+        {
+          title: "Chiffon Festive 3-Piece",
+          price: 6500,
+          quantity: 1,
+          total: 6500,
+          imageUrl: "/assets/products/chiffon-festive.jpg",
+        },
+      ],
+    };
+
+    const adminEmail = buildAdminOrderHtmlEmail(payloadWithImg);
+    expect(adminEmail.html).toContain('<img src="https://tauheed-textile.vercel.app/assets/products/chiffon-festive.jpg"');
+    expect(adminEmail.html).toContain('alt="Chiffon Festive 3-Piece"');
+    expect(adminEmail.html).toContain("Photo");
   });
 });
+
 

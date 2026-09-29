@@ -70,6 +70,45 @@ function cleanPhoneNumber(phone: string): { display: string; intl: string } {
 }
 
 /**
+ * Convert relative image URLs (e.g. /assets/... or /uploads/...) to absolute URLs for email clients
+ */
+export function toAbsoluteImageUrl(url?: string | null): string {
+  if (!url) return "";
+  const trimmed = url.trim();
+
+  // If already absolute
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
+    // If it points to localhost/127.0.0.1, convert to live production URL so email clients can fetch it
+    if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) {
+      const liveBase = (
+        process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+          : "https://tauheed-textile.vercel.app"
+      ).replace(/\/+$/, "");
+      const pathOnly = trimmed.replace(/^https?:\/\/[^\/]+/, "");
+      return `${liveBase}${pathOnly}`;
+    }
+    return trimmed;
+  }
+
+  // For relative paths:
+  // If NEXT_PUBLIC_BASE_URL is localhost or empty, fallback to live production URL so Gmail loads the photos
+  const rawBase = (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "").trim();
+  const isLocal = !rawBase || rawBase.includes("localhost") || rawBase.includes("127.0.0.1");
+
+  const appBaseUrl = isLocal
+    ? (
+        process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+          : "https://tauheed-textile.vercel.app"
+      ).replace(/\/+$/, "")
+    : rawBase.replace(/\/+$/, "");
+
+  const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return `${appBaseUrl}${cleanPath}`;
+}
+
+/**
  * Generate luxury responsive HTML Email for Usama's Gmail
  */
 export function buildAdminOrderHtmlEmail(payload: AdminOrderEmailPayload): {
@@ -116,7 +155,7 @@ export function buildAdminOrderHtmlEmail(payload: AdminOrderEmailPayload): {
 
   const subject = `🚨 NEW ORDER #${orderNumber} — ${formatPkr(total)} [${paymentMethod}] — Dispatch to ${city} (${customerName})`;
 
-  // Render items table rows
+  // Render items table rows with dress photo thumbnail
   const itemRowsHtml = items
     .map((item, idx) => {
       const title = item.title || item.productTitle || `Item #${idx + 1}`;
@@ -127,8 +166,17 @@ export function buildAdminOrderHtmlEmail(payload: AdminOrderEmailPayload): {
           .join(" | ") ||
         "Standard Variant";
 
+      const photoUrl = toAbsoluteImageUrl(item.imageUrl);
+
       return `
       <tr style="border-bottom: 1px solid #E7E1D8;">
+        <td style="padding: 10px 8px; vertical-align: middle; width: 68px; text-align: center;">
+          ${
+            photoUrl
+              ? `<img src="${photoUrl}" alt="${title}" width="60" height="80" style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #E7E1D8; display: block; margin: 0 auto;" />`
+              : `<div style="width: 60px; height: 80px; background: #F8F5F0; border-radius: 6px; border: 1px dashed #D0C8BE; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #7A6652; margin: 0 auto; text-align: center; line-height: 1.2;">👗 No Photo</div>`
+          }
+        </td>
         <td style="padding: 12px 8px; vertical-align: top; font-size: 13px; color: #171717;">
           <strong style="color: #171717; font-size: 14px;">${title}</strong>
           ${item.sku ? `<div style="font-size: 11px; color: #7A6652; margin-top: 2px;">SKU: <strong>${item.sku}</strong></div>` : ""}
@@ -310,6 +358,7 @@ export function buildAdminOrderHtmlEmail(payload: AdminOrderEmailPayload): {
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #E7E1D8; border-radius: 8px; overflow: hidden;">
           <thead>
             <tr style="background-color: #171717; color: #FFFFFF; font-size: 12px; text-transform: uppercase;">
+              <th style="padding: 10px 8px; text-align: center; width: 68px;">Photo</th>
               <th style="padding: 10px 8px; text-align: left;">Product Details & Variations</th>
               <th style="padding: 10px 8px; text-align: center; width: 50px;">Qty</th>
               <th style="padding: 10px 8px; text-align: right; width: 85px;">Price</th>
@@ -481,19 +530,29 @@ export function buildCustomerOrderHtmlEmail(payload: AdminOrderEmailPayload): {
           .join(" | ") ||
         "Standard Edition";
 
+      const photoUrl = toAbsoluteImageUrl(item.imageUrl);
+
       return `
       <tr style="border-bottom: 1px solid #E7E1D8;">
-        <td style="padding: 14px 10px; vertical-align: top; font-size: 13px; color: #171717;">
+        <td style="padding: 10px 8px; vertical-align: middle; width: 68px; text-align: center;">
+          ${
+            photoUrl
+              ? `<img src="${photoUrl}" alt="${title}" width="60" height="80" style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #E7E1D8; display: block; margin: 0 auto;" />`
+              : `<div style="width: 60px; height: 80px; background: #F8F5F0; border-radius: 6px; border: 1px dashed #D0C8BE; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #7A6652; margin: 0 auto; text-align: center; line-height: 1.2;">👗 No Photo</div>`
+          }
+        </td>
+        <td style="padding: 12px 10px; vertical-align: top; font-size: 13px; color: #171717;">
           <strong style="color: #171717; font-size: 14px; font-family: 'Georgia', serif;">${title}</strong>
+          ${item.sku ? `<div style="font-size: 11px; color: #7A6652; margin-top: 2px;">SKU: <strong>${item.sku}</strong></div>` : ""}
           <div style="font-size: 12px; color: #7A6652; margin-top: 3px;">
             ${variants}
           </div>
           ${item.fabric ? `<div style="font-size: 11px; color: #8A7E73; margin-top: 2px;">Fabric: ${item.fabric}</div>` : ""}
         </td>
-        <td style="padding: 14px 10px; vertical-align: top; text-align: center; font-size: 13px; font-weight: bold; color: #171717;">
+        <td style="padding: 12px 8px; vertical-align: top; text-align: center; font-size: 13px; font-weight: bold; color: #171717;">
           x${item.quantity}
         </td>
-        <td style="padding: 14px 10px; vertical-align: top; text-align: right; font-size: 13px; font-weight: bold; color: #171717; white-space: nowrap;">
+        <td style="padding: 12px 10px; vertical-align: top; text-align: right; font-size: 13px; font-weight: bold; color: #171717; white-space: nowrap;">
           ${formatPkr(item.total || item.price * item.quantity)}
         </td>
       </tr>
@@ -543,9 +602,10 @@ export function buildCustomerOrderHtmlEmail(payload: AdminOrderEmailPayload): {
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #E7E1D8; border-radius: 10px; overflow: hidden;">
           <thead>
             <tr style="background-color: #F8F5F0; color: #171717; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
-              <th style="padding: 10px; text-align: left;">Dress Selection</th>
-              <th style="padding: 10px; text-align: center; width: 50px;">Qty</th>
-              <th style="padding: 10px; text-align: right; width: 90px;">Subtotal</th>
+              <th style="padding: 10px 8px; text-align: center; width: 68px;">Dress</th>
+              <th style="padding: 10px 8px; text-align: left;">Dress Selection</th>
+              <th style="padding: 10px 8px; text-align: center; width: 50px;">Qty</th>
+              <th style="padding: 10px 8px; text-align: right; width: 90px;">Subtotal</th>
             </tr>
           </thead>
           <tbody>
