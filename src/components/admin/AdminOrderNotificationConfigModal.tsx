@@ -40,6 +40,10 @@ export default function AdminOrderNotificationConfigModal({
 
   // Business Email Config States (Configured for usama.buisness.usama@gmail.com)
   const [emailEnabled, setEmailEnabled] = useState(true);
+  const [emailProvider, setEmailProvider] = useState<"RESEND_API" | "GMAIL_SMTP" | "BREVO_API" | "CUSTOM_SMTP">("RESEND_API");
+  const [resendApiKey, setResendApiKey] = useState("");
+  const [brevoApiKey, setBrevoApiKey] = useState("");
+  const [notifyCustomer, setNotifyCustomer] = useState(true);
   const [smtpHost, setSmtpHost] = useState("smtp.gmail.com");
   const [smtpPort, setSmtpPort] = useState(465);
   const [smtpUser, setSmtpUser] = useState("usama.buisness.usama@gmail.com");
@@ -72,6 +76,10 @@ export default function AdminOrderNotificationConfigModal({
         }
         if (data.emailConfig) {
           setEmailEnabled(data.emailConfig.enabled ?? true);
+          setEmailProvider(data.emailConfig.provider || (data.emailConfig.resendApiKey ? "RESEND_API" : "GMAIL_SMTP"));
+          setResendApiKey(data.emailConfig.resendApiKey || "");
+          setBrevoApiKey(data.emailConfig.brevoApiKey || "");
+          setNotifyCustomer(data.emailConfig.notifyCustomer ?? true);
           setSmtpHost(data.emailConfig.smtpHost || "smtp.gmail.com");
           setSmtpPort(data.emailConfig.smtpPort || 465);
           setSmtpUser(data.emailConfig.smtpUser || "usama.buisness.usama@gmail.com");
@@ -105,6 +113,10 @@ export default function AdminOrderNotificationConfigModal({
         },
         emailConfig: {
           enabled: emailEnabled,
+          provider: emailProvider,
+          resendApiKey: resendApiKey.trim(),
+          brevoApiKey: brevoApiKey.trim(),
+          notifyCustomer,
           smtpHost: smtpHost.trim(),
           smtpPort: Number(smtpPort),
           smtpUser: smtpUser.trim(),
@@ -371,103 +383,304 @@ export default function AdminOrderNotificationConfigModal({
               </div>
             </div>
           ) : (
-            /* BUSINESS EMAIL TAB (EDITABLE OPTION - WILL PROVIDE LATER) */
+            /* BUSINESS EMAIL TAB (FREE AUTOMATION APIS) */
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3">
                 <Mail className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-amber-950 text-xs">
-                    Automated Order Dispatch to Gmail (usama.buisness.usama@gmail.com)
+                    Automated Order Email Notification & Customer Receipts
                   </h4>
                   <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
-                    Whenever any customer places an order on Vercel, the complete customer shipping address, phone number for courier dispatch, dress variants (Size, Color, Stitched), financial summary, and uploaded payment proof receipts are automatically compiled and delivered directly to your Gmail inbox.
+                    Instantly emails full order details, customer shipping address, phone number for courier dispatch, dress variants (Size, Color, Stitched), and payment receipts to <strong>usama.buisness.usama@gmail.com</strong>, plus an automated confirmation receipt to the customer!
                   </p>
                 </div>
               </div>
 
-              {/* Email Status Toggle */}
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-sand-50 border border-sand-200">
-                <div>
-                  <span className="font-bold text-brand-950 block">Activate Email Dispatch</span>
-                  <span className="text-[11px] text-brand-500 block">
-                    Turn on once your business email domain and password are ready
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEmailEnabled(!emailEnabled)}
-                  className={`px-4 py-1.5 rounded-full font-bold text-xs transition-colors ${
-                    emailEnabled
-                      ? "bg-emerald-700 text-white"
-                      : "bg-sand-300 text-brand-800"
-                  }`}
-                >
-                  {emailEnabled ? "Active" : "Disabled (Waiting for Credentials)"}
-                </button>
-              </div>
-
-              {/* SMTP Host & Port */}
+              {/* Email Status Toggle & Customer Receipt Toggle */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
-                    SMTP Host / Server
-                  </label>
-                  <input
-                    type="text"
-                    value={smtpHost}
-                    onChange={(e) => setSmtpHost(e.target.value)}
-                    placeholder="mail.tauheedtextile.com"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-brand-950 focus:outline-none focus:border-gold-600"
-                  />
+                <div className="flex items-center justify-between p-3.5 rounded-xl bg-sand-50 border border-sand-200">
+                  <div>
+                    <span className="font-bold text-brand-950 text-xs block">Automated Dispatch Email</span>
+                    <span className="text-[10px] text-brand-500 block">
+                      Send order alerts to your Gmail
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEmailEnabled(!emailEnabled)}
+                    className={`px-3 py-1.5 rounded-full font-bold text-xs transition-colors ${
+                      emailEnabled
+                        ? "bg-emerald-700 text-white"
+                        : "bg-sand-300 text-brand-800"
+                    }`}
+                  >
+                    {emailEnabled ? "Active" : "Disabled"}
+                  </button>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
-                    SMTP Port
-                  </label>
-                  <input
-                    type="number"
-                    value={smtpPort}
-                    onChange={(e) => setSmtpPort(Number(e.target.value) || 587)}
-                    placeholder="587 or 465"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-brand-950 focus:outline-none focus:border-gold-600"
-                  />
+                <div className="flex items-center justify-between p-3.5 rounded-xl bg-sand-50 border border-sand-200">
+                  <div>
+                    <span className="font-bold text-brand-950 text-xs block">Customer Receipt Email</span>
+                    <span className="text-[10px] text-brand-500 block">
+                      Auto-email receipt to buyer
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNotifyCustomer(!notifyCustomer)}
+                    className={`px-3 py-1.5 rounded-full font-bold text-xs transition-colors ${
+                      notifyCustomer
+                        ? "bg-emerald-700 text-white"
+                        : "bg-sand-300 text-brand-800"
+                    }`}
+                  >
+                    {notifyCustomer ? "Enabled" : "Disabled"}
+                  </button>
                 </div>
               </div>
 
-              {/* Username & Password */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
-                    SMTP Username / Email
-                  </label>
-                  <input
-                    type="text"
-                    value={smtpUser}
-                    onChange={(e) => setSmtpUser(e.target.value)}
-                    placeholder="orders@tauheedtextile.com"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-brand-950 focus:outline-none focus:border-gold-600"
-                  />
-                </div>
+              {/* Free Email Provider Selector */}
+              <div>
+                <label className="block font-bold text-xs text-brand-900 mb-2">
+                  Select Free Email Provider / API
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEmailProvider("RESEND_API")}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      emailProvider === "RESEND_API"
+                        ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20"
+                        : "border-sand-300 bg-white hover:border-sand-400"
+                    }`}
+                  >
+                    <span className="block text-xs font-bold text-brand-950">⚡ Resend API</span>
+                    <span className="block text-[10px] text-emerald-800 font-medium mt-0.5">3,000 Free/Mo (Recommended)</span>
+                  </button>
 
-                <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
-                    SMTP Password (Will Provide Later)
-                  </label>
-                  <input
-                    type="password"
-                    value={smtpPass}
-                    onChange={(e) => setSmtpPass(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-brand-950 focus:outline-none focus:border-gold-600"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setEmailProvider("GMAIL_SMTP")}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      emailProvider === "GMAIL_SMTP"
+                        ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20"
+                        : "border-sand-300 bg-white hover:border-sand-400"
+                    }`}
+                  >
+                    <span className="block text-xs font-bold text-brand-950">✉️ Gmail App Pass</span>
+                    <span className="block text-[10px] text-brand-600 font-medium mt-0.5">500 Free/Day</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEmailProvider("BREVO_API")}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      emailProvider === "BREVO_API"
+                        ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20"
+                        : "border-sand-300 bg-white hover:border-sand-400"
+                    }`}
+                  >
+                    <span className="block text-xs font-bold text-brand-950">📨 Brevo API</span>
+                    <span className="block text-[10px] text-brand-600 font-medium mt-0.5">300 Free/Day</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEmailProvider("CUSTOM_SMTP")}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      emailProvider === "CUSTOM_SMTP"
+                        ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20"
+                        : "border-sand-300 bg-white hover:border-sand-400"
+                    }`}
+                  >
+                    <span className="block text-xs font-bold text-brand-950">⚙️ Custom SMTP</span>
+                    <span className="block text-[10px] text-brand-600 font-medium mt-0.5">Custom Server</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Sender Name & Email */}
+              {/* Provider 1: Resend REST API */}
+              {emailProvider === "RESEND_API" && (
+                <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-950">Resend API Configuration (100% Free)</span>
+                    <a
+                      href="https://resend.com/api-keys"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] text-emerald-700 underline font-semibold hover:text-emerald-900"
+                    >
+                      Get Free API Key on resend.com ↗
+                    </a>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-brand-900 mb-1">
+                      Resend API Key (starts with re_...)
+                    </label>
+                    <input
+                      type="password"
+                      value={resendApiKey}
+                      onChange={(e) => setResendApiKey(e.target.value)}
+                      placeholder="re_123456789_abcdef..."
+                      className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950 focus:outline-none focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <p className="text-[10px] text-brand-600 leading-relaxed">
+                    💡 <strong>How to get free key:</strong> Visit <a href="https://resend.com" target="_blank" rel="noreferrer" className="underline font-bold">resend.com</a>, log in with Google, go to API Keys → Create API Key, and paste it here. No credit card required!
+                  </p>
+                </div>
+              )}
+
+              {/* Provider 2: Gmail SMTP App Password */}
+              {emailProvider === "GMAIL_SMTP" && (
+                <div className="p-4 bg-blue-50/50 border border-blue-200 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-950">Gmail Free App Password (500 emails/day)</span>
+                    <a
+                      href="https://myaccount.google.com/apppasswords"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] text-blue-700 underline font-semibold hover:text-blue-900"
+                    >
+                      Generate 16-Letter App Password ↗
+                    </a>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">
+                        Your Gmail Address
+                      </label>
+                      <input
+                        type="email"
+                        value={smtpUser}
+                        onChange={(e) => setSmtpUser(e.target.value)}
+                        placeholder="usama.buisness.usama@gmail.com"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950 focus:outline-none focus:border-blue-600"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">
+                        16-Letter App Password
+                      </label>
+                      <input
+                        type="password"
+                        value={smtpPass}
+                        onChange={(e) => setSmtpPass(e.target.value)}
+                        placeholder="abcd efgh ijkl mnop"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950 focus:outline-none focus:border-blue-600"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-brand-600 leading-relaxed">
+                    💡 <strong>30-Second Guide:</strong> Turn on 2-Step Verification in your Google Account, go to <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="underline font-bold">myaccount.google.com/apppasswords</a>, name it &quot;Tauheed Textile&quot;, and copy the generated 16-letter password here.
+                  </p>
+                </div>
+              )}
+
+              {/* Provider 3: Brevo API */}
+              {emailProvider === "BREVO_API" && (
+                <div className="p-4 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-purple-950">Brevo API Configuration (300 Free/Day)</span>
+                    <a
+                      href="https://app.brevo.com/settings/keys/api"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] text-purple-700 underline font-semibold hover:text-purple-900"
+                    >
+                      Get Brevo Key ↗
+                    </a>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-brand-900 mb-1">
+                      Brevo API Key (starts with xkeysib-...)
+                    </label>
+                    <input
+                      type="password"
+                      value={brevoApiKey}
+                      onChange={(e) => setBrevoApiKey(e.target.value)}
+                      placeholder="xkeysib-12345..."
+                      className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950 focus:outline-none focus:border-purple-600"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Provider 4: Custom SMTP */}
+              {emailProvider === "CUSTOM_SMTP" && (
+                <div className="p-4 bg-sand-50 border border-sand-200 rounded-2xl space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">SMTP Host</label>
+                      <input
+                        type="text"
+                        value={smtpHost}
+                        onChange={(e) => setSmtpHost(e.target.value)}
+                        placeholder="mail.tauheedtextile.com"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">SMTP Port</label>
+                      <input
+                        type="number"
+                        value={smtpPort}
+                        onChange={(e) => setSmtpPort(Number(e.target.value) || 465)}
+                        placeholder="465"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">Username / Email</label>
+                      <input
+                        type="text"
+                        value={smtpUser}
+                        onChange={(e) => setSmtpUser(e.target.value)}
+                        placeholder="orders@tauheedtextile.com"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-brand-900 mb-1">Password</label>
+                      <input
+                        type="password"
+                        value={smtpPass}
+                        onChange={(e) => setSmtpPass(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full px-3 py-2 bg-white border border-sand-300 rounded-xl font-mono text-xs text-brand-950"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Target Notification Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
+                  <label className="block text-[11px] font-semibold text-brand-900 mb-1">
+                    Store Dispatch Receiver Gmail
+                  </label>
+                  <input
+                    type="email"
+                    value={testEmail}
+                    onChange={(e) => setTestEmail(e.target.value)}
+                    placeholder="usama.buisness.usama@gmail.com"
+                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-xs text-brand-950 focus:outline-none focus:border-gold-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-brand-900 mb-1">
                     Sender Display Name
                   </label>
                   <input
@@ -475,47 +688,20 @@ export default function AdminOrderNotificationConfigModal({
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
                     placeholder="Tauheed Textile Orders"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl text-brand-950 focus:outline-none focus:border-gold-600"
+                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl text-xs text-brand-950 focus:outline-none focus:border-gold-600"
                   />
                 </div>
-
-                <div>
-                  <label className="block font-semibold text-brand-900 mb-1">
-                    Sender From Email
-                  </label>
-                  <input
-                    type="email"
-                    value={senderEmail}
-                    onChange={(e) => setSenderEmail(e.target.value)}
-                    placeholder="orders@tauheedtextile.com"
-                    className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl font-mono text-brand-950 focus:outline-none focus:border-gold-600"
-                  />
-                </div>
-              </div>
-
-              {/* Subject Template */}
-              <div>
-                <label className="block font-semibold text-brand-900 mb-1">
-                  Email Subject Line Template
-                </label>
-                <input
-                  type="text"
-                  value={subjectTemplate}
-                  onChange={(e) => setSubjectTemplate(e.target.value)}
-                  placeholder="Order Confirmation #{order_number} — Tauheed Textile"
-                  className="w-full px-3 py-2 bg-sand-50 border border-sand-300 rounded-xl text-brand-950 focus:outline-none focus:border-gold-600"
-                />
               </div>
 
               {/* Test Email Row */}
               <div className="pt-2 border-t border-sand-200 flex items-center justify-between gap-3 bg-sand-50/50 p-3 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-brand-900">Test Recipient:</span>
+                  <span className="font-bold text-xs text-brand-900">Send Test To:</span>
                   <input
                     type="email"
                     value={testEmail}
                     onChange={(e) => setTestEmail(e.target.value)}
-                    placeholder="care@tauheedtextile.com"
+                    placeholder="usama.buisness.usama@gmail.com"
                     className="px-2.5 py-1 bg-white border border-sand-300 rounded-lg font-mono text-xs w-48"
                   />
                 </div>
@@ -523,10 +709,10 @@ export default function AdminOrderNotificationConfigModal({
                   type="button"
                   onClick={handleTestEmail}
                   disabled={testing}
-                  className="px-4 py-2 bg-brand-950 hover:bg-black text-sand-100 font-bold rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 bg-brand-950 hover:bg-black text-sand-100 font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span>{testing ? "Testing..." : "Test Business Email"}</span>
+                  <span>{testing ? "Testing..." : "Send Test Order Email"}</span>
                 </button>
               </div>
             </div>

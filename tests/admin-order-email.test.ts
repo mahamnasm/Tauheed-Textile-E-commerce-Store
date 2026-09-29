@@ -110,4 +110,45 @@ describe("Admin Gmail Order Dispatch Service", () => {
     expect(result.html).toContain("MEEZAN-TRX-8829102");
     expect(result.html).toContain("data:image/jpeg;base64,/9j/4AAQSkZJRg==");
   });
+
+  it("should build customer confirmation receipt email with tracking link and items", async () => {
+    const { buildCustomerOrderHtmlEmail } = await import("../src/lib/adminOrderEmailService");
+
+    const payload: AdminOrderEmailPayload = {
+      orderNumber: "TT-2026-7711",
+      customerName: "Sana Mir",
+      guestPhone: "0333 4567890",
+      guestEmail: "sana.mir@example.com",
+      address: "House 12, Gulberg III",
+      city: "Lahore",
+      paymentMethod: "COD",
+      subtotal: 9500,
+      shippingFee: 0,
+      discount: 0,
+      total: 9500,
+      items: [
+        {
+          title: "Embroidered Velvet Shawl Suit",
+          size: "Medium",
+          color: "Deep Plum",
+          stitchedType: "Stitched",
+          quantity: 1,
+          price: 9500,
+          total: 9500,
+        },
+      ],
+      bankTransferDetails: null,
+    };
+
+    const customerEmail = buildCustomerOrderHtmlEmail(payload);
+
+    expect(customerEmail.subject).toContain("Order Confirmed #TT-2026-7711");
+    expect(customerEmail.html).toContain("Shukriya, Sana Mir!");
+    expect(customerEmail.html).toContain("Embroidered Velvet Shawl Suit");
+    expect(customerEmail.html).toContain("Size: Medium | Color: Deep Plum | Stitched");
+    expect(customerEmail.html).toContain("Rs. 9,500");
+    expect(customerEmail.html).toContain("/order-confirmation/TT-2026-7711");
+    expect(customerEmail.html).toContain("0340 0262732");
+  });
 });
+

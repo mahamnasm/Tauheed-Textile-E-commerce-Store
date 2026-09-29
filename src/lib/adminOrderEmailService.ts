@@ -437,25 +437,238 @@ Customer WhatsApp: https://wa.me/${phoneInfo.intl}
 }
 
 /**
- * Send Automated Order Dispatch Email to usama.buisness.usama@gmail.com
+ * Generate luxury responsive HTML Email for Customer Order Confirmation
  */
-export async function sendAdminOrderEmail(
-  payload: AdminOrderEmailPayload
-): Promise<{ success: boolean; method: string; messageId?: string; error?: string }> {
-  const targetEmail =
-    process.env.ADMIN_DISPATCH_EMAIL ||
-    process.env.ADMIN_NOTIFICATION_EMAIL ||
-    DEFAULT_ADMIN_GMAIL;
+export function buildCustomerOrderHtmlEmail(payload: AdminOrderEmailPayload): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const {
+    orderNumber,
+    customerName,
+    guestPhone,
+    address,
+    landmark,
+    city,
+    province = "Pakistan",
+    postalCode,
+    paymentMethod,
+    subtotal,
+    shippingFee,
+    discount,
+    total,
+    items = [],
+  } = payload;
 
-  const { subject, html, text } = buildAdminOrderHtmlEmail(payload);
+  const phoneInfo = cleanPhoneNumber(guestPhone);
+  const isAdvancePayment = ["BANK_TRANSFER", "JAZZCASH", "EASYPAISA"].includes(paymentMethod.toUpperCase());
+  const appUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tauheed-textile.vercel.app";
+  const trackingUrl = `${appUrl}/order-confirmation/${orderNumber}`;
+  const whatsappUrl = `https://wa.me/923400262732?text=${encodeURIComponent(
+    `Assalam-o-Alaikum Tauheed Textile! 🌸 Mera order #${orderNumber} confirm ho chuka hai.`
+  )}`;
 
-  // 1. Check for configured Gmail / SMTP credentials
-  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
-  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+  const subject = `🌸 Order Confirmed #${orderNumber} — Tauheed Textile Luxury Pret`;
 
-  // Also check database business email config if env var not set
+  const itemRowsHtml = items
+    .map((item, idx) => {
+      const title = item.title || item.productTitle || `Luxury Dress #${idx + 1}`;
+      const variants =
+        item.variantDetails ||
+        [item.size ? `Size: ${item.size}` : "", item.color ? `Color: ${item.color}` : "", item.stitchedType || ""]
+          .filter(Boolean)
+          .join(" | ") ||
+        "Standard Edition";
+
+      return `
+      <tr style="border-bottom: 1px solid #E7E1D8;">
+        <td style="padding: 14px 10px; vertical-align: top; font-size: 13px; color: #171717;">
+          <strong style="color: #171717; font-size: 14px; font-family: 'Georgia', serif;">${title}</strong>
+          <div style="font-size: 12px; color: #7A6652; margin-top: 3px;">
+            ${variants}
+          </div>
+          ${item.fabric ? `<div style="font-size: 11px; color: #8A7E73; margin-top: 2px;">Fabric: ${item.fabric}</div>` : ""}
+        </td>
+        <td style="padding: 14px 10px; vertical-align: top; text-align: center; font-size: 13px; font-weight: bold; color: #171717;">
+          x${item.quantity}
+        </td>
+        <td style="padding: 14px 10px; vertical-align: top; text-align: right; font-size: 13px; font-weight: bold; color: #171717; white-space: nowrap;">
+          ${formatPkr(item.total || item.price * item.quantity)}
+        </td>
+      </tr>
+      `;
+    })
+    .join("");
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Order #${orderNumber} is Confirmed — Tauheed Textile</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F8F5F0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #171717; line-height: 1.6;">
+
+  <div style="max-width: 600px; margin: 30px auto; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.06); border: 1px solid #E7E1D8;">
+
+    <!-- BRAND HEADER -->
+    <div style="background-color: #171717; color: #FFFFFF; padding: 32px 24px; text-align: center; border-bottom: 3px solid #B28A3E;">
+      <h1 style="margin: 0; font-family: 'Georgia', serif; font-size: 26px; letter-spacing: 2px; text-transform: uppercase; color: #F5EFEB;">
+        Tauheed Textile
+      </h1>
+      <p style="margin: 6px 0 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #C4A882;">
+        Haute Couture & Luxury Lawn
+      </p>
+    </div>
+
+    <!-- MAIN BODY -->
+    <div style="padding: 30px 24px;">
+
+      <div style="text-align: center; margin-bottom: 24px;">
+        <span style="display: inline-block; background: #FAF5EB; border: 1px solid #D4AF37; color: #7A5C00; font-size: 11px; font-weight: bold; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+          Order Confirmed
+        </span>
+        <h2 style="font-family: 'Georgia', serif; font-size: 22px; margin: 12px 0 6px 0; color: #171717;">
+          Shukriya, ${customerName}! 🌸
+        </h2>
+        <p style="margin: 0; font-size: 14px; color: #6B6259;">
+          We have received your order <strong>#${orderNumber}</strong>. Our master artisans are preparing your dress with meticulous care for dispatch.
+        </p>
+      </div>
+
+      <!-- ORDER DETAILS TABLE -->
+      <div style="margin-bottom: 24px;">
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #E7E1D8; border-radius: 10px; overflow: hidden;">
+          <thead>
+            <tr style="background-color: #F8F5F0; color: #171717; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+              <th style="padding: 10px; text-align: left;">Dress Selection</th>
+              <th style="padding: 10px; text-align: center; width: 50px;">Qty</th>
+              <th style="padding: 10px; text-align: right; width: 90px;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemRowsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FINANCIAL SUMMARY -->
+      <div style="background-color: #FAF8F5; border: 1px solid #E7E1D8; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+        <table style="width: 100%; font-size: 13px; color: #4A4036;">
+          <tr>
+            <td style="padding: 4px 0;">Items Subtotal:</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: bold; color: #171717;">${formatPkr(subtotal)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0;">Delivery Charges:</td>
+            <td style="padding: 4px 0; text-align: right; color: #171717;">${shippingFee === 0 ? "FREE" : formatPkr(shippingFee)}</td>
+          </tr>
+          ${
+            discount > 0
+              ? `<tr>
+                  <td style="padding: 4px 0; color: #9B3D3D;">Discount:</td>
+                  <td style="padding: 4px 0; text-align: right; font-weight: bold; color: #9B3D3D;">- ${formatPkr(discount)}</td>
+                </tr>`
+              : ""
+          }
+          <tr style="border-top: 2px solid #E7E1D8;">
+            <td style="padding: 10px 0 4px 0; font-size: 16px; font-weight: bold; color: #171717;">Total Amount:</td>
+            <td style="padding: 10px 0 4px 0; text-align: right; font-size: 18px; font-weight: bold; color: #171717;">${formatPkr(total)}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0; font-size: 12px; color: #7A6652;">Payment Method:</td>
+            <td style="padding: 2px 0; text-align: right; font-size: 12px; font-weight: bold; color: #7A6652;">
+              ${isAdvancePayment ? "Advance Paid (Verified)" : `Cash on Delivery (${formatPkr(total)})`}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- DELIVERY ADDRESS -->
+      <div style="background-color: #F8F5F0; border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #4A4036;">
+        <strong style="color: #171717; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; display: block; margin-bottom: 6px;">
+          📍 Shipping Destination:
+        </strong>
+        <strong>${customerName}</strong> • ${guestPhone}<br>
+        ${address}${landmark ? `, Near ${landmark}` : ""}<br>
+        ${city.toUpperCase()}${province ? `, ${province}` : ""}${postalCode ? ` - ${postalCode}` : ""}
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div style="text-align: center; margin-top: 28px; margin-bottom: 10px;">
+        <a href="${trackingUrl}" target="_blank" style="background-color: #171717; color: #FFFFFF; text-decoration: none; padding: 14px 28px; border-radius: 30px; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; display: inline-block; margin-bottom: 12px;">
+          🔍 Track Order Status Live
+        </a>
+        <br>
+        <a href="${whatsappUrl}" target="_blank" style="color: #128C7E; text-decoration: none; font-size: 12px; font-weight: bold;">
+          💬 Need help? Chat with Tauheed Textile Concierge on WhatsApp
+        </a>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div style="background-color: #F8F5F0; padding: 20px; text-align: center; font-size: 11px; color: #8A7E73; border-top: 1px solid #E7E1D8;">
+      Tauheed Textile • Shop G10 New Qurtaba Market, Bahadurabad, Karachi<br>
+      WhatsApp Hotline: 0340 0262732 • 100% Authentic Pakistani Designer Fashion
+    </div>
+
+  </div>
+
+</body>
+</html>
+  `;
+
+  const text = `
+TAUHEED TEXTILE — ORDER CONFIRMED #${orderNumber}
+==================================================
+Dear ${customerName},
+
+Thank you for choosing Tauheed Textile. Your order #${orderNumber} has been received and confirmed.
+
+ORDER SUMMARY:
+${items
+  .map(
+    (i, idx) =>
+      `${idx + 1}. ${i.title || i.productTitle || "Dress"} | Qty: x${i.quantity} | Total: ${formatPkr(i.total || i.price * i.quantity)}\n   Variants: ${i.variantDetails || "Standard"}`
+  )
+  .join("\n")}
+
+Grand Total: ${formatPkr(total)}
+Payment Method: ${paymentMethod}
+Delivery Address: ${address}, ${city}
+
+Track your order live: ${trackingUrl}
+WhatsApp Support: 0340 0262732
+  `.trim();
+
+  return { subject, html, text };
+}
+
+/**
+ * Universal Sender: Sends an email using the best available configured provider
+ * (Resend Free API, Brevo Free API, Gmail SMTP, or Generic SMTP)
+ */
+async function sendRawEmail({
+  to,
+  subject,
+  html,
+  text,
+  fromEmail,
+  fromName,
+  replyTo,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  fromEmail?: string;
+  fromName?: string;
+  replyTo?: string;
+}): Promise<{ success: boolean; method: string; messageId?: string; error?: string }> {
+  // Check environment & database configuration
   let dbEmailConfig: any = null;
   try {
     const record = await prisma.setting.findUnique({
@@ -468,52 +681,117 @@ export async function sendAdminOrderEmail(
     console.warn("Could not query admin_business_email_config:", err);
   }
 
-  const activeUser = gmailUser || dbEmailConfig?.smtpUser;
-  const activePass = gmailPass || dbEmailConfig?.smtpPass;
-  const activeHost = process.env.SMTP_HOST || dbEmailConfig?.smtpHost || "smtp.gmail.com";
-  const activePort = Number(process.env.SMTP_PORT || dbEmailConfig?.smtpPort || 465);
+  const resendApiKey = process.env.RESEND_API_KEY || dbEmailConfig?.resendApiKey;
+  const brevoApiKey = process.env.BREVO_API_KEY || dbEmailConfig?.brevoApiKey;
+  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER || dbEmailConfig?.smtpUser;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS || dbEmailConfig?.smtpPass;
+  const smtpHost = process.env.SMTP_HOST || dbEmailConfig?.smtpHost || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT || dbEmailConfig?.smtpPort || 465);
 
-  // 2. Try Nodemailer / Gmail SMTP if credentials exist
-  if (activeUser && activePass) {
+  const senderName = fromName || dbEmailConfig?.senderName || "Tauheed Textile Orders";
+  const senderEmail = fromEmail || dbEmailConfig?.senderEmail || "orders@tauheedtextile.com";
+
+  // 1. Try Resend REST API (Free 3,000/month, best for Vercel serverless)
+  if (resendApiKey) {
     try {
-      const isGmail = activeHost.includes("gmail") || activeUser.includes("@gmail.com");
+      const fromFormatted =
+        senderEmail && !senderEmail.endsWith("@gmail.com") && !senderEmail.endsWith("@yahoo.com")
+          ? `${senderName} <${senderEmail}>`
+          : process.env.RESEND_FROM || "Tauheed Textile <onboarding@resend.dev>";
+
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${resendApiKey.trim()}`,
+        },
+        body: JSON.stringify({
+          from: fromFormatted,
+          to: [to],
+          subject,
+          html,
+          text,
+          reply_to: replyTo,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data?.id) {
+        return { success: true, method: "RESEND_API", messageId: data.id };
+      } else {
+        console.warn("[Order Email] Resend API error:", data);
+      }
+    } catch (resendErr: any) {
+      console.error("[Order Email] Resend network error:", resendErr?.message || resendErr);
+    }
+  }
+
+  // 2. Try Brevo REST API (Free 300 emails/day, no SMTP port blockage)
+  if (brevoApiKey) {
+    try {
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": brevoApiKey.trim(),
+        },
+        body: JSON.stringify({
+          sender: { name: senderName, email: senderEmail.includes("@") ? senderEmail : "care@tauheedtextile.com" },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html,
+          textContent: text,
+          ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data?.messageId) {
+        return { success: true, method: "BREVO_API", messageId: data.messageId };
+      } else {
+        console.warn("[Order Email] Brevo API error:", data);
+      }
+    } catch (brevoErr: any) {
+      console.error("[Order Email] Brevo network error:", brevoErr?.message || brevoErr);
+    }
+  }
+
+  // 3. Try Nodemailer / Gmail SMTP (Free 500 emails/day with App Password)
+  if (gmailUser && gmailPass) {
+    try {
+      const isGmail = smtpHost.includes("gmail") || gmailUser.includes("@gmail.com");
       const transporter = nodemailer.createTransport(
         isGmail
           ? {
               service: "gmail",
               auth: {
-                user: activeUser,
-                pass: activePass,
+                user: gmailUser.trim(),
+                pass: gmailPass.trim(),
               },
             }
           : {
-              host: activeHost,
-              port: activePort,
-              secure: activePort === 465,
+              host: smtpHost,
+              port: smtpPort,
+              secure: smtpPort === 465,
               auth: {
-                user: activeUser,
-                pass: activePass,
+                user: gmailUser.trim(),
+                pass: gmailPass.trim(),
               },
             }
       );
 
       const info = await transporter.sendMail({
-        from: `"Tauheed Textile Orders" <${activeUser}>`,
-        to: targetEmail,
-        replyTo: payload.guestEmail || undefined,
+        from: `"${senderName}" <${gmailUser.trim()}>`,
+        to,
+        replyTo: replyTo || undefined,
         subject,
         text,
         html,
       });
 
-      console.log(`[Order Email] Dispatched to ${targetEmail} via SMTP (Message ID: ${info.messageId})`);
-
-      // Archive dispatch history in database
-      await recordDispatchHistory(payload.orderNumber, targetEmail, "SMTP_SENT", info.messageId);
-
       return {
         success: true,
-        method: "SMTP",
+        method: isGmail ? "GMAIL_SMTP" : "SMTP",
         messageId: info.messageId,
       };
     } catch (smtpError: any) {
@@ -521,52 +799,91 @@ export async function sendAdminOrderEmail(
     }
   }
 
-  // 3. Try Resend REST API if RESEND_API_KEY is available
-  if (process.env.RESEND_API_KEY) {
-    try {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: process.env.RESEND_FROM || "Tauheed Textile <onboarding@resend.dev>",
-          to: [targetEmail],
-          subject,
-          html,
-          text,
-        }),
-      });
+  return {
+    success: false,
+    method: "NO_PROVIDER_CONFIGURED",
+    error: "No active email API key (Resend/Brevo) or Gmail App Password configured.",
+  };
+}
 
-      if (res.ok) {
-        const data = await res.json();
-        console.log(`[Order Email] Dispatched to ${targetEmail} via Resend (ID: ${data.id})`);
-        await recordDispatchHistory(payload.orderNumber, targetEmail, "RESEND_SENT", data.id);
-        return { success: true, method: "RESEND", messageId: data.id };
+/**
+ * Send Automated Order Dispatch Email to Admin (usama.buisness.usama@gmail.com)
+ * AND automatically send Customer Confirmation Receipt if guest email is present!
+ */
+export async function sendAdminOrderEmail(
+  payload: AdminOrderEmailPayload
+): Promise<{ success: boolean; method: string; messageId?: string; customerEmailSent?: boolean; error?: string }> {
+  const targetAdminEmail =
+    process.env.ADMIN_DISPATCH_EMAIL ||
+    process.env.ADMIN_NOTIFICATION_EMAIL ||
+    DEFAULT_ADMIN_GMAIL;
+
+  const { subject: adminSubject, html: adminHtml, text: adminText } = buildAdminOrderHtmlEmail(payload);
+
+  // 1. Send Dispatch Manifest to Admin
+  const adminResult = await sendRawEmail({
+    to: targetAdminEmail,
+    subject: adminSubject,
+    html: adminHtml,
+    text: adminText,
+    replyTo: payload.guestEmail || undefined,
+  });
+
+  // Archive admin dispatch event in database
+  await recordDispatchHistory(
+    payload.orderNumber,
+    targetAdminEmail,
+    adminResult.success ? `${adminResult.method}_SENT` : "ARCHIVED_READY",
+    adminResult.messageId,
+    { subject: adminSubject, payload }
+  );
+
+  // 2. If Customer entered an email, ALSO send them their Order Confirmation Receipt!
+  let customerEmailSent = false;
+  if (payload.guestEmail && payload.guestEmail.includes("@") && !payload.guestEmail.includes("example.com")) {
+    try {
+      const { subject: custSubject, html: custHtml, text: custText } = buildCustomerOrderHtmlEmail(payload);
+      const custResult = await sendRawEmail({
+        to: payload.guestEmail.trim(),
+        subject: custSubject,
+        html: custHtml,
+        text: custText,
+        replyTo: targetAdminEmail,
+      });
+      customerEmailSent = custResult.success;
+      if (custResult.success) {
+        console.log(`[Order Email] Customer receipt delivered to ${payload.guestEmail} via ${custResult.method}`);
       }
-    } catch (resendErr) {
-      console.error("[Order Email] Resend API error:", resendErr);
+    } catch (custErr) {
+      console.warn("[Order Email] Customer receipt error:", custErr);
     }
   }
 
-  // 4. Secure Database Archive Fallback:
-  // Even if external SMTP is pending or network drops, full email manifest is saved to DB
-  await recordDispatchHistory(
-    payload.orderNumber,
-    targetEmail,
-    "ARCHIVED_DISPATCH_READY",
-    undefined,
-    { subject, text, payload }
-  );
-
-  console.log(`[Order Email] Order #${payload.orderNumber} dispatch recorded for ${targetEmail}.`);
-
   return {
     success: true,
-    method: "ARCHIVED_READY",
-    messageId: `local_${Date.now()}`,
+    method: adminResult.method || "ARCHIVED_READY",
+    messageId: adminResult.messageId || `local_${Date.now()}`,
+    customerEmailSent,
   };
+}
+
+/**
+ * Send direct Customer Order Confirmation Email explicitly
+ */
+export async function sendCustomerOrderEmail(
+  payload: AdminOrderEmailPayload
+): Promise<{ success: boolean; method: string; messageId?: string }> {
+  if (!payload.guestEmail) {
+    return { success: false, method: "NO_CUSTOMER_EMAIL" };
+  }
+  const { subject, html, text } = buildCustomerOrderHtmlEmail(payload);
+  return sendRawEmail({
+    to: payload.guestEmail.trim(),
+    subject,
+    html,
+    text,
+    replyTo: DEFAULT_ADMIN_GMAIL,
+  });
 }
 
 /**
@@ -603,3 +920,4 @@ async function recordDispatchHistory(
     console.error("Failed to archive dispatch history:", err);
   }
 }
+

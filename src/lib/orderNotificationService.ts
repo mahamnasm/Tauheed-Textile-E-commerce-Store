@@ -13,6 +13,9 @@ export interface WhatsAppApiConfig {
 
 export interface BusinessEmailConfig {
   enabled: boolean;
+  provider?: "GMAIL_SMTP" | "RESEND_API" | "BREVO_API" | "CUSTOM_SMTP";
+  resendApiKey?: string;
+  brevoApiKey?: string;
   statusNote: string;
   smtpHost: string;
   smtpPort: number;
@@ -23,6 +26,7 @@ export interface BusinessEmailConfig {
   subjectTemplate: string;
   emailBodyTemplate: string;
   targetEmail?: string;
+  notifyCustomer?: boolean;
 }
 
 export const DEFAULT_WHATSAPP_CONFIG: WhatsAppApiConfig = {
@@ -55,6 +59,10 @@ JazakAllah Khair!
 
 export const DEFAULT_BUSINESS_EMAIL_CONFIG: BusinessEmailConfig = {
   enabled: true,
+  provider: "RESEND_API",
+  resendApiKey: "",
+  brevoApiKey: "",
+  notifyCustomer: true,
   statusNote: "Configured for automatic dispatch to usama.buisness.usama@gmail.com",
   smtpHost: "smtp.gmail.com",
   smtpPort: 465,
