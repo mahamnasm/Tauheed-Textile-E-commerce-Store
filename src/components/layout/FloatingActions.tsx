@@ -36,22 +36,35 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
   const [mounted, setMounted] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [showPromoPills, setShowPromoPills] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    // Auto-dismiss promo pills after 30 seconds on site
+    const promoTimer = setTimeout(() => {
+      setShowPromoPills(false);
+    }, 30000);
+
+    // Initial discount popup check
     try {
       const seen = sessionStorage.getItem("tauheed_discount_popup_seen");
       if (!seen) {
         const timer = setTimeout(() => {
           setShowDiscountModal(true);
           sessionStorage.setItem("tauheed_discount_popup_seen", "true");
-        }, 3500);
-        return () => clearTimeout(timer);
+        }, 4000);
+        return () => {
+          clearTimeout(timer);
+          clearTimeout(promoTimer);
+        };
       }
     } catch {
       // ignore
     }
+
+    return () => clearTimeout(promoTimer);
   }, []);
 
   const isHiddenInCart =
@@ -98,104 +111,97 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
 
   return (
     <>
-      {/* Floating Action Buttons Glassmorphism Dock - Hidden in Cart/Checkout */}
+      {/* Floating Action Buttons Dock - Hidden in Cart/Checkout */}
       {!isHiddenInCart && (
         <aside 
           aria-label="Floating Storefront Actions" 
-          className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[40] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
+          className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[40] flex flex-col items-end gap-2.5 select-none"
         >
-          {/* 0. Flat 5% OFF Viral Community Offer Pill */}
-        <button
-          type="button"
-          onClick={() => setShowDiscountModal(true)}
-          aria-label="Unlock Flat 5% OFF Discount"
-          className="btn-shimmer animate-glow-gold group flex items-center gap-2 bg-[#121110]/85 hover:bg-[#1A1816] backdrop-blur-2xl backdrop-saturate-150 text-white px-3.5 py-2.5 rounded-full border border-[#E5A93C]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
-        >
-          <div className="relative flex items-center justify-center shrink-0">
-            <Gift className="w-4 h-4 text-[#E5A93C] transition-transform group-hover:scale-110" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#E5A93C] animate-ping" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#B28A3E]" />
-          </div>
-          <span className="text-xs font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
-            <span>Flat 5% OFF</span>
-            <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs">
-              CLAIM
-            </span>
-          </span>
-        </button>
+          {/* Promotional Pills (Auto-disappear after 30 seconds on site) */}
+          {showPromoPills && (
+            <div className="flex flex-col items-end gap-2 transition-all duration-700 ease-out animate-fadeIn">
+              {/* Flat 5% OFF Pill */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowDiscountModal(true)}
+                  aria-label="Unlock Flat 5% OFF Discount"
+                  className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+                >
+                  <Gift className="w-3.5 h-3.5 text-[#E5A93C]" />
+                  <span>Flat 5% OFF</span>
+                  <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
+                    CLAIM
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPromoPills(false)}
+                  className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-[#171717] text-[#A89F95] hover:text-white border border-[#B28A3E]/40 flex items-center justify-center text-[9px] transition-colors cursor-pointer"
+                  title="Dismiss promo pill"
+                >
+                  ✕
+                </button>
+              </div>
 
-        {/* 1. VIP WhatsApp Community Glass Pill (Animated Breathing Shimmer) */}
-        {showCommunity && (
-          <button
-            type="button"
-            onClick={() => setShowVipModal(true)}
-            aria-label="Join VIP WhatsApp Community"
-            className="btn-shimmer animate-glow-gold animate-float-gentle group flex items-center gap-2 bg-[#121110]/85 hover:bg-[#1A1816] backdrop-blur-2xl backdrop-saturate-150 text-white px-4 py-2.5 rounded-full border border-[#E5A93C]/70 hover:border-[#E5A93C] text-xs font-bold transition-all duration-300 hover:scale-105 active:scale-90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#C4A882]"
-          >
-            <div className="relative flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 text-[#E5A93C] transition-transform group-hover:scale-110" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#E5A93C] animate-ping" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#B28A3E]" />
+              {/* VIP Community Pill */}
+              {showCommunity && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowVipModal(true)}
+                    aria-label="Join VIP WhatsApp Community"
+                    className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+                  >
+                    <Users className="w-3.5 h-3.5 text-[#E5A93C]" />
+                    <span>VIP Community</span>
+                    <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
+                      JOIN
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPromoPills(false)}
+                    className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-[#171717] text-[#A89F95] hover:text-white border border-[#B28A3E]/40 flex items-center justify-center text-[9px] transition-colors cursor-pointer"
+                    title="Dismiss promo pill"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
             </div>
-            <span className="text-xs font-semibold tracking-wide flex items-center gap-1.5 whitespace-nowrap">
-              <span>VIP Community</span>
-              <span className="text-[9px] bg-gradient-to-r from-[#C4A882] via-[#E5A93C] to-[#C4A882] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-xs animate-pulse">
-                JOIN
-              </span>
-            </span>
-          </button>
-        )}
+          )}
 
-        {/* 2 & 3. High-Contrast Floating Dock Bar */}
-        <div className="flex flex-col items-end gap-2.5 p-2 rounded-full bg-[#141312] border-2 border-[#C4A882]/70 shadow-[0_10px_35px_rgba(0,0,0,0.55)]">
-          {/* Floating Quick Cart Button (High Contrast Solid Gold & Onyx) */}
-          <button
-            type="button"
-            onClick={openCart}
-            aria-label="Open Shopping Cart"
-            className="group relative flex items-center bg-[#24211D] hover:bg-[#332D27] text-white p-3.5 sm:p-4 rounded-full shadow-lg border-2 border-[#E5A93C] transition-all duration-300 hover:scale-110 active:scale-90 focus:outline-none cursor-pointer"
-          >
-            <div className="relative flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#E5A93C] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12" strokeWidth={2.5} />
-              {cartCount > 0 ? (
-                <span className="absolute -top-3 -right-3 min-w-[22px] h-[22px] px-1 rounded-full bg-[#C23535] text-white text-[11px] font-black flex items-center justify-center border-2 border-[#141312] shadow-lg animate-bounce">
+          {/* Core Floating Actions (Cart if items exist + Official WhatsApp) */}
+          <div className="flex flex-col items-end gap-2.5">
+            {/* Quick Cart Floating Button (Only visible when items are added!) */}
+            {cartCount > 0 && (
+              <button
+                type="button"
+                onClick={openCart}
+                aria-label="Open Shopping Bag"
+                className="group relative flex items-center justify-center w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#171717] hover:bg-[#24211D] text-white shadow-xl border border-[#B28A3E]/80 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+              >
+                <ShoppingBag className="w-5 h-5 text-[#E5A93C] transition-transform duration-300 group-hover:scale-110" strokeWidth={2.2} />
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[#9B3D3D] text-white text-[10px] font-black flex items-center justify-center border border-white/60 shadow-md">
                   {cartCount}
                 </span>
-              ) : (
-                <span className="absolute -top-2.5 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#38332E] text-[#E5A93C] text-[10px] font-black flex items-center justify-center border border-[#E5A93C]/50 shadow">
-                  0
-                </span>
-              )}
-            </div>
+              </button>
+            )}
 
-            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-bold tracking-wide flex items-center gap-1.5 text-white">
-              <span>Cart</span>
-              {cartTotal > 0 && (
-                <span className="text-[#E5A93C] font-black">
-                  • Rs. {cartTotal.toLocaleString()}
-                </span>
-              )}
-            </div>
-          </button>
-
-          {/* Direct 1-on-1 WhatsApp Concierge (High Contrast Solid Emerald & Onyx) */}
-          <a
-            href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Contact on WhatsApp"
-            className="animate-glow-emerald group flex items-center bg-[#25D366] hover:bg-[#20BA5A] text-[#0A2612] p-3.5 sm:p-4 rounded-full shadow-lg border-2 border-white/40 transition-all duration-300 hover:scale-110 active:scale-90 cursor-pointer"
-          >
-            <div className="relative flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#0A2612] transition-transform duration-300 group-hover:scale-115 fill-current" />
-            </div>
-
-            <div className="max-w-0 opacity-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2.5 transition-all duration-300 ease-out text-xs font-black tracking-wide pr-0.5">
-              WhatsApp
-            </div>
-          </a>
-        </div>
-      </aside>
+            {/* Official WhatsApp Floating Contact Button */}
+            <a
+              href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Contact on WhatsApp"
+              className="group relative flex items-center justify-center w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20BA5A] shadow-[0_8px_25px_rgba(37,211,102,0.45)] border-2 border-white/80 ring-2 ring-[#B28A3E]/40 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+              title="Chat with Tauheed Textile on WhatsApp"
+            >
+              <WhatsAppBrandIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+            </a>
+          </div>
+        </aside>
       )}
 
       {/* VIP Community Interactive Modal */}
