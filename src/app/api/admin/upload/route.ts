@@ -4,6 +4,7 @@ import path from "path";
 import crypto from "crypto";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import { optimizeImageBuffer } from "@/lib/imageProcessor";
+import { uploadMediaToCdn } from "@/lib/cdnService";
 
 const ALLOWED_ADMIN_EXTENSIONS = new Set([
   ".jpg",
@@ -103,15 +104,24 @@ export async function POST(req: NextRequest) {
       const mime = finalExt === ".webp" ? "image/webp" : finalExt === ".png" ? "image/png" : "image/jpeg";
       const fallbackDataUrl = `data:${mime};base64,${finalBuffer.toString("base64")}`;
 
-      try {
-        const filePath = path.join(uploadDir, filename);
-        fs.writeFileSync(filePath, finalBuffer);
-        savedUrls.push(`/uploads/${filename}`);
-      } catch (fsErr) {
-        // Ephemeral / read-only filesystem on serverless cloud: use persistent data URI
-        console.warn("Local disk write not permitted on serverless container, using persistent data URI fallback:", fsErr);
-        savedUrls.push(fallbackDataUrl);
+      // In development, also save local copy for quick offline preview
+      if (process.env.NODE_ENV !== "production") {
+        try {
+          const filePath = path.join(uploadDir, filename);
+          fs.writeFileSync(filePath, finalBuffer);
+        } catch {
+          // Ignore dev filesystem write errors
+        }
       }
+
+      // Upload to Permanent Cloud CDN (Cloudinary / ImgBB) with persistent database fallback
+      const cdnResult = await uploadMediaToCdn(finalBuffer, {
+        filename,
+        mimeType: mime,
+        folder: "tauheed-textile/products",
+      });
+
+      savedUrls.push(cdnResult.url);
     }
 
     return NextResponse.json({
