@@ -98,7 +98,8 @@ export default function ProductCard({
         maxStock: defaultVariant.stockQuantity,
         weight: detectedWeight,
       },
-      1
+      1,
+      false
     );
 
     setJustAdded(true);

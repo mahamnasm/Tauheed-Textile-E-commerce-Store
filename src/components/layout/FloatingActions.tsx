@@ -121,53 +121,33 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
           {showPromoPills && (
             <div className="flex flex-col items-end gap-2 transition-all duration-700 ease-out animate-fadeIn">
               {/* Flat 5% OFF Pill */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowDiscountModal(true)}
-                  aria-label="Unlock Flat 5% OFF Discount"
-                  className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
-                >
-                  <Gift className="w-3.5 h-3.5 text-[#E5A93C]" />
-                  <span>Flat 5% OFF</span>
-                  <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
-                    CLAIM
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowPromoPills(false)}
-                  className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-[#171717] text-[#A89F95] hover:text-white border border-[#B28A3E]/40 flex items-center justify-center text-[9px] transition-colors cursor-pointer"
-                  title="Dismiss promo pill"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowDiscountModal(true)}
+                aria-label="Unlock Flat 5% OFF Discount"
+                className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+              >
+                <Gift className="w-3.5 h-3.5 text-[#E5A93C]" />
+                <span>Flat 5% OFF</span>
+                <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
+                  CLAIM
+                </span>
+              </button>
 
               {/* VIP Community Pill */}
               {showCommunity && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowVipModal(true)}
-                    aria-label="Join VIP WhatsApp Community"
-                    className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
-                  >
-                    <Users className="w-3.5 h-3.5 text-[#E5A93C]" />
-                    <span>VIP Community</span>
-                    <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
-                      JOIN
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowPromoPills(false)}
-                    className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-[#171717] text-[#A89F95] hover:text-white border border-[#B28A3E]/40 flex items-center justify-center text-[9px] transition-colors cursor-pointer"
-                    title="Dismiss promo pill"
-                  >
-                    ✕
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowVipModal(true)}
+                  aria-label="Join VIP WhatsApp Community"
+                  className="group flex items-center gap-2 bg-[#171717]/95 hover:bg-[#221F1C] text-white px-3.5 py-2 rounded-full border border-[#B28A3E]/60 hover:border-[#E5A93C] text-xs font-semibold shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+                >
+                  <Users className="w-3.5 h-3.5 text-[#E5A93C]" />
+                  <span>VIP Community</span>
+                  <span className="text-[9px] bg-gradient-to-r from-[#B28A3E] via-[#E5A93C] to-[#B28A3E] text-[#171717] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">
+                    JOIN
+                  </span>
+                </button>
               )}
             </div>
           )}
@@ -180,25 +160,25 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
                 type="button"
                 onClick={openCart}
                 aria-label="Open Shopping Bag"
-                className="group relative flex items-center justify-center w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#171717] hover:bg-[#24211D] text-white shadow-xl border border-[#B28A3E]/80 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+                className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#171717] hover:bg-[#24211D] text-white shadow-xl border border-[#B28A3E]/80 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
               >
-                <ShoppingBag className="w-5 h-5 text-[#E5A93C] transition-transform duration-300 group-hover:scale-110" strokeWidth={2.2} />
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-[#E5A93C] transition-transform duration-300 group-hover:scale-110" strokeWidth={2.2} />
                 <span className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[#9B3D3D] text-white text-[10px] font-black flex items-center justify-center border border-white/60 shadow-md">
                   {cartCount}
                 </span>
               </button>
             )}
 
-            {/* Official WhatsApp Floating Contact Button */}
+            {/* Official WhatsApp Floating Contact Button — Large, mobile-prominent and easy to tap */}
             <a
               href={`https://wa.me/${formattedPhone}?text=${defaultDirectMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Contact on WhatsApp"
-              className="group relative flex items-center justify-center w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20BA5A] shadow-[0_8px_25px_rgba(37,211,102,0.45)] border-2 border-white/80 ring-2 ring-[#B28A3E]/40 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+              className="group relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#25D366] hover:bg-[#20BA5A] shadow-[0_10px_28px_rgba(37,211,102,0.5)] border-2 border-white ring-2 ring-[#B28A3E]/40 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
               title="Chat with Tauheed Textile on WhatsApp"
             >
-              <WhatsAppBrandIcon className="w-7 h-7 sm:w-8 sm:h-8" />
+              <WhatsAppBrandIcon className="w-8 h-8 sm:w-9 sm:h-9" />
             </a>
           </div>
         </aside>

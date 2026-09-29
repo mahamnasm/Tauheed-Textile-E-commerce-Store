@@ -26,7 +26,7 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
-  addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
+  addToCart: (item: Omit<CartItem, "quantity">, quantity?: number, openDrawer?: boolean) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
   removeFromCart: (variantId: string) => void;
   clearCart: () => void;
@@ -82,7 +82,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 
-  const addToCart = (item: Omit<CartItem, "quantity">, quantity = 1) => {
+  const addToCart = (item: Omit<CartItem, "quantity">, quantity = 1, openDrawer = false) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.variantId === item.variantId);
       if (existing) {
@@ -91,7 +91,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prev, { ...item, quantity: Math.min(quantity, item.maxStock) }];
     });
-    setIsCartOpen(true);
+    if (openDrawer) {
+      setIsCartOpen(true);
+    }
   };
 
   const updateQuantity = (variantId: string, quantity: number) => {
