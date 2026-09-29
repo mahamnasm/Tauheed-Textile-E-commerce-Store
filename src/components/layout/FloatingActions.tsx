@@ -32,7 +32,7 @@ interface FloatingActionsProps {
 
 export default function FloatingActions({ initialSettings }: FloatingActionsProps) {
   const pathname = usePathname();
-  const { cartCount, cartTotal, openCart } = useCart();
+  const { cartCount, cartTotal, openCart, isCartOpen } = useCart();
   const [mounted, setMounted] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
@@ -53,6 +53,12 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
       // ignore
     }
   }, []);
+
+  const isHiddenInCart =
+    isCartOpen ||
+    pathname === "/cart" ||
+    pathname === "/checkout" ||
+    pathname?.startsWith("/order-confirmation");
 
   if (!mounted || pathname?.startsWith("/admin")) return null;
 
@@ -92,12 +98,13 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
 
   return (
     <>
-      {/* Floating Action Buttons Glassmorphism Dock */}
-      <aside 
-        aria-label="Floating Storefront Actions" 
-        className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[60] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
-      >
-        {/* 0. Flat 5% OFF Viral Community Offer Pill */}
+      {/* Floating Action Buttons Glassmorphism Dock - Hidden in Cart/Checkout */}
+      {!isHiddenInCart && (
+        <aside 
+          aria-label="Floating Storefront Actions" 
+          className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-[40] flex flex-col items-end gap-2 sm:gap-2.5 select-none"
+        >
+          {/* 0. Flat 5% OFF Viral Community Offer Pill */}
         <button
           type="button"
           onClick={() => setShowDiscountModal(true)}
@@ -189,6 +196,7 @@ export default function FloatingActions({ initialSettings }: FloatingActionsProp
           </a>
         </div>
       </aside>
+      )}
 
       {/* VIP Community Interactive Modal */}
       {showVipModal && (

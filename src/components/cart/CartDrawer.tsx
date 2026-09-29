@@ -24,7 +24,7 @@ export default function CartDrawer() {
   const diffToFree = FREE_SHIPPING_THRESHOLD - cartSubtotal;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-[80] overflow-hidden">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" 
