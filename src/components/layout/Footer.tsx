@@ -69,8 +69,8 @@ export default function Footer({ initialSettings }: FooterProps) {
         <div className="mb-10 flex flex-col items-start">
           <Link 
             href="/" 
-            className="inline-flex items-center gap-3.5 select-none group"
-            title="Tauheed Textile"
+            className="inline-flex items-center gap-3.5 select-none group cursor-pointer"
+            title="Tauheed Textile - Return to Homepage"
           >
             <div className="relative h-12 w-9 sm:h-14 sm:w-10.5 shrink-0 transition-transform duration-300 group-hover:scale-105 drop-shadow-xs">
               <Image

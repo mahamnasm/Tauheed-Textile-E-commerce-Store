@@ -68,10 +68,10 @@ export default function NotFound() {
               Chiffon &amp; Formals
             </Link>
             <Link
-              href="/shop?category=pret-ready-to-wear"
+              href="/shop?category=lawn-formals"
               className="px-3.5 py-1.5 rounded-full bg-white border border-[#E7E1D8] text-[#171717] hover:border-[#B28A3E] transition-colors"
             >
-              Ready to Wear Pret
+              Lawn Formals
             </Link>
             <Link
               href="/shop?category=sale"

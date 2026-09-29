@@ -354,12 +354,12 @@ export default function Header({ initialSettings }: HeaderProps) {
               <div className="flex items-center justify-center flex-1 min-w-0 px-1 sm:px-2 lg:flex-none">
                 <Link
                   href="/"
-                  onDoubleClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = "/admin";
+                  onClick={() => {
+                    if (searchOpen) setSearchOpen(false);
+                    if (mobileMenuOpen) setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-2.5 sm:gap-3.5 group py-1 select-none max-w-full"
-                  title="Tauheed Textile (Double-click for Staff Portal)"
+                  className="flex items-center gap-2.5 sm:gap-3.5 group py-1 select-none max-w-full cursor-pointer"
+                  title="Tauheed Textile - Return to Homepage"
                 >
                   <div className="relative h-9 w-7 min-[380px]:h-10 min-[380px]:w-8 sm:h-13 sm:w-10 lg:h-14 lg:w-11 transition-transform duration-300 group-hover:scale-105 shrink-0 drop-shadow-sm">
                     <Image
@@ -411,7 +411,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </Link>
 
                 <Link
-                  href="/shop?category=pret-ready-to-wear"
+                  href="/shop?stitched=stitched"
                   className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
                   <span>Ready to Wear</span>
@@ -419,7 +419,7 @@ export default function Header({ initialSettings }: HeaderProps) {
                 </Link>
 
                 <Link
-                  href="/shop?category=unstitched"
+                  href="/shop?stitched=unstitched"
                   className="relative group py-1 text-[11px] xl:text-xs uppercase tracking-[0.18em] font-medium text-[#E5E0D8] hover:text-[#C5A059] transition-colors duration-300"
                 >
                   <span>Unstitched</span>
@@ -524,7 +524,8 @@ export default function Header({ initialSettings }: HeaderProps) {
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 select-none"
+                className="flex items-center gap-2.5 select-none cursor-pointer"
+                title="Tauheed Textile - Return to Homepage"
               >
                 <div className="relative h-9 w-7 shrink-0">
                   <Image

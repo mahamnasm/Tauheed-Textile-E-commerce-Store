@@ -15,18 +15,88 @@ interface ShopPageProps {
     minPrice?: string;
     maxPrice?: string;
     stitched?: string;
+    isNewArrival?: string;
+    isBestSeller?: string;
+    isSale?: string;
+    isFeatured?: string;
+    pieces?: string;
   };
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const { category, subcategory, search, sort, minPrice, maxPrice, stitched } = searchParams;
+  const {
+    category,
+    subcategory,
+    search,
+    sort,
+    minPrice,
+    maxPrice,
+    stitched,
+    isNewArrival,
+    isBestSeller,
+    isSale,
+    isFeatured,
+    pieces,
+  } = searchParams;
 
   const whereClause: any = {
     inStock: true,
   };
 
+  if (isNewArrival === "true") {
+    whereClause.isNewArrival = true;
+  }
+
+  if (isBestSeller === "true") {
+    whereClause.isBestSeller = true;
+  }
+
+  if (isSale === "true") {
+    whereClause.isSale = true;
+  }
+
+  if (isFeatured === "true") {
+    whereClause.isFeatured = true;
+  }
+
+  if (pieces) {
+    const pc = parseInt(pieces, 10);
+    if (!isNaN(pc) && pc > 0) {
+      whereClause.pieceCount = pc;
+    }
+  }
+
+  if (stitched) {
+    const isStitched = stitched.toLowerCase().includes("stitch") && !stitched.toLowerCase().includes("un");
+    whereClause.variants = {
+      some: {
+        stitchedType: isStitched
+          ? { in: ["Stitched", "Standard Edition", "Custom Made"] }
+          : { in: ["Unstitched"] },
+      },
+    };
+  }
+
   if (category) {
-    whereClause.category = { slug: category };
+    if (category === "pret-ready-to-wear" || category === "ready-to-wear") {
+      whereClause.variants = {
+        some: {
+          stitchedType: { in: ["Stitched", "Standard Edition", "Custom Made"] },
+        },
+      };
+    } else if (category === "unstitched") {
+      whereClause.variants = {
+        some: {
+          stitchedType: "Unstitched",
+        },
+      };
+    } else if (category === "wedding-luxury-pret") {
+      whereClause.category = {
+        slug: { in: ["net-formals", "organza-formals", "bridal-maxies", "chiffon-formal"] },
+      };
+    } else {
+      whereClause.category = { slug: category };
+    }
   }
 
   if (subcategory) {
@@ -97,8 +167,23 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   if (!products || products.length === 0) {
     let filtered = [...FALLBACK_PRODUCTS];
+    if (isNewArrival === "true") {
+      filtered = filtered.filter((p) => p.isNewArrival);
+    }
+    if (isBestSeller === "true") {
+      filtered = filtered.filter((p) => p.isBestSeller);
+    }
+    if (isSale === "true") {
+      filtered = filtered.filter((p) => p.isSale);
+    }
     if (category) {
-      filtered = filtered.filter(p => p.category?.slug === category || (category === "sale" && p.isSale));
+      if (category === "pret-ready-to-wear" || category === "ready-to-wear") {
+        filtered = filtered.filter((p) => p.variants?.some((v: any) => v.stitchedType === "Stitched"));
+      } else if (category === "unstitched") {
+        filtered = filtered.filter((p) => p.variants?.some((v: any) => v.stitchedType === "Unstitched") || p.fabric?.toLowerCase().includes("unstitched"));
+      } else {
+        filtered = filtered.filter((p) => p.category?.slug === category || (category === "sale" && p.isSale));
+      }
     }
     if (subcategory) {
       const subClean = subcategory.toLowerCase().replace(/-/g, " ");
