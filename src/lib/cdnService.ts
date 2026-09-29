@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { v2 as cloudinary } from "cloudinary";
 import { prisma } from "@/lib/prisma";
 
 export interface CdnConfig {
@@ -11,10 +12,10 @@ export interface CdnConfig {
 }
 
 export const DEFAULT_CDN_CONFIG: CdnConfig = {
-  provider: "AUTO",
-  cloudinaryCloudName: "",
-  cloudinaryApiKey: "",
-  cloudinaryApiSecret: "",
+  provider: "CLOUDINARY",
+  cloudinaryCloudName: "nidk4xo1",
+  cloudinaryApiKey: "718146665431332",
+  cloudinaryApiSecret: "yNIuChoRxyQM5EogD8K75VEhNn4",
   cloudinaryUploadPreset: "",
   imgbbApiKey: "",
 };
@@ -92,53 +93,38 @@ async function uploadToCloudinary(
   config: CdnConfig,
   options: { filename: string; mimeType: string; folder?: string }
 ): Promise<string> {
-  const cloudName = config.cloudinaryCloudName.trim();
-  const apiKey = config.cloudinaryApiKey.trim();
-  const apiSecret = config.cloudinaryApiSecret.trim();
-  const preset = config.cloudinaryUploadPreset.trim();
+  const cloudName = config.cloudinaryCloudName.trim() || "nidk4xo1";
+  const apiKey = config.cloudinaryApiKey.trim() || "718146665431332";
+  const apiSecret = config.cloudinaryApiSecret.trim() || "yNIuChoRxyQM5EogD8K75VEhNn4";
   const isVideo = options.mimeType.startsWith("video/") || options.filename.endsWith(".mp4");
-  const resourceType = isVideo ? "video" : "image";
-  const folder = options.folder || "tauheed-textile";
+  const folder = options.folder || "tauheed-textile/products";
 
-  const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
-  const base64Data = `data:${options.mimeType};base64,${buffer.toString("base64")}`;
-
-  const formData = new FormData();
-  formData.append("file", base64Data);
-  formData.append("folder", folder);
-
-  if (apiKey && apiSecret) {
-    // Signed upload: compute SHA-1 signature of parameters
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const paramsToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-    const signature = crypto.createHash("sha1").update(paramsToSign).digest("hex");
-
-    formData.append("api_key", apiKey);
-    formData.append("timestamp", timestamp);
-    formData.append("signature", signature);
-  } else if (preset) {
-    // Unsigned upload via preset
-    formData.append("upload_preset", preset);
-  } else {
-    throw new Error("Cloudinary requires either (API Key + Secret) or an Upload Preset.");
-  }
-
-  const res = await fetch(endpoint, {
-    method: "POST",
-    body: formData,
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+    secure: true,
   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Cloudinary upload failed (${res.status}): ${errorText}`);
-  }
-
-  const data = await res.json();
-  if (!data.secure_url) {
-    throw new Error("Cloudinary response missing secure_url");
-  }
-
-  return data.secure_url as string;
+  return new Promise<string>((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: isVideo ? "video" : "image",
+        transformation: isVideo ? undefined : [{ quality: "auto", fetch_format: "auto" }],
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else if (result?.secure_url) {
+          resolve(result.secure_url);
+        } else {
+          reject(new Error("Cloudinary response missing secure_url"));
+        }
+      }
+    );
+    uploadStream.end(buffer);
+  });
 }
 
 /**
