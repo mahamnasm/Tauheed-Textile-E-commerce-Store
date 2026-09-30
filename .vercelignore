@@ -1,7 +1,5 @@
 tauheed-video/
 brag-output/
-tests/
-scripts/
-agent/
 .agents/
 .claude/
+agent/
