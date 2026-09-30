@@ -117,12 +117,18 @@ export default function CheckoutPage() {
 
   // Payment method calculations:
   // COD: 4% service tax applied
-  // Advance payment: 4% tax waived + Flat 2% Off applied
+  // Advance payment: 4% tax waived + Flat 5% Off applied
   const isAdvancePayment = paymentMethod === "BANK_TRANSFER" || paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA";
   const codTax = paymentMethod === "COD" ? Math.round(cartSubtotal * 0.04) : 0;
   const advanceDiscount = isAdvancePayment ? Math.round(cartSubtotal * 0.02) : 0;
   const totalDiscount = discountAmount + advanceDiscount;
   const grandTotal = Math.max(0, cartSubtotal + shippingFee + codTax - totalDiscount);
+
+  // Total savings compared to COD (4% COD fee waived + advance discount):
+  const potentialCodFee = Math.round(cartSubtotal * 0.04);
+  const potentialAdvanceDisc = Math.round(cartSubtotal * 0.02);
+  const totalPotentialSavings = potentialCodFee + potentialAdvanceDisc;
+  const actualSavedWithAdvance = isAdvancePayment ? (potentialCodFee + advanceDiscount) : 0;
 
   // Delivery timelines
   const getTimeline = () => {
@@ -317,7 +323,7 @@ export default function CheckoutPage() {
           Complete Your Order
         </h1>
         <p className="text-xs text-[#6B6259] mt-1">
-          Fast nationwide dispatch • Free delivery on Rs. 10,000+ • Extra 2% off on Advance Payments (Bank Transfer / EasyPaisa)
+          Fast nationwide dispatch • Free delivery on Rs. 10,000+ • Flat 5% off on Advance Payments
         </p>
       </div>
 
@@ -503,12 +509,12 @@ export default function CheckoutPage() {
                     Pay in cash to courier rider upon delivery. Standard 4% courier handling fee applies to COD parcels.
                   </p>
                   <p className="text-[10px] text-[#1A6B3C] font-semibold mt-1">
-                    💡 Tip: Switch to Bank Transfer or EasyPaisa/JazzCash to WAIVE the 4% fee and save an extra 2% (Save Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()})!
+                    💡 Tip: Switch to Bank Transfer or EasyPaisa/JazzCash to save <strong>Rs. {totalPotentialSavings.toLocaleString()}</strong> (0% COD Fee + Flat 5% OFF)!
                   </p>
                 </div>
               </label>
 
-              {/* Option 2: Bank Transfer (Flat 2% OFF, No 4% Tax) */}
+              {/* Option 2: Bank Transfer (Flat 5% OFF, No 4% Tax) */}
               <label className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
                 paymentMethod === "BANK_TRANSFER"
                   ? "border-[#7A6652] bg-[#F8F5F0] ring-1 ring-[#7A6652]"
@@ -529,15 +535,27 @@ export default function CheckoutPage() {
                       Direct Bank Transfer (Meezan / HBL / Faysal)
                     </span>
                     <span className="text-[11px] font-bold text-[#1A6B3C] bg-[#E8F5E9] border border-[#A5D6A7] px-2 py-0.5 rounded">
-                      SAVE 2% + 0% COD TAX
+                      FLAT 5% OFF + 0% COD TAX
                     </span>
                   </div>
                   <p className="text-[11px] text-[#6B6259] mt-1">
-                    Transfer directly to our official corporate account. 4% COD tax is waived, plus you save <strong className="text-[#1A6B3C]">Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()} (Flat 2% OFF)</strong> instantly!
+                    Transfer directly to our official corporate account. 4% COD tax is waived, plus you get <strong className="text-[#1A6B3C]">Flat 5% OFF</strong> instantly applied!
                   </p>
 
                   {paymentMethod === "BANK_TRANSFER" && (
                     <div id="receipt-upload-section" className="mt-3 p-4 bg-white rounded-xl border border-[#E7E1D8] text-xs space-y-3 shadow-xs">
+                      {actualSavedWithAdvance > 0 && (
+                        <div className="flex items-center justify-between bg-[#E8F5E9] border border-[#A5D6A7] p-2.5 rounded-lg text-[#1A6B3C]">
+                          <div className="flex items-center gap-1.5 font-semibold text-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-[#1A6B3C] shrink-0" />
+                            <span>You saved <strong>Rs. {actualSavedWithAdvance.toLocaleString()}</strong> on this order with Bank Transfer!</span>
+                          </div>
+                          <span className="text-[10px] font-bold bg-white text-[#1A6B3C] px-2 py-0.5 rounded border border-[#A5D6A7] shadow-2xs">
+                            -Rs. {actualSavedWithAdvance.toLocaleString()} SAVED
+                          </span>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-2">
                         <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider">
                           Official Corporate Bank Details
@@ -680,7 +698,7 @@ export default function CheckoutPage() {
                 </div>
               </label>
 
-              {/* Option 3: JazzCash / EasyPaisa (Flat 2% OFF, No 4% Tax) */}
+              {/* Option 3: JazzCash / EasyPaisa (Flat 5% OFF, No 4% Tax) */}
               <label className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
                 paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA"
                   ? "border-[#7A6652] bg-[#F8F5F0] ring-1 ring-[#7A6652]"
@@ -701,15 +719,27 @@ export default function CheckoutPage() {
                       JazzCash / EasyPaisa Mobile Wallet
                     </span>
                     <span className="text-[11px] font-bold text-[#1A6B3C] bg-[#E8F5E9] border border-[#A5D6A7] px-2 py-0.5 rounded">
-                      SAVE 2% + 0% COD TAX
+                      FLAT 5% OFF + 0% COD TAX
                     </span>
                   </div>
                   <p className="text-[11px] text-[#6B6259] mt-1">
-                    Send to our registered mobile account <span className="font-bold text-[#171717]">0340 0262732</span>. 4% COD tax is waived, plus you save <strong className="text-[#1A6B3C]">Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()} (Flat 2% OFF)</strong> instantly!
+                    Send to our registered mobile account <span className="font-bold text-[#171717]">0340 0262732</span>. Enjoy <strong className="text-[#1A6B3C]">Flat 5% discount</strong> and zero COD tax!
                   </p>
 
                   {(paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA") && (
                     <div id="receipt-upload-section" className="mt-3 p-4 bg-white rounded-xl border border-[#E7E1D8] text-xs space-y-3 shadow-xs">
+                      {actualSavedWithAdvance > 0 && (
+                        <div className="flex items-center justify-between bg-[#E8F5E9] border border-[#A5D6A7] p-2.5 rounded-lg text-[#1A6B3C]">
+                          <div className="flex items-center gap-1.5 font-semibold text-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-[#1A6B3C] shrink-0" />
+                            <span>You saved <strong>Rs. {actualSavedWithAdvance.toLocaleString()}</strong> on this order with EasyPaisa / JazzCash!</span>
+                          </div>
+                          <span className="text-[10px] font-bold bg-white text-[#1A6B3C] px-2 py-0.5 rounded border border-[#A5D6A7] shadow-2xs">
+                            -Rs. {actualSavedWithAdvance.toLocaleString()} SAVED
+                          </span>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between border-b border-[#E7E1D8] pb-2">
                         <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider">
                           Official Wallet Account Details
@@ -935,12 +965,23 @@ export default function CheckoutPage() {
               )}
 
               {advanceDiscount > 0 && (
-                <div className="flex justify-between items-center text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2.5 py-1.5 rounded-lg text-xs border border-[#A5D6A7]/60">
-                  <span className="flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-[#1A6B3C]" />
-                    <span>You Saved (2% {paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" : "EasyPaisa / JazzCash"} Discount)</span>
+                <div className="flex justify-between text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2.5 py-1 rounded">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" /> Flat 5% Advance Payment Discount
                   </span>
-                  <span className="font-bold">-Rs. {advanceDiscount.toLocaleString()}</span>
+                  <span>-Rs. {advanceDiscount.toLocaleString()}</span>
+                </div>
+              )}
+
+              {isAdvancePayment && actualSavedWithAdvance > 0 && (
+                <div className="p-2.5 bg-gradient-to-r from-[#E8F5E9] to-[#F1F8E9] border border-[#A5D6A7] rounded-xl text-xs flex items-center justify-between text-[#1A6B3C]">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#1A6B3C] shrink-0" />
+                    <span className="font-semibold">You Saved on Bank / EasyPaisa:</span>
+                  </div>
+                  <span className="font-bold text-xs text-[#1A6B3C] bg-white px-2 py-0.5 rounded border border-[#A5D6A7] shadow-2xs">
+                    Rs. {actualSavedWithAdvance.toLocaleString()}
+                  </span>
                 </div>
               )}
 
@@ -948,12 +989,6 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-[#1A6B3C] font-semibold">
                   <span>Coupon Discount</span>
                   <span>-Rs. {discountAmount.toLocaleString()}</span>
-                </div>
-              )}
-
-              {isAdvancePayment && advanceDiscount > 0 && (
-                <div className="p-2.5 bg-[#E8F5E9] border border-[#A5D6A7] rounded-xl text-center text-xs text-[#1A6B3C] font-bold shadow-xs">
-                  🎉 You saved Rs. {advanceDiscount.toLocaleString()} with 2% {paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" : "EasyPaisa / JazzCash"} Discount!
                 </div>
               )}
 

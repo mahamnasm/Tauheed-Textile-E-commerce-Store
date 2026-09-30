@@ -62,7 +62,7 @@ describe("Phase 1 [UNIT-02]: Pakistani E-Commerce Business Logic Engine", () => 
     };
   }
 
-  it("should apply 2% advance payment discount on Bank Transfer orders", () => {
+  it("should apply advance payment discount on Bank Transfer orders", () => {
     const summary = calculateOrderSummary({
       subtotal: 10000,
       paymentMethod: "BANK_TRANSFER",
