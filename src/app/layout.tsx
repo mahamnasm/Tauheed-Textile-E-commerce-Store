@@ -10,6 +10,7 @@ import AbandonedCartRetention from "@/components/cart/AbandonedCartRetention";
 import AIStylistModal from "@/components/ai/AIStylistModal";
 import CookieConsent from "@/components/common/CookieConsent";
 import { Toaster } from "react-hot-toast";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tauheedtextile.com";
 
@@ -108,6 +109,7 @@ export default async function RootLayout({
           <main className="flex-1 pt-[88px] lg:pt-[108px]">{children}</main>
           <Footer initialSettings={settings} />
           <CookieConsent />
+          <SpeedInsights />
         </CartProvider>
 
         {/* Analytics Hook (Google Analytics 4) */}
