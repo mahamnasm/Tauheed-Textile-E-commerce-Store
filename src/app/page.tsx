@@ -286,7 +286,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             <div className="flex flex-col items-center">
               <Truck className="w-8 h-8 text-[#7A6652] mb-3" />
-              <h4 className="font-semibold text-sm text-[#171717]">COD &amp; 5% Off Advance</h4>
+              <h4 className="font-semibold text-sm text-[#171717]">COD &amp; 2% Off Advance</h4>
               <p className="text-xs text-[#6B6259] mt-1">Bank Transfer &amp; EasyPaisa</p>
             </div>
             <div className="flex flex-col items-center">

@@ -70,7 +70,7 @@ export default function CartPage() {
         </div>
         <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
           <span>🏷️</span>
-          <span><strong>Advance Payment Perk:</strong> Get <strong>Flat 5% OFF</strong> on all orders paid via Bank Transfer, JazzCash, or EasyPaisa at checkout!</span>
+          <span><strong>Advance Payment Perk:</strong> Get <strong>Flat 2% OFF</strong> on all orders paid via Bank Transfer, JazzCash, or EasyPaisa at checkout!</span>
         </div>
       </div>
 

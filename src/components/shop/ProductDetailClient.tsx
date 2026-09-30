@@ -543,7 +543,7 @@ export default function ProductDetailClient({
             </div>
             <p className="text-sm text-[#6B6259]">
               Estimated delivery to <span className="font-bold text-[#171717]">{selectedCity}</span>: {getCityDeliveryEstimate(selectedCity)}. 
-              <strong className="text-[#171717]"> Free nationwide delivery on orders over Rs. 10,000.</strong> Flat 5% off on advance payment orders.
+              <strong className="text-[#171717]"> Free nationwide delivery on orders over Rs. 10,000.</strong> Flat 2% off on advance payment orders.
             </p>
           </div>
 

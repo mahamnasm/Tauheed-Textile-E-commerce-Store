@@ -117,10 +117,10 @@ export default function CheckoutPage() {
 
   // Payment method calculations:
   // COD: 4% service tax applied
-  // Advance payment: 4% tax waived + Flat 5% Off applied
+  // Advance payment: 4% tax waived + Flat 2% Off applied
   const isAdvancePayment = paymentMethod === "BANK_TRANSFER" || paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA";
   const codTax = paymentMethod === "COD" ? Math.round(cartSubtotal * 0.04) : 0;
-  const advanceDiscount = isAdvancePayment ? Math.round(cartSubtotal * 0.05) : 0;
+  const advanceDiscount = isAdvancePayment ? Math.round(cartSubtotal * 0.02) : 0;
   const totalDiscount = discountAmount + advanceDiscount;
   const grandTotal = Math.max(0, cartSubtotal + shippingFee + codTax - totalDiscount);
 
@@ -317,7 +317,7 @@ export default function CheckoutPage() {
           Complete Your Order
         </h1>
         <p className="text-xs text-[#6B6259] mt-1">
-          Fast nationwide dispatch • Free delivery on Rs. 10,000+ • Flat 5% off on Advance Payments
+          Fast nationwide dispatch • Free delivery on Rs. 10,000+ • Extra 2% off on Advance Payments (Bank Transfer / EasyPaisa)
         </p>
       </div>
 
@@ -503,12 +503,12 @@ export default function CheckoutPage() {
                     Pay in cash to courier rider upon delivery. Standard 4% courier handling fee applies to COD parcels.
                   </p>
                   <p className="text-[10px] text-[#1A6B3C] font-semibold mt-1">
-                    💡 Tip: Switch to Bank Transfer or JazzCash/EasyPaisa to WAIVE the 4% fee and get Flat 5% OFF!
+                    💡 Tip: Switch to Bank Transfer or EasyPaisa/JazzCash to WAIVE the 4% fee and save an extra 2% (Save Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()})!
                   </p>
                 </div>
               </label>
 
-              {/* Option 2: Bank Transfer (Flat 5% OFF, No 4% Tax) */}
+              {/* Option 2: Bank Transfer (Flat 2% OFF, No 4% Tax) */}
               <label className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
                 paymentMethod === "BANK_TRANSFER"
                   ? "border-[#7A6652] bg-[#F8F5F0] ring-1 ring-[#7A6652]"
@@ -529,11 +529,11 @@ export default function CheckoutPage() {
                       Direct Bank Transfer (Meezan / HBL / Faysal)
                     </span>
                     <span className="text-[11px] font-bold text-[#1A6B3C] bg-[#E8F5E9] border border-[#A5D6A7] px-2 py-0.5 rounded">
-                      FLAT 5% OFF + 0% COD TAX
+                      SAVE 2% + 0% COD TAX
                     </span>
                   </div>
                   <p className="text-[11px] text-[#6B6259] mt-1">
-                    Transfer directly to our official corporate account. 4% COD tax is waived, plus you get <strong className="text-[#1A6B3C]">Flat 5% OFF</strong> instantly applied!
+                    Transfer directly to our official corporate account. 4% COD tax is waived, plus you save <strong className="text-[#1A6B3C]">Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()} (Flat 2% OFF)</strong> instantly!
                   </p>
 
                   {paymentMethod === "BANK_TRANSFER" && (
@@ -680,7 +680,7 @@ export default function CheckoutPage() {
                 </div>
               </label>
 
-              {/* Option 3: JazzCash / EasyPaisa (Flat 5% OFF, No 4% Tax) */}
+              {/* Option 3: JazzCash / EasyPaisa (Flat 2% OFF, No 4% Tax) */}
               <label className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
                 paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA"
                   ? "border-[#7A6652] bg-[#F8F5F0] ring-1 ring-[#7A6652]"
@@ -701,11 +701,11 @@ export default function CheckoutPage() {
                       JazzCash / EasyPaisa Mobile Wallet
                     </span>
                     <span className="text-[11px] font-bold text-[#1A6B3C] bg-[#E8F5E9] border border-[#A5D6A7] px-2 py-0.5 rounded">
-                      FLAT 5% OFF + 0% COD TAX
+                      SAVE 2% + 0% COD TAX
                     </span>
                   </div>
                   <p className="text-[11px] text-[#6B6259] mt-1">
-                    Send to our registered mobile account <span className="font-bold text-[#171717]">0340 0262732</span>. Enjoy <strong className="text-[#1A6B3C]">Flat 5% discount</strong> and zero COD tax!
+                    Send to our registered mobile account <span className="font-bold text-[#171717]">0340 0262732</span>. 4% COD tax is waived, plus you save <strong className="text-[#1A6B3C]">Rs. {Math.round(cartSubtotal * 0.02).toLocaleString()} (Flat 2% OFF)</strong> instantly!
                   </p>
 
                   {(paymentMethod === "JAZZCASH" || paymentMethod === "EASYPAISA") && (
@@ -935,11 +935,12 @@ export default function CheckoutPage() {
               )}
 
               {advanceDiscount > 0 && (
-                <div className="flex justify-between text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2.5 py-1 rounded">
-                  <span className="flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> Flat 5% Advance Payment Discount
+                <div className="flex justify-between items-center text-[#1A6B3C] font-semibold bg-[#E8F5E9] px-2.5 py-1.5 rounded-lg text-xs border border-[#A5D6A7]/60">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#1A6B3C]" />
+                    <span>You Saved (2% {paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" : "EasyPaisa / JazzCash"} Discount)</span>
                   </span>
-                  <span>-Rs. {advanceDiscount.toLocaleString()}</span>
+                  <span className="font-bold">-Rs. {advanceDiscount.toLocaleString()}</span>
                 </div>
               )}
 
@@ -947,6 +948,12 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-[#1A6B3C] font-semibold">
                   <span>Coupon Discount</span>
                   <span>-Rs. {discountAmount.toLocaleString()}</span>
+                </div>
+              )}
+
+              {isAdvancePayment && advanceDiscount > 0 && (
+                <div className="p-2.5 bg-[#E8F5E9] border border-[#A5D6A7] rounded-xl text-center text-xs text-[#1A6B3C] font-bold shadow-xs">
+                  🎉 You saved Rs. {advanceDiscount.toLocaleString()} with 2% {paymentMethod === "BANK_TRANSFER" ? "Bank Transfer" : "EasyPaisa / JazzCash"} Discount!
                 </div>
               )}
 

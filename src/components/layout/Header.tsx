@@ -114,7 +114,7 @@ export default function Header({ initialSettings }: HeaderProps) {
     },
     {
       icon: <span className="text-xs shrink-0">🏷️</span>,
-      text: "Flat 5% Off: Bank & EasyPaisa",
+      text: "Flat 2% Off: Bank & EasyPaisa",
     },
     {
       icon: <RotateCcw className="w-3.5 h-3.5 shrink-0 text-white" />,

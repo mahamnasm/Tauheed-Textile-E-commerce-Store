@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { sanitizePublicOrder } from "../src/lib/publicOrder";
 
 describe("Phase 1 [UNIT-01]: Currency Formatting & Decimal Handling", () => {
@@ -46,7 +46,7 @@ describe("Phase 1 [UNIT-02]: Pakistani E-Commerce Business Logic Engine", () => 
     if (paymentMethod === "COD") {
       codSurcharge = Math.round(discountedSubtotal * 0.04);
     } else {
-      advanceDiscount = Math.round(discountedSubtotal * 0.05);
+      advanceDiscount = Math.round(discountedSubtotal * 0.02);
     }
 
     const shippingFee = discountedSubtotal >= freeShippingThreshold ? 0 : standardShippingFee;
@@ -62,17 +62,17 @@ describe("Phase 1 [UNIT-02]: Pakistani E-Commerce Business Logic Engine", () => 
     };
   }
 
-  it("should apply 5% advance payment discount on Bank Transfer orders", () => {
+  it("should apply 2% advance payment discount on Bank Transfer orders", () => {
     const summary = calculateOrderSummary({
       subtotal: 10000,
       paymentMethod: "BANK_TRANSFER",
     });
 
     expect(summary.subtotal).toBe(10000);
-    expect(summary.advanceDiscount).toBe(500);
+    expect(summary.advanceDiscount).toBe(200);
     expect(summary.codSurcharge).toBe(0);
     expect(summary.shippingFee).toBe(0);
-    expect(summary.finalTotal).toBe(9500);
+    expect(summary.finalTotal).toBe(9800);
   });
 
   it("should apply 4% COD surcharge and standard shipping below 10,000 threshold", () => {
@@ -97,9 +97,9 @@ describe("Phase 1 [UNIT-02]: Pakistani E-Commerce Business Logic Engine", () => 
 
     expect(summary.subtotal).toBe(12000);
     expect(summary.promoDiscount).toBe(2000);
-    expect(summary.advanceDiscount).toBe(500);
+    expect(summary.advanceDiscount).toBe(200);
     expect(summary.shippingFee).toBe(0);
-    expect(summary.finalTotal).toBe(9500);
+    expect(summary.finalTotal).toBe(9800);
   });
 });
 

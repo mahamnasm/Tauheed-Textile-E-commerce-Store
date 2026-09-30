@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (isAdvancePayment) {
-      discountAmount += Math.round(calculatedSubtotal * 0.05);
+      discountAmount += Math.round(calculatedSubtotal * 0.02);
     }
 
     const codHandlingFee = paymentMethod === "COD" ? Math.round(calculatedSubtotal * 0.04) : 0;

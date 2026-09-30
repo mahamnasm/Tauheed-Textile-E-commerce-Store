@@ -44,7 +44,7 @@ export default function Footer({ initialSettings }: FooterProps) {
 
               <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#4A4036] px-6 whitespace-nowrap">
                 <span className="text-sm shrink-0">🏷️</span>
-                <span>Flat 5% Off: Bank &amp; EasyPaisa</span>
+                <span>Flat 2% Off: Bank &amp; EasyPaisa</span>
               </div>
               <span className="text-[#C4B8A8] text-xs shrink-0 select-none">•</span>
 

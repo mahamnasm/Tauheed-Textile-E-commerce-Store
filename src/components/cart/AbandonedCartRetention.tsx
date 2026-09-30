@@ -248,7 +248,7 @@ export default function AbandonedCartRetention() {
                 </button>
               </div>
               <p className="text-xs text-[#7A5C00] leading-relaxed">
-                Get an instant <strong className="font-bold">Flat 5% OFF</strong> on advance payments via Bank Transfer, JazzCash, or EasyPaisa! Free delivery on orders over Rs. 10,000.
+                Get an instant <strong className="font-bold">Flat 2% OFF</strong> on advance payments via Bank Transfer, JazzCash, or EasyPaisa! Free delivery on orders over Rs. 10,000.
               </p>
             </div>
 

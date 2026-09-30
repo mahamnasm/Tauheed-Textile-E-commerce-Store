@@ -126,7 +126,7 @@ export interface SiteLayoutSettings {
 export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   // 1. Announcement Ribbon
   announcementText: "Free Delivery Over Rs. 10,000",
-  announcementSubtext: "Flat 5% Off on Advance Payment Orders",
+  announcementSubtext: "Flat 2% Off on Advance Payment Orders",
   announcementEnabled: true,
   announcementLink: "/shop?category=sale",
   announcementTheme: "midnight",
@@ -134,7 +134,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
 
   // 2. Festive Marquee Ticker
   marqueeEnabled: true,
-  marqueeText: "⚡ FREE DELIVERY OVER RS. 10,000 • FLAT 5% OFF ON ADVANCE PAYMENT ORDERS • 7-DAY EXCHANGE ONLY • KARACHI 1-2 DAYS • NATIONWIDE 4-7 DAYS",
+  marqueeText: "⚡ FREE DELIVERY OVER RS. 10,000 • FLAT 2% OFF ON ADVANCE PAYMENT ORDERS • 7-DAY EXCHANGE ONLY • KARACHI 1-2 DAYS • NATIONWIDE 4-7 DAYS",
   marqueeLink: "/shop",
 
   // 3. Hero Showcase
@@ -183,7 +183,7 @@ export const DEFAULT_SITE_SETTINGS: SiteLayoutSettings = {
   trustPerk1Title: "Nationwide Delivery",
   trustPerk1Desc: "Karachi 1-2 days • Major cities 4-5 days • Regional 5-7 days",
   trustPerk2Title: "Cash On Delivery & Advance Pay",
-  trustPerk2Desc: "Pay COD or save 5% on Advance Bank Transfer / Wallet",
+  trustPerk2Desc: "Pay COD or save 2% on Advance Bank Transfer / Wallet",
   trustPerk3Title: "7-Day Exchange Policy",
   trustPerk3Desc: "Hassle-free 7-day exchange service",
   trustPerk4Title: "100% Authentic Fabric",

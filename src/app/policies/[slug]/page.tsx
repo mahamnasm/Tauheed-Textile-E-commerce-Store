@@ -73,7 +73,7 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
               <strong>Cash on Delivery (COD):</strong> A standard 4% courier collection handling fee is automatically calculated and added to COD orders at checkout.
             </li>
             <li>
-              <strong>Advance Payment (Bank Transfer / JazzCash / EasyPaisa):</strong> The 4% COD fee is completely waived, AND an instant <strong>Flat 5% OFF</strong> is applied to your order subtotal!
+              <strong>Advance Payment (Bank Transfer / JazzCash / EasyPaisa):</strong> The 4% COD fee is completely waived, AND an instant <strong>Flat 2% OFF</strong> is applied to your order subtotal!
             </li>
           </ul>
 
@@ -156,7 +156,7 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">4. Is Cash on Delivery (COD) available?</h3>
           <p>
-            Yes, COD is available across Pakistan. A 4% handling fee applies to COD parcels, or you can pay via Bank Transfer / JazzCash / EasyPaisa to waive this fee and receive Flat 5% OFF!
+            Yes, COD is available across Pakistan. A 4% handling fee applies to COD parcels, or you can pay via Bank Transfer / JazzCash / EasyPaisa to waive this fee and receive Flat 2% OFF!
           </p>
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">5. What is your exchange policy?</h3>
@@ -223,7 +223,7 @@ export default function PolicyPage({ params }: { params: { slug: string } }) {
           <h3 className="font-serif font-bold text-sm text-[#171717]">2. Payment &amp; Courier Surcharges</h3>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Cash on Delivery (COD):</strong> A 4% courier handling fee is automatically added to COD parcels at checkout.</li>
-            <li><strong>Advance Payment:</strong> Paying via Bank Transfer, JazzCash, or EasyPaisa waives the 4% fee and provides an instant Flat 5% discount on the order subtotal. Payment proof must be attached prior to final dispatch.</li>
+            <li><strong>Advance Payment:</strong> Paying via Bank Transfer, JazzCash, or EasyPaisa waives the 4% fee and provides an instant Flat 2% discount on the order subtotal. Payment proof must be attached prior to final dispatch.</li>
           </ul>
 
           <h3 className="font-serif font-bold text-sm text-[#171717]">3. Exchanges &amp; Returns</h3>

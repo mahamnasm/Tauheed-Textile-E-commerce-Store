@@ -71,7 +71,7 @@ export default function CartDrawer() {
           </div>
           <div className="text-[11px] text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1.5 mt-2 font-medium">
             <span>🏷️</span>
-            <span>Advance Payment: Get <strong>Flat 5% OFF</strong> via Bank Transfer or Wallet!</span>
+            <span>Advance Payment: Get <strong>Flat 2% OFF</strong> via Bank Transfer or Wallet!</span>
           </div>
         </div>
 
