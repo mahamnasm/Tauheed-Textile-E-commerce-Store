@@ -100,28 +100,21 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   }
 
   if (subcategory) {
-    const subClean = subcategory.replace(/-/g, " ");
-    whereClause.OR = [
-      { subcategory: { slug: subcategory } },
-      { title: { contains: subClean, mode: "insensitive" } },
-      { description: { contains: subClean, mode: "insensitive" } },
-      { fabric: { contains: subClean, mode: "insensitive" } },
-    ];
+    whereClause.subcategory = {
+      OR: [
+        { slug: subcategory },
+        { id: subcategory },
+      ],
+    };
   }
 
   if (search) {
-    const searchConditions = [
+    whereClause.OR = [
       { title: { contains: search, mode: "insensitive" } },
       { description: { contains: search, mode: "insensitive" } },
       { fabric: { contains: search, mode: "insensitive" } },
       { sku: { contains: search, mode: "insensitive" } },
     ];
-    if (whereClause.OR) {
-      whereClause.AND = [{ OR: whereClause.OR }, { OR: searchConditions }];
-      delete whereClause.OR;
-    } else {
-      whereClause.OR = searchConditions;
-    }
   }
 
   if (minPrice || maxPrice) {
@@ -137,6 +130,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   let products: any[] = [];
   let categories: any[] = [];
+  let dbConnected = false;
 
   try {
     const [dbProducts, dbCategories] = await Promise.all([
@@ -161,11 +155,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     ]);
     products = dbProducts;
     categories = dbCategories;
+    dbConnected = true;
   } catch (err) {
     console.warn("Shop page database query fallback:", err);
   }
 
-  if (!products || products.length === 0) {
+  // Strictly preserve empty state when database succeeds with 0 matching products
+  if (!dbConnected) {
     let filtered = [...FALLBACK_PRODUCTS];
     if (isNewArrival === "true") {
       filtered = filtered.filter((p) => p.isNewArrival);
@@ -186,16 +182,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       }
     }
     if (subcategory) {
-      const subClean = subcategory.toLowerCase().replace(/-/g, " ");
-      filtered = filtered.filter(p => 
-        p.subcategory?.slug === subcategory || 
-        p.title.toLowerCase().includes(subClean) || 
-        p.fabric.toLowerCase().includes(subClean)
-      );
+      filtered = filtered.filter((p) => p.subcategoryId === subcategory || p.subcategory?.slug === subcategory);
     }
     if (search) {
       const s = search.toLowerCase();
-      filtered = filtered.filter(p => p.title.toLowerCase().includes(s) || p.fabric.toLowerCase().includes(s));
+      filtered = filtered.filter((p) => p.title.toLowerCase().includes(s) || p.fabric.toLowerCase().includes(s));
     }
     products = filtered;
   }

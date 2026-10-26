@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
         where,
         include: {
           category: { select: { id: true, name: true, slug: true } },
+          subcategory: { select: { id: true, name: true, slug: true } },
+          collection: { select: { id: true, name: true, slug: true } },
           images: { orderBy: { displayOrder: "asc" } },
           variants: true,
         },
@@ -70,6 +72,7 @@ export async function POST(req: NextRequest) {
       comparePrice,
       costPrice,
       categoryId,
+      subcategoryId,
       collectionId,
       barcode,
       videoUrl,
@@ -127,6 +130,7 @@ export async function POST(req: NextRequest) {
         comparePrice: comparePrice ? parseFloat(comparePrice) : null,
         costPrice: costPrice ? parseFloat(costPrice) : 0,
         categoryId: categoryId || null,
+        subcategoryId: subcategoryId || null,
         collectionId: collectionId || null,
         description: description || `Premium Pakistani creation by Tauheed Textile crafted in ${fabric}.`,
         packageIncludes: packageIncludes || "Complete shirt fabric, pure dupatta, and dyed trouser.",
@@ -189,37 +193,224 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  return handleUpdateProduct(req);
+}
+
 export async function PATCH(req: NextRequest) {
+  return handleUpdateProduct(req);
+}
+
+async function handleUpdateProduct(req: NextRequest) {
   const auth = await requireAdmin(req);
   if (!auth.ok) return auth.response;
 
   try {
     const body = await req.json();
-    const { id, title, basePrice, comparePrice, salePrice, inStock, isFeatured, isBestSeller, isNewArrival, isSale } = body;
+    const {
+      id,
+      title,
+      sku,
+      description,
+      fabric,
+      workType,
+      pieceCount,
+      weight,
+      basePrice,
+      comparePrice,
+      salePrice,
+      costPrice,
+      categoryId,
+      subcategoryId,
+      collectionId,
+      barcode,
+      videoUrl,
+      packageIncludes,
+      careInstructions,
+      inStock,
+      isFeatured,
+      isBestSeller,
+      isNewArrival,
+      isSale,
+      isPreOrder,
+      preOrderDate,
+      images,
+      variants,
+      stockQuantity,
+      initialStock,
+    } = body;
 
     if (!id || typeof id !== "string") {
       return jsonError("Product ID is required", 400);
     }
 
+    const currentProduct = await prisma.product.findUnique({
+      where: { id },
+      include: { variants: true },
+    });
+
+    if (!currentProduct) {
+      return jsonError("Product not found", 404);
+    }
+
+    // Check SKU collision if SKU changed
+    if (sku && typeof sku === "string") {
+      const cleanSku = sku.trim().toUpperCase();
+      if (cleanSku !== currentProduct.sku) {
+        const existingSku = await prisma.product.findFirst({
+          where: {
+            sku: cleanSku,
+            id: { not: id },
+          },
+        });
+        if (existingSku) {
+          return jsonError(`SKU "${cleanSku}" is already taken by another product.`, 400);
+        }
+      }
+    }
+
     const updateData: Record<string, unknown> = {};
     if (title && typeof title === "string") updateData.title = title.trim();
-    if (basePrice !== undefined) updateData.basePrice = parseFloat(basePrice);
-    if (comparePrice !== undefined) updateData.comparePrice = comparePrice ? parseFloat(comparePrice) : null;
-    if (salePrice !== undefined) updateData.salePrice = salePrice ? parseFloat(salePrice) : null;
+    if (sku && typeof sku === "string") updateData.sku = sku.trim().toUpperCase();
+    if (description !== undefined) updateData.description = typeof description === "string" ? description.trim() : "";
+    if (fabric && typeof fabric === "string") updateData.fabric = fabric.trim();
+    if (workType !== undefined) updateData.workType = typeof workType === "string" ? workType.trim() : "";
+    if (pieceCount !== undefined) updateData.pieceCount = parseInt(String(pieceCount), 10) || 3;
+    if (weight !== undefined) updateData.weight = parseFloat(String(weight)) || 1.0;
+    if (basePrice !== undefined) updateData.basePrice = parseFloat(String(basePrice));
+    if (comparePrice !== undefined) updateData.comparePrice = comparePrice ? parseFloat(String(comparePrice)) : null;
+    if (salePrice !== undefined) updateData.salePrice = salePrice ? parseFloat(String(salePrice)) : null;
+    if (costPrice !== undefined) updateData.costPrice = costPrice ? parseFloat(String(costPrice)) : 0;
+    if (categoryId !== undefined) updateData.categoryId = categoryId || null;
+    if (subcategoryId !== undefined) updateData.subcategoryId = subcategoryId || null;
+    if (collectionId !== undefined) updateData.collectionId = collectionId || null;
+    if (barcode !== undefined) updateData.barcode = barcode ? String(barcode).trim() : null;
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl ? String(videoUrl).trim() : null;
+    if (packageIncludes !== undefined) updateData.packageIncludes = packageIncludes ? String(packageIncludes).trim() : null;
+    if (careInstructions !== undefined) updateData.careInstructions = careInstructions ? String(careInstructions).trim() : null;
     if (inStock !== undefined) updateData.inStock = Boolean(inStock);
     if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
     if (isBestSeller !== undefined) updateData.isBestSeller = Boolean(isBestSeller);
     if (isNewArrival !== undefined) updateData.isNewArrival = Boolean(isNewArrival);
     if (isSale !== undefined) updateData.isSale = Boolean(isSale);
+    if (isPreOrder !== undefined) updateData.isPreOrder = Boolean(isPreOrder);
+    if (preOrderDate !== undefined) updateData.preOrderDate = preOrderDate ? String(preOrderDate).trim() : null;
 
-    const updated = await prisma.product.update({
-      where: { id },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      // 1. Update basic product attributes
+      await tx.product.update({
+        where: { id },
+        data: updateData,
+      });
+
+      // 2. Synchronize multi-angle image gallery if images array is supplied
+      if (Array.isArray(images)) {
+        const cleanImages = images
+          .map((img: unknown) => (typeof img === "string" ? img.trim() : ""))
+          .filter(Boolean);
+
+        if (cleanImages.length > 0) {
+          // Replace all images in order
+          await tx.productImage.deleteMany({ where: { productId: id } });
+          await tx.productImage.createMany({
+            data: cleanImages.map((url, idx) => ({
+              productId: id,
+              url,
+              alt: `${updateData.title || currentProduct.title} - Angle ${idx + 1}`,
+              displayOrder: idx,
+            })),
+          });
+        }
+      }
+
+      // 3. Synchronize variants (Sizes/Colors/Prices/Stock) if provided
+      if (Array.isArray(variants) && variants.length > 0) {
+        const existingVariants = await tx.productVariant.findMany({ where: { productId: id } });
+        const existingIds = new Set(existingVariants.map((v) => v.id));
+        const incomingIds = new Set(variants.filter((v: any) => v.id).map((v: any) => v.id));
+
+        // Delete variants that were removed by admin
+        for (const ev of existingVariants) {
+          if (!incomingIds.has(ev.id)) {
+            try {
+              await tx.productVariant.delete({ where: { id: ev.id } });
+            } catch {
+              // In case variant is linked to historical orders, mark stock zero
+              await tx.productVariant.update({
+                where: { id: ev.id },
+                data: { stockQuantity: 0 },
+              });
+            }
+          }
+        }
+
+        // Upsert variants
+        for (let i = 0; i < variants.length; i++) {
+          const v = variants[i];
+          const vSize = v.size?.trim() || "Standard";
+          const vColor = v.color?.trim() || "Default";
+          const vStitched = v.stitchedType?.trim() || "Unstitched";
+          const baseSku = (updateData.sku as string) || currentProduct.sku;
+          const vSku = v.sku?.trim() || `${baseSku}-${vSize}-${i + 1}`.replace(/\s+/g, "").toUpperCase();
+          const vStock = parseInt(String(v.stockQuantity ?? 0), 10) || 0;
+          const vPriceAdj = parseFloat(String(v.priceAdjustment ?? 0)) || 0;
+
+          if (v.id && existingIds.has(v.id)) {
+            await tx.productVariant.update({
+              where: { id: v.id },
+              data: {
+                size: vSize,
+                color: vColor,
+                stitchedType: vStitched,
+                sku: vSku,
+                priceAdjustment: vPriceAdj,
+                stockQuantity: Math.max(0, vStock),
+              },
+            });
+          } else {
+            await tx.productVariant.create({
+              data: {
+                productId: id,
+                size: vSize,
+                color: vColor,
+                stitchedType: vStitched,
+                sku: vSku,
+                priceAdjustment: vPriceAdj,
+                stockQuantity: Math.max(0, vStock),
+              },
+            });
+          }
+        }
+      } else if (stockQuantity !== undefined || initialStock !== undefined) {
+        // Simple stock update when full variant table was not submitted
+        const newStock = parseInt(String(stockQuantity ?? initialStock), 10);
+        if (!isNaN(newStock)) {
+          const firstVariant = currentProduct.variants[0];
+          if (firstVariant) {
+            await tx.productVariant.update({
+              where: { id: firstVariant.id },
+              data: { stockQuantity: Math.max(0, newStock) },
+            });
+          }
+        }
+      }
+
+      // Return fully hydrated product
+      return tx.product.findUnique({
+        where: { id },
+        include: {
+          category: { select: { id: true, name: true, slug: true } },
+          subcategory: { select: { id: true, name: true, slug: true } },
+          collection: { select: { id: true, name: true, slug: true } },
+          images: { orderBy: { displayOrder: "asc" } },
+          variants: true,
+        },
+      });
     });
 
     return NextResponse.json({ success: true, product: updated });
   } catch (err: unknown) {
-    return internalError("PATCH /api/admin/products error:", err);
+    return internalError("PUT/PATCH /api/admin/products error:", err);
   }
 }
 

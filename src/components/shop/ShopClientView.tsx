@@ -443,8 +443,14 @@ export default function ShopClientView({
                 <p className="font-serif text-xl font-bold text-[#171717]">No items found</p>
                 <p className="mt-2 text-sm">Try clearing your filters or search terms.</p>
                 <button
-                  onClick={() => router.push("/shop")}
-                  className="mt-4 px-6 py-2 bg-[#171717] text-white rounded-full text-sm"
+                  onClick={() => {
+                    if (currentCategory) {
+                      handleSubcategoryClick(null);
+                    } else {
+                      router.push("/shop");
+                    }
+                  }}
+                  className="mt-4 px-6 py-2 bg-[#171717] text-white rounded-full text-sm hover:bg-[#333] transition-colors cursor-pointer"
                 >
                   Clear Filters
                 </button>

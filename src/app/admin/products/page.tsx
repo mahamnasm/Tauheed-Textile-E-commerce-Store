@@ -15,6 +15,7 @@ export default async function AdminProductsPage() {
       prisma.product.findMany({
         include: {
           category: true,
+          subcategory: true,
           collection: true,
           variants: true,
           images: { orderBy: { displayOrder: "asc" } },
@@ -22,9 +23,16 @@ export default async function AdminProductsPage() {
         orderBy: { createdAt: "desc" },
       }),
       prisma.category.findMany({
+        include: {
+          subcategories: { orderBy: { name: "asc" } },
+        },
         orderBy: { displayOrder: "asc" },
       }),
       prisma.collection.findMany({
+        include: {
+          _count: { select: { products: true } },
+          products: { select: { id: true, title: true, sku: true } },
+        },
         orderBy: { name: "asc" },
       }),
     ]);
