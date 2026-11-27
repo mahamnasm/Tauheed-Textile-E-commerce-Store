@@ -104,10 +104,10 @@ export const categoryMutationSchema = z.object({
   type: z.enum(["category", "subcategory"]).optional(),
   id: z.string().max(80).optional(),
   name: z.string().min(2).max(80).trim(),
-  slug: z.string().max(100).optional(),
-  description: z.string().max(500).optional(),
-  image: z.string().max(500).optional(),
-  categoryId: z.string().max(80).optional(),
+  slug: z.string().max(100).nullable().optional(),
+  description: z.string().max(1000).nullable().optional(),
+  image: z.string().max(5000000).nullable().optional(),
+  categoryId: z.string().max(80).nullable().optional(),
 });
 
 export const loginSchema = z.object({

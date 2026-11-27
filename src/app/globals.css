@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 :root {
   --warm-bg: #F8F5F0;
   --warm-card: #FFFFFF;
@@ -166,6 +164,16 @@ h1, h2, h3, h4, .font-serif {
 
 .animate-float-gentle {
   animation: floatGentle 3s ease-in-out infinite;
+}
+
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .animate-cinematic,
+  .animate-glow-gold,
+  .animate-glow-emerald,
+  .animate-float-gentle,
+  .btn-shimmer::before {
+    animation: none !important;
+  }
 }
 
 @media print {

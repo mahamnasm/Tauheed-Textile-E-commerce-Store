@@ -349,11 +349,12 @@ export default function CategoriesClientView({
               className="bg-white rounded-2xl border border-sand-200 shadow-sm overflow-hidden transition-all"
             >
               {/* Category Header Row */}
-              <div className="p-4 sm:p-5 flex items-center justify-between gap-4 bg-white">
-                <div className="flex items-center gap-3.5 min-w-0">
+              <div className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+                <div className="flex items-center gap-3 min-w-0">
                   <button
+                    type="button"
                     onClick={() => toggleExpand(cat.id)}
-                    className="p-1 rounded-lg text-brand-400 hover:bg-sand-100 transition-colors shrink-0"
+                    className="p-1.5 rounded-lg text-brand-500 hover:bg-sand-100 transition-colors shrink-0 cursor-pointer"
                     title={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
                   >
                     {isExpanded ? (
@@ -363,63 +364,67 @@ export default function CategoriesClientView({
                     )}
                   </button>
 
-                  <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-sand-100 border border-sand-200 shrink-0 hidden sm:block">
+                  <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-sand-100 border border-sand-200 shrink-0">
                     <Image
                       src={cat.image || "/assets/banners/banner-lawn.jpg"}
                       alt={cat.name}
                       fill
+                      sizes="48px"
                       className="object-cover"
                     />
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-serif font-bold text-base text-brand-950 truncate">
+                      <h3 className="font-serif font-bold text-sm sm:text-base text-brand-950 truncate">
                         {cat.name}
                       </h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sand-100 text-brand-600 border border-sand-200">
-                        slug: /{cat.slug}
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sand-100 text-brand-600 border border-sand-200 truncate max-w-[140px] sm:max-w-none">
+                        /{cat.slug}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-brand-500 mt-0.5">
+                    <div className="flex items-center gap-2.5 text-[11px] sm:text-xs text-brand-500 mt-0.5">
                       <span>{subCount} Subcategories</span>
                       <span>•</span>
-                      <span>{prodCount} Active Dresses</span>
+                      <span>{prodCount} Dresses</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Category Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 border-t sm:border-t-0 border-sand-100 pt-2 sm:pt-0">
                   <button
+                    type="button"
                     onClick={() => handleOpenAddSub(cat.id)}
-                    className="px-3 py-1.5 rounded-lg bg-sand-100 hover:bg-sand-200 text-brand-800 text-xs font-semibold flex items-center gap-1 transition-colors"
+                    className="px-2.5 py-1.5 rounded-lg bg-sand-100 hover:bg-sand-200 text-brand-800 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                     title="Add subcategory to this collection"
                   >
                     <Plus className="w-3.5 h-3.5 text-gold-700" />
-                    <span className="hidden sm:inline">Add Subcategory</span>
+                    <span>Add Sub</span>
                   </button>
 
                   <Link
                     href={`/shop?category=${cat.slug}`}
                     target="_blank"
-                    className="p-2 rounded-lg text-brand-400 hover:text-brand-900 hover:bg-sand-100 transition-colors"
+                    className="p-2 rounded-lg text-brand-500 hover:text-brand-900 hover:bg-sand-100 transition-colors"
                     title="View live in shop"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
 
                   <button
+                    type="button"
                     onClick={() => handleOpenEditCat(cat)}
-                    className="p-2 rounded-lg text-brand-600 hover:bg-sand-100 transition-colors"
+                    className="p-2 rounded-lg text-brand-700 bg-sand-50 hover:bg-sand-200 transition-colors cursor-pointer"
                     title="Edit category"
                   >
                     <Edit3 className="w-4 h-4" />
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                    className="p-2 rounded-lg text-maroon-600 hover:bg-maroon-50 transition-colors"
+                    className="p-2 rounded-lg text-maroon-600 hover:bg-maroon-50 transition-colors cursor-pointer"
                     title="Delete category"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -429,14 +434,15 @@ export default function CategoriesClientView({
 
               {/* Subcategories Accordion Content */}
               {isExpanded && (
-                <div className="bg-sand-50/60 border-t border-sand-200 p-4 sm:p-5 pl-8 sm:pl-16 space-y-3">
+                <div className="bg-sand-50/60 border-t border-sand-200 p-3.5 sm:p-5 sm:pl-14 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
                       <Layers className="w-3.5 h-3.5 text-gold-600" /> Subcategories
                     </span>
                     <button
+                      type="button"
                       onClick={() => handleOpenAddSub(cat.id)}
-                      className="text-xs font-bold text-gold-700 hover:text-gold-900 flex items-center gap-1"
+                      className="text-xs font-bold text-gold-700 hover:text-gold-900 flex items-center gap-1 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" /> Add another
                     </button>
@@ -444,32 +450,34 @@ export default function CategoriesClientView({
 
                   {subCount === 0 ? (
                     <div className="p-4 bg-white rounded-xl border border-sand-200 text-center text-xs text-brand-500">
-                      No subcategories created yet for {cat.name}. Click "Add Subcategory" to create filters like 2 Piece, 3 Piece, Printed, or Embroidered.
+                      No subcategories created yet for {cat.name}. Click &quot;Add Sub&quot; to create filters.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                       {cat.subcategories.map((sub) => (
                         <div
                           key={sub.id}
                           className="bg-white p-3 rounded-xl border border-sand-200 shadow-sm flex items-center justify-between gap-2"
                         >
-                          <div>
-                            <p className="font-semibold text-xs text-brand-950">{sub.name}</p>
-                            <span className="text-[10px] text-brand-500 font-mono">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-xs text-brand-950 truncate">{sub.name}</p>
+                            <span className="text-[10px] text-brand-500 font-mono truncate block">
                               /{sub.slug}
                             </span>
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
                             <button
+                              type="button"
                               onClick={() => handleOpenEditSub(cat.id, sub)}
-                              className="p-1 text-brand-500 hover:text-brand-900 rounded"
+                              className="p-1.5 text-brand-600 hover:text-brand-950 hover:bg-sand-100 rounded-lg cursor-pointer"
                               title="Edit subcategory"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
                             <button
+                              type="button"
                               onClick={() => handleDeleteSubcategory(cat.id, sub.id, sub.name)}
-                              className="p-1 text-maroon-500 hover:text-maroon-700 rounded"
+                              className="p-1.5 text-maroon-500 hover:text-maroon-700 hover:bg-maroon-50 rounded-lg cursor-pointer"
                               title="Delete subcategory"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -488,16 +496,17 @@ export default function CategoriesClientView({
 
       {/* Category Modal (Create / Edit) */}
       {showCatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCatModal(false)} />
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl z-10 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setShowCatModal(false)} />
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-4 sm:p-6 shadow-2xl z-10 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-sand-200 pb-3">
-              <h3 className="font-serif font-bold text-lg text-brand-950">
+              <h3 className="font-serif font-bold text-base sm:text-lg text-brand-950 truncate pr-2">
                 {editingCat ? `Edit Category: ${editingCat.name}` : "Create New Category"}
               </h3>
               <button
+                type="button"
                 onClick={() => setShowCatModal(false)}
-                className="p-1 rounded-full text-brand-400 hover:bg-sand-100"
+                className="p-1.5 rounded-full text-brand-500 hover:bg-sand-100 cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -522,7 +531,7 @@ export default function CategoriesClientView({
                       );
                     }
                   }}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
               </div>
 
@@ -533,7 +542,7 @@ export default function CategoriesClientView({
                   placeholder="e.g. lawn-formals"
                   value={catSlug}
                   onChange={(e) => setCatSlug(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
               </div>
 
@@ -678,16 +687,17 @@ export default function CategoriesClientView({
 
       {/* Subcategory Modal (Create / Edit) */}
       {showSubModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSubModal(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl z-10 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setShowSubModal(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-2xl p-4 sm:p-6 shadow-2xl z-10 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-sand-200 pb-3">
-              <h3 className="font-serif font-bold text-lg text-brand-950">
+              <h3 className="font-serif font-bold text-base sm:text-lg text-brand-950">
                 {editingSub ? `Edit Subcategory` : "Add Subcategory"}
               </h3>
               <button
+                type="button"
                 onClick={() => setShowSubModal(false)}
-                className="p-1 rounded-full text-brand-400 hover:bg-sand-100"
+                className="p-1.5 rounded-full text-brand-500 hover:bg-sand-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -712,7 +722,7 @@ export default function CategoriesClientView({
                       );
                     }
                   }}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
               </div>
 
@@ -723,7 +733,7 @@ export default function CategoriesClientView({
                   placeholder="e.g. 2-piece"
                   value={subSlug}
                   onChange={(e) => setSubSlug(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
                 />
               </div>
 

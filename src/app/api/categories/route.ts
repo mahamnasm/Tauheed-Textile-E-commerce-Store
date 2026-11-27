@@ -83,8 +83,11 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = categoryMutationSchema.safeParse(body);
-    if (!parsed.success || !parsed.data.id) {
-      return jsonError("ID and name are required", 400);
+    if (!parsed.success) {
+      return jsonError(firstZodMessage(parsed.error), 400);
+    }
+    if (!parsed.data.id) {
+      return jsonError("Category or subcategory ID is required", 400);
     }
 
     const { type, id, name, slug, description, image } = parsed.data;
@@ -105,8 +108,8 @@ export async function PATCH(req: NextRequest) {
       data: {
         name: name.trim(),
         ...(slug ? { slug: toSlug(name, slug) } : {}),
-        ...(description !== undefined ? { description } : {}),
-        ...(image ? { image } : {}),
+        ...(description !== undefined ? { description: description || null } : {}),
+        ...(image !== undefined ? { image: image || null } : {}),
       },
     });
 
