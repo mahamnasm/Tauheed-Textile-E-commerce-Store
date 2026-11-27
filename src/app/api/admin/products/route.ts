@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { internalError, jsonError } from "@/lib/http";
 import { generateProductSeoAeo } from "@/lib/seoAeo";
+import { triggerAutoSeoAndIndexing } from "@/lib/autoIndexing";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);
@@ -251,6 +252,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await triggerAutoSeoAndIndexing({
+      paths: [`/product/${product.slug}`],
+    });
+
     return NextResponse.json({ success: true, product });
   } catch (err: unknown) {
     return internalError("POST /api/admin/products error:", err);
@@ -398,6 +403,19 @@ async function handleUpdateProduct(req: NextRequest) {
     if (searchTags !== undefined) {
       updateData.searchTags = Array.isArray(searchTags) ? searchTags.join(", ") : (searchTags ? String(searchTags).trim() : null);
     }
+
+    // Auto-fill missing SEO/AEO fields on edit
+    if (!currentProduct.metaTitle || !currentProduct.metaDesc || !currentProduct.searchTags || updateData.metaTitle === null || updateData.metaDesc === null) {
+      const autoSeo = generateProductSeoAeo({
+        title: (updateData.title as string) || currentProduct.title,
+        fabric: (updateData.fabric as string) || currentProduct.fabric,
+        pieceCount: (updateData.pieceCount as number) || currentProduct.pieceCount,
+        basePrice: updateData.basePrice !== undefined ? (updateData.basePrice as number) : currentProduct.basePrice,
+      });
+      if (!updateData.metaTitle && !currentProduct.metaTitle) updateData.metaTitle = autoSeo.metaTitle;
+      if (!updateData.metaDesc && !currentProduct.metaDesc) updateData.metaDesc = autoSeo.metaDesc;
+      if (!updateData.searchTags && !currentProduct.searchTags) updateData.searchTags = autoSeo.searchTags;
+    }
     if (dimensions !== undefined) updateData.dimensions = dimensions ? String(dimensions).trim() : null;
     if (lowStockThreshold !== undefined) updateData.lowStockThreshold = parseInt(String(lowStockThreshold), 10) || 5;
     if (status !== undefined) updateData.status = String(status).trim().toUpperCase() || "ACTIVE";
@@ -524,6 +542,10 @@ async function handleUpdateProduct(req: NextRequest) {
           variants: true,
         },
       });
+    });
+
+    await triggerAutoSeoAndIndexing({
+      paths: updated?.slug ? [`/product/${updated.slug}`] : [],
     });
 
     return NextResponse.json({ success: true, product: updated });

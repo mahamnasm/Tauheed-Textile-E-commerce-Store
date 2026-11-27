@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { categoryMutationSchema } from "@/lib/validation";
 import { firstZodMessage, internalError, jsonError } from "@/lib/http";
+import { triggerAutoSeoAndIndexing } from "@/lib/autoIndexing";
 
 function toSlug(name: string, slug?: string) {
   return (slug || name)
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      await triggerAutoSeoAndIndexing();
       return NextResponse.json({ success: true, subcategory: sub });
     }
 
@@ -70,6 +72,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await triggerAutoSeoAndIndexing();
     return NextResponse.json({ success: true, category: cat });
   } catch (error: unknown) {
     return internalError("POST /api/categories error:", error);
@@ -100,6 +103,7 @@ export async function PATCH(req: NextRequest) {
           ...(slug ? { slug: toSlug(name, slug) } : {}),
         },
       });
+      await triggerAutoSeoAndIndexing();
       return NextResponse.json({ success: true, subcategory: updatedSub });
     }
 
@@ -113,6 +117,7 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
+    await triggerAutoSeoAndIndexing();
     return NextResponse.json({ success: true, category: updatedCat });
   } catch (error: unknown) {
     return internalError("PATCH /api/categories error:", error);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { internalError, jsonError } from "@/lib/http";
+import { triggerAutoSeoAndIndexing } from "@/lib/autoIndexing";
 
 function toSlug(name: string, slug?: string) {
   return (slug || name)
@@ -96,6 +97,7 @@ export async function POST(req: NextRequest) {
       });
     });
 
+    await triggerAutoSeoAndIndexing();
     return NextResponse.json({ success: true, collection });
   } catch (error: unknown) {
     return internalError("POST /api/admin/collections error:", error);
@@ -190,6 +192,7 @@ async function handleUpdateCollection(req: NextRequest) {
       });
     });
 
+    await triggerAutoSeoAndIndexing();
     return NextResponse.json({ success: true, collection: updated });
   } catch (error: unknown) {
     return internalError("PUT/PATCH /api/admin/collections error:", error);
