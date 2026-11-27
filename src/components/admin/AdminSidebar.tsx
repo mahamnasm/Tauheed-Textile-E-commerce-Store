@@ -71,7 +71,7 @@ export default function AdminSidebar() {
       } catch {}
     };
     fetchNotifs();
-    const interval = setInterval(fetchNotifs, 15000);
+    const interval = setInterval(fetchNotifs, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -152,9 +152,6 @@ export default function AdminSidebar() {
       title: "System & Tools",
       isDaily: false,
       items: [
-        { label: "📸 Cover Photos Studio", href: "/admin/nano-banana", icon: Camera },
-        { label: "🔍 Google SEO & Rank", href: "/admin/seo", icon: Globe },
-        { label: "⚙️ AI Settings & Prompts", href: "/admin/ai", icon: Sparkles },
         { label: "🛡️ Security & Lockdown", href: "/admin/security", icon: ShieldCheck },
         { label: "⚡ Health & Optimizer", href: "/admin/health", icon: Activity },
       ],
@@ -191,7 +188,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* 1. MOBILE TOP HEADER (Screens < lg) */}
-      <header className="lg:hidden sticky top-0 z-40 w-full bg-brand-950/95 backdrop-blur-md border-b border-sand-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-md">
+      <header className="lg:hidden sticky top-0 z-40 w-full bg-brand-950 border-b border-sand-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-md">
         <Link 
           href="/" 
           className="flex items-center gap-2.5 group cursor-pointer hover:opacity-95 transition-all"

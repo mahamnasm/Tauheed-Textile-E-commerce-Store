@@ -23,9 +23,15 @@ import {
 interface AdminDashboardClientViewProps {
   totalRevenue?: number;
   totalOrders?: number;
+  dailyRevenue?: number;
+  dailyOrdersCount?: number;
+  monthlyRevenue?: number;
+  monthlyOrdersCount?: number;
+  averageOrderValue?: number;
   codOrdersCount?: number;
   prepaidOrdersCount?: number;
   lowStockCount?: number;
+  lowStockItems?: any[];
   pendingBankProofsCount?: number;
   recentOrders?: any[];
   latestSecurityAlert?: any;
@@ -35,9 +41,15 @@ interface AdminDashboardClientViewProps {
 export default function AdminDashboardClientView({
   totalRevenue = 0,
   totalOrders = 0,
+  dailyRevenue = 0,
+  dailyOrdersCount = 0,
+  monthlyRevenue = 0,
+  monthlyOrdersCount = 0,
+  averageOrderValue = 0,
   codOrdersCount = 0,
   prepaidOrdersCount = 0,
   lowStockCount = 0,
+  lowStockItems = [],
   pendingBankProofsCount = 0,
   recentOrders = [],
   latestSecurityAlert,
@@ -152,68 +164,111 @@ export default function AdminDashboardClientView({
         </div>
       )}
 
-      {/* 2. Four Essential Summary Stat Cards */}
+      {/* 2. Executive Analytics & Financial Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Sales */}
+        {/* Today's Daily Revenue */}
         <div className="bg-white p-5 rounded-3xl border border-sand-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-brand-500">Total Sales</span>
+            <span className="text-xs font-bold text-brand-600">Today's Revenue</span>
             <div className="p-2 bg-emerald-100 text-emerald-800 rounded-xl">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-bold font-serif text-brand-950">
-            PKR {totalRevenue.toLocaleString()}
+            PKR {dailyRevenue.toLocaleString()}
           </div>
-          <p className="text-[11px] text-emerald-700 font-medium">All completed orders</p>
+          <p className="text-[11px] text-emerald-700 font-medium">
+            {dailyOrdersCount} orders booked today
+          </p>
         </div>
 
-        {/* Orders */}
+        {/* Monthly Revenue */}
         <div className="bg-white p-5 rounded-3xl border border-sand-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-brand-500">Total Orders</span>
-            <div className="p-2 bg-blue-100 text-blue-800 rounded-xl">
+            <span className="text-xs font-bold text-brand-600">This Month's Sales</span>
+            <div className="p-2 bg-purple-100 text-purple-800 rounded-xl">
               <Receipt className="w-4 h-4" />
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-bold font-serif text-brand-950">
-            {totalOrders}
+            PKR {monthlyRevenue.toLocaleString()}
           </div>
-          <p className="text-[11px] text-blue-700 font-medium">{codOrdersCount} Cash on Delivery</p>
+          <p className="text-[11px] text-purple-700 font-medium">
+            {monthlyOrdersCount} orders this month
+          </p>
         </div>
 
-        {/* Bank Slips to Verify */}
+        {/* Average Order Value (AOV) */}
         <div className="bg-white p-5 rounded-3xl border border-sand-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-brand-500">Bank Slips</span>
-            <div className="p-2 bg-amber-100 text-amber-800 rounded-xl">
-              <Clock className="w-4 h-4" />
+            <span className="text-xs font-bold text-brand-600">Avg. Order Value (AOV)</span>
+            <div className="p-2 bg-blue-100 text-blue-800 rounded-xl">
+              <Activity className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl font-bold font-serif text-amber-900">
-            {pendingBankProofsCount} Pending
+          <div className="text-xl sm:text-2xl font-bold font-serif text-brand-950">
+            PKR {averageOrderValue.toLocaleString()}
           </div>
-          <Link href="/admin/payments" className="text-[11px] text-amber-700 font-bold hover:underline block">
-            Review Receipts →
-          </Link>
+          <p className="text-[11px] text-blue-700 font-medium">
+            Lifetime Sales: PKR {totalRevenue.toLocaleString()}
+          </p>
         </div>
 
         {/* Low Stock Warning */}
         <div className="bg-white p-5 rounded-3xl border border-sand-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-brand-500">Stock Alerts</span>
+            <span className="text-xs font-bold text-brand-600">Low Stock Alert</span>
             <div className="p-2 bg-rose-100 text-rose-800 rounded-xl">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-bold font-serif text-rose-900">
-            {lowStockCount} Low Suits
+            {lowStockCount} Variants Alert
           </div>
           <Link href="/admin/inventory" className="text-[11px] text-rose-700 font-bold hover:underline block">
-            Restock Suits →
+            Inspect Low Inventory →
           </Link>
         </div>
       </div>
+
+      {/* Low-Stock Intelligence Feed (when variants breach threshold) */}
+      {lowStockItems.length > 0 && (
+        <div className="bg-gradient-to-r from-rose-50 to-orange-50 p-5 rounded-3xl border border-rose-200 shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <h3 className="font-serif font-bold text-sm text-brand-950">
+                Minimum Stock Threshold Breach Warning ({lowStockItems.length} Variants Critical)
+              </h3>
+            </div>
+            <Link
+              href="/admin/inventory"
+              className="text-xs font-bold text-rose-700 hover:text-rose-900 hover:underline"
+            >
+              Open Warehouse Stock Manager →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+            {lowStockItems.slice(0, 4).map((v: any, idx: number) => (
+              <div key={v.id || idx} className="bg-white p-3 rounded-xl border border-rose-200 space-y-1 shadow-xs">
+                <p className="font-bold text-brand-950 text-xs truncate">
+                  {v.product?.title || "Luxury Dress"}
+                </p>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-mono text-brand-600">{v.sku}</span>
+                  <span className="font-mono font-black text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded">
+                    {v.stockQuantity} Left
+                  </span>
+                </div>
+                <p className="text-[10px] text-brand-400">
+                  Threshold: {v.product?.lowStockThreshold ?? 5} units
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 3. Quick Shortcuts (Short, Simple & Clean) */}
       <div className="space-y-2.5">
@@ -275,9 +330,9 @@ export default function AdminDashboardClientView({
             </div>
           </Link>
 
-          {/* 4: Cover Photos */}
+          {/* 4: Categories */}
           <Link
-            href="/admin/nano-banana"
+            href="/admin/categories"
             className="p-3 rounded-2xl bg-white hover:bg-sand-50 border border-sand-200 hover:border-gold-400 shadow-2xs transition-all flex items-center gap-2.5 group"
           >
             <div className="w-8 h-8 rounded-xl bg-brand-950 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -285,9 +340,9 @@ export default function AdminDashboardClientView({
             </div>
             <div className="min-w-0">
               <p className="font-serif font-bold text-xs text-brand-950 truncate group-hover:text-gold-700">
-                Cover Studio
+                Categories
               </p>
-              <p className="text-[10px] text-brand-500 truncate">Dress Photos</p>
+              <p className="text-[10px] text-brand-500 truncate">Collections &amp; Subs</p>
             </div>
           </Link>
 

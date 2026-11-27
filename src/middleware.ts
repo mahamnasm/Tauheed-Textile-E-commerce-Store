@@ -10,7 +10,6 @@ const PROTECTED_PUBLIC_APIS = [
   "/api/ai/config",
   "/api/ai/caption",
   "/api/ai/copywriter",
-  "/api/ai/nano-banana",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -60,6 +59,5 @@ export const config = {
     "/api/ai/config",
     "/api/ai/caption",
     "/api/ai/copywriter",
-    "/api/ai/nano-banana",
   ],
 };
