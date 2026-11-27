@@ -61,9 +61,9 @@ export async function getLiveSystemHealth(): Promise<SystemHealthReport> {
   // 3. Health Checks
   const checks: HealthCheckItem[] = [
     {
-      name: "SQLite Database & WAL Engine",
+      name: "Neon PostgreSQL Pooler",
       category: "DATABASE",
-      status: dbLatencyMs < 25 ? "OPTIMAL" : "PASS",
+      status: dbLatencyMs < 100 ? "OPTIMAL" : "PASS",
       latencyMs: dbLatencyMs,
       detail: `Query latency ${dbLatencyMs}ms. ${productCount} products, ${orderCount} orders indexed.`,
     },
@@ -142,12 +142,12 @@ export async function executeSpeedOptimization(): Promise<{
   const reclaimedDetails: string[] = [];
 
   try {
-    // 1. Optimize SQLite Database indexes and WAL
-    await prisma.$executeRawUnsafe("PRAGMA optimize;");
-    reclaimedDetails.push("PRAGMA optimize executed: query planner statistics updated.");
-
-    await prisma.$executeRawUnsafe("PRAGMA wal_checkpoint(PASSIVE);");
-    reclaimedDetails.push("Database Write-Ahead Log (WAL) checkpoint completed.");
+    // 1. Optimize PostgreSQL query planner statistics
+    await prisma.$queryRawUnsafe("SELECT 1");
+    await prisma.$executeRawUnsafe('ANALYZE "Product";');
+    await prisma.$executeRawUnsafe('ANALYZE "Order";');
+    await prisma.$executeRawUnsafe('ANALYZE "Category";');
+    reclaimedDetails.push("PostgreSQL ANALYZE executed: query planner statistics updated for Product, Order & Category.");
 
     // 2. Clear Node garbage if available
     if (typeof (global as any).gc === "function") {

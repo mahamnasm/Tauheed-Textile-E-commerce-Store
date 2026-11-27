@@ -175,7 +175,7 @@ export default function AdminHealthClientView({ initialReport }: AdminHealthClie
           <div className="text-2xl sm:text-3xl font-bold font-serif text-brand-950 font-mono">
             {report.database.latencyMs}ms
           </div>
-          <p className="text-[11px] text-blue-700 font-medium">Ultra-fast SQLite query response</p>
+          <p className="text-[11px] text-blue-700 font-medium">Ultra-fast PostgreSQL query response</p>
         </div>
 
         {/* Card 3: Memory Usage */}
