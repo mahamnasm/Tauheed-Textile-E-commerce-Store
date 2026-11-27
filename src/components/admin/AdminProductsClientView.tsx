@@ -194,6 +194,16 @@ export default function AdminProductsClientView({
   // -------------------------------------------------------------
   // ADD PRODUCT HANDLERS
   // -------------------------------------------------------------
+  const generateArticleSku = (catId?: string, prodTitle?: string) => {
+    const cat = categories.find((c) => c.id === catId);
+    const catCode = (cat?.name || prodTitle || "TT")
+      .replace(/[^a-zA-Z]/g, "")
+      .toUpperCase()
+      .slice(0, 3) || "LUX";
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `TT-${catCode}-${rand}`;
+  };
+
   const handleAddImageSlot = () => {
     setImages((prev) => [...prev, ""]);
   };
@@ -241,6 +251,9 @@ export default function AdminProductsClientView({
       const json = await res.json();
       if (res.ok && json.success && json.urls) {
         setImages((prev) => [...prev, ...json.urls]);
+        if (!sku.trim()) {
+          setSku(generateArticleSku(categoryId, title));
+        }
         setUploadProgress(`Successfully uploaded ${json.urls.length} photo(s) from your PC!`);
         toast.success(`Uploaded ${json.urls.length} photo(s)!`);
         setTimeout(() => setUploadProgress(""), 4000);
@@ -334,25 +347,26 @@ export default function AdminProductsClientView({
         throw new Error("Please add at least one product image.");
       }
 
+      const finalSku = sku.trim() || generateArticleSku(categoryId, title);
       const res = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          sku,
+          sku: finalSku,
           barcode: barcode || null,
           videoUrl: videoUrl || null,
           runwayReelUrl: videoUrl || null,
           fabric,
-          workType,
+          workType: "",
           pieceCount,
           weight: parseFloat(weight) || 1.0,
-          basePrice,
+          basePrice: basePrice ? parseFloat(basePrice) : 0,
           comparePrice: comparePrice || null,
           costPrice: costPrice || null,
           categoryId: categoryId || null,
           subcategoryId: subcategoryId || null,
-          collectionId: collectionId || null,
+          collectionId: null,
           images: filteredImages,
           imageUrl: filteredImages[0],
           initialStock,
@@ -433,7 +447,7 @@ export default function AdminProductsClientView({
     setEditWorkType(p.workType || "");
     setEditPieceCount(String(p.pieceCount || 3));
     setEditWeight(String(p.weight || 1.0));
-    setEditBasePrice(String(p.basePrice || ""));
+    setEditBasePrice(p.basePrice && p.basePrice > 0 ? String(p.basePrice) : "");
     setEditComparePrice(p.comparePrice ? String(p.comparePrice) : "");
     setEditSalePrice(p.salePrice ? String(p.salePrice) : "");
     setEditCostPrice(p.costPrice ? String(p.costPrice) : "");
@@ -626,8 +640,8 @@ export default function AdminProductsClientView({
     e.preventDefault();
     setEditErrorMsg("");
 
-    if (!editTitle.trim() || !editSku.trim() || !editBasePrice || !editFabric.trim()) {
-      setEditErrorMsg("Product Title, SKU, Base Price, and Fabric are required fields.");
+    if (!editTitle.trim() || !editSku.trim() || !editFabric.trim()) {
+      setEditErrorMsg("Product Title, SKU, and Fabric are required fields.");
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -651,7 +665,7 @@ export default function AdminProductsClientView({
         workType: editWorkType.trim(),
         pieceCount: parseInt(editPieceCount || "3", 10),
         weight: parseFloat(editWeight) || 1.0,
-        basePrice: parseFloat(editBasePrice),
+        basePrice: editBasePrice ? parseFloat(editBasePrice) : 0,
         comparePrice: editComparePrice ? parseFloat(editComparePrice) : null,
         salePrice: editSalePrice ? parseFloat(editSalePrice) : null,
         costPrice: editCostPrice ? parseFloat(editCostPrice) : null,
@@ -863,7 +877,10 @@ export default function AdminProductsClientView({
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              if (!sku.trim()) setSku(generateArticleSku(categoryId, title));
+              setIsModalOpen(true);
+            }}
             className="flex-1 sm:flex-none justify-center px-4 sm:px-5 py-2.5 bg-brand-900 hover:bg-brand-950 text-sand-50 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 text-gold-400" /> Add New Product
@@ -948,7 +965,13 @@ export default function AdminProductsClientView({
                     <td className="p-3 text-brand-600">{p.fabric}</td>
                     <td className="p-3">
                       <div className="font-serif font-bold text-brand-950">
-                        Rs. {p.basePrice?.toLocaleString()}
+                        {p.basePrice && p.basePrice > 0 ? (
+                          `Rs. ${p.basePrice.toLocaleString()}`
+                        ) : (
+                          <span className="text-[10px] font-sans font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                            Price Not Set
+                          </span>
+                        )}
                       </div>
                       {p.comparePrice && p.comparePrice > p.basePrice && (
                         <div className="text-[10px] text-brand-400 line-through">
@@ -1107,22 +1130,6 @@ export default function AdminProductsClientView({
                   </div>
 
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Collection</label>
-                    <select
-                      value={editCollectionId}
-                      onChange={(e) => setEditCollectionId(e.target.value)}
-                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-medium text-brand-950"
-                    >
-                      <option value="">None (Standard Catalog)</option>
-                      {collectionsList.map((col) => (
-                        <option key={col.id} value={col.id}>
-                          {col.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
                     <label className="block font-bold text-brand-900 mb-1">Barcode / EAN</label>
                     <input
                       type="text"
@@ -1167,7 +1174,7 @@ export default function AdminProductsClientView({
                   <Tag className="w-4 h-4 text-gold-600" /> Fabric & Specifications
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-bold text-brand-900 mb-1">Fabric Type *</label>
                     <input
@@ -1176,16 +1183,6 @@ export default function AdminProductsClientView({
                       value={editFabric}
                       onChange={(e) => setEditFabric(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-brand-900 mb-1">Work / Embroidery Type</label>
-                    <input
-                      type="text"
-                      value={editWorkType}
-                      onChange={(e) => setEditWorkType(e.target.value)}
-                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950"
                     />
                   </div>
 
@@ -1273,10 +1270,10 @@ export default function AdminProductsClientView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Selling Price (PKR) *</label>
+                    <label className="block font-bold text-brand-900 mb-1">Selling Price (PKR) <span className="text-[10px] font-normal text-brand-500">(Optional)</span></label>
                     <input
                       type="number"
-                      required
+                      placeholder="Leave empty to update later"
                       value={editBasePrice}
                       onChange={(e) => setEditBasePrice(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950 font-mono"
@@ -2213,11 +2210,19 @@ export default function AdminProductsClientView({
                   </div>
 
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Article SKU *</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-bold text-brand-900">Article SKU (Auto-Generated)</label>
+                      <button
+                        type="button"
+                        onClick={() => setSku(generateArticleSku(categoryId, title))}
+                        className="text-[10px] font-bold text-gold-700 hover:text-gold-900 cursor-pointer"
+                      >
+                        ↻ Regenerate
+                      </button>
+                    </div>
                     <input
                       type="text"
-                      required
-                      placeholder="e.g. TT-VLV-007"
+                      placeholder="Auto-generated (e.g. TT-LAW-4821)"
                       value={sku}
                       onChange={(e) => setSku(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 uppercase font-mono"
@@ -2225,7 +2230,7 @@ export default function AdminProductsClientView({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block font-bold text-brand-900 mb-1">Category *</label>
                     <select
@@ -2255,22 +2260,6 @@ export default function AdminProductsClientView({
                       {categories.find((c) => c.id === categoryId)?.subcategories?.map((sub: any) => (
                         <option key={sub.id} value={sub.id}>
                           {sub.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-brand-900 mb-1">Collection</label>
-                    <select
-                      value={collectionId}
-                      onChange={(e) => setCollectionId(e.target.value)}
-                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-medium text-brand-950"
-                    >
-                      <option value="">None (Standard Collection)</option>
-                      {collectionsList.map((col) => (
-                        <option key={col.id} value={col.id}>
-                          {col.name}
                         </option>
                       ))}
                     </select>
@@ -2321,7 +2310,7 @@ export default function AdminProductsClientView({
                   <Tag className="w-4 h-4 text-gold-600" /> Fabric & Workmanship
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-bold text-brand-900 mb-1">Fabric Type *</label>
                     <input
@@ -2330,17 +2319,6 @@ export default function AdminProductsClientView({
                       placeholder="e.g. Pure Crinkle Chiffon & Silk"
                       value={fabric}
                       onChange={(e) => setFabric(e.target.value)}
-                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-brand-900 mb-1">Work / Embroidery Type</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Tilla, Zari, Cutwork & Micro-Sequins"
-                      value={workType}
-                      onChange={(e) => setWorkType(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50"
                     />
                   </div>
@@ -2418,11 +2396,10 @@ export default function AdminProductsClientView({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Selling Price (PKR) *</label>
+                    <label className="block font-bold text-brand-900 mb-1">Selling Price (PKR) <span className="text-[10px] font-normal text-brand-500">(Optional)</span></label>
                     <input
                       type="number"
-                      required
-                      placeholder="12950"
+                      placeholder="Optional — update anytime later"
                       value={basePrice}
                       onChange={(e) => setBasePrice(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950"

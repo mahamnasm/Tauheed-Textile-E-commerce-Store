@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
       collectionId,
       barcode,
       videoUrl,
+      runwayReelUrl,
       description,
       packageIncludes,
       careInstructions,
@@ -89,11 +90,33 @@ export async function POST(req: NextRequest) {
       preOrderDate,
       initialStock,
       weight,
+      slug,
+      metaTitle,
+      metaDesc,
+      searchTags,
+      dimensions,
+      lowStockThreshold,
+      status,
+      isLimitedEdition,
+      modelSpecs,
+      crossSellIds,
     } = body;
 
-    if (!title || !sku || !basePrice || !fabric) {
-      return jsonError("Title, SKU, Base Price, and Fabric are required fields.", 400);
+    if (!title || !fabric) {
+      return jsonError("Title and Fabric are required fields.", 400);
     }
+
+    // Auto-generate Article SKU if omitted
+    const cleanSku =
+      typeof sku === "string" && sku.trim()
+        ? sku.trim().toUpperCase()
+        : `TT-${Date.now().toString().slice(-4)}-${Math.floor(100 + Math.random() * 900)}`;
+
+    const parsedBasePrice =
+      basePrice !== undefined && basePrice !== null && String(basePrice).trim() !== ""
+        ? parseFloat(String(basePrice))
+        : 0;
+    const safeBasePrice = Number.isFinite(parsedBasePrice) && parsedBasePrice >= 0 ? parsedBasePrice : 0;
 
     // Process image list (supports 1 to unlimited images, e.g. 6, 8, 10+ images)
     let processedImages: string[] = [];
@@ -107,26 +130,41 @@ export async function POST(req: NextRequest) {
       processedImages = ["/assets/hero-model.jpg"];
     }
 
-    // Generate slug from title
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, "") + `-${Math.floor(100 + Math.random() * 900)}`;
+    // Determine slug (custom slug if provided, else generated from title)
+    let finalSlug: string;
+    if (slug && typeof slug === "string" && slug.trim()) {
+      finalSlug = slug
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const existing = await prisma.product.findUnique({ where: { slug: finalSlug } });
+      if (existing) {
+        finalSlug = `${finalSlug}-${Math.floor(100 + Math.random() * 900)}`;
+      }
+    } else {
+      finalSlug = title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "") + `-${Math.floor(100 + Math.random() * 900)}`;
+    }
 
     const product = await prisma.product.create({
       data: {
         title,
-        slug,
-        sku,
+        slug: finalSlug,
+        sku: cleanSku,
         barcode: barcode || null,
-        videoUrl: videoUrl || null,
+        videoUrl: (runwayReelUrl || videoUrl || null) ? String(runwayReelUrl || videoUrl).trim() : null,
+        runwayReelUrl: (runwayReelUrl || videoUrl || null) ? String(runwayReelUrl || videoUrl).trim() : null,
         fabric,
-        workType: workType || "Handcrafted Embroidery",
+        workType: workType || "Signature Craft",
         pieceCount: parseInt(pieceCount || "3", 10),
         weight: weight ? parseFloat(weight) : (parseInt(pieceCount || "3", 10) === 2 ? 0.8 : (parseInt(pieceCount || "3", 10) === 1 ? 0.5 : 1.0)),
-        basePrice: parseFloat(basePrice),
+        basePrice: safeBasePrice,
         comparePrice: comparePrice ? parseFloat(comparePrice) : null,
         costPrice: costPrice ? parseFloat(costPrice) : 0,
         categoryId: categoryId || null,
@@ -135,6 +173,15 @@ export async function POST(req: NextRequest) {
         description: description || `Premium Pakistani creation by Tauheed Textile crafted in ${fabric}.`,
         packageIncludes: packageIncludes || "Complete shirt fabric, pure dupatta, and dyed trouser.",
         careInstructions: careInstructions || "Dry clean recommended. Gentle hand wash in cold water.",
+        metaTitle: metaTitle ? String(metaTitle).trim() : null,
+        metaDesc: metaDesc ? String(metaDesc).trim() : null,
+        searchTags: Array.isArray(searchTags) ? searchTags.join(", ") : (searchTags ? String(searchTags).trim() : null),
+        dimensions: dimensions ? String(dimensions).trim() : null,
+        lowStockThreshold: lowStockThreshold !== undefined ? parseInt(String(lowStockThreshold), 10) || 5 : 5,
+        status: status ? String(status).trim().toUpperCase() : "ACTIVE",
+        isLimitedEdition: Boolean(isLimitedEdition),
+        modelSpecs: modelSpecs ? String(modelSpecs).trim() : null,
+        crossSellIds: Array.isArray(crossSellIds) ? crossSellIds.join(", ") : (crossSellIds ? String(crossSellIds).trim() : null),
         isNewArrival: Boolean(isNewArrival),
         isBestSeller: Boolean(isBestSeller),
         isFeatured: Boolean(isFeatured),
@@ -151,7 +198,7 @@ export async function POST(req: NextRequest) {
         variants: {
           create: [
             {
-              sku: `${sku}-UN`,
+              sku: `${cleanSku}-UN`,
               size: "Unstitched",
               color: "Default",
               stitchedType: "Unstitched",
@@ -159,7 +206,7 @@ export async function POST(req: NextRequest) {
               stockQuantity: parseInt(initialStock || "25", 10),
             },
             {
-              sku: `${sku}-SM`,
+              sku: `${cleanSku}-SM`,
               size: "S",
               color: "Default",
               stitchedType: "Stitched",
@@ -167,7 +214,7 @@ export async function POST(req: NextRequest) {
               stockQuantity: Math.max(5, Math.floor(parseInt(initialStock || "25", 10) / 3)),
             },
             {
-              sku: `${sku}-MD`,
+              sku: `${cleanSku}-MD`,
               size: "M",
               color: "Default",
               stitchedType: "Stitched",
@@ -175,7 +222,7 @@ export async function POST(req: NextRequest) {
               stockQuantity: Math.max(5, Math.floor(parseInt(initialStock || "25", 10) / 3)),
             },
             {
-              sku: `${sku}-LG`,
+              sku: `${cleanSku}-LG`,
               size: "L",
               color: "Default",
               stitchedType: "Stitched",
@@ -225,6 +272,7 @@ async function handleUpdateProduct(req: NextRequest) {
       collectionId,
       barcode,
       videoUrl,
+      runwayReelUrl,
       packageIncludes,
       careInstructions,
       inStock,
@@ -234,6 +282,16 @@ async function handleUpdateProduct(req: NextRequest) {
       isSale,
       isPreOrder,
       preOrderDate,
+      slug,
+      metaTitle,
+      metaDesc,
+      searchTags,
+      dimensions,
+      lowStockThreshold,
+      status,
+      isLimitedEdition,
+      modelSpecs,
+      crossSellIds,
       images,
       variants,
       stockQuantity,
@@ -270,6 +328,28 @@ async function handleUpdateProduct(req: NextRequest) {
     }
 
     const updateData: Record<string, unknown> = {};
+
+    // Check Slug collision if Slug changed
+    if (slug && typeof slug === "string") {
+      const cleanSlug = slug
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      if (cleanSlug && cleanSlug !== currentProduct.slug) {
+        const existingSlug = await prisma.product.findFirst({
+          where: {
+            slug: cleanSlug,
+            id: { not: id },
+          },
+        });
+        if (existingSlug) {
+          return jsonError(`Slug "${cleanSlug}" is already taken by another product.`, 400);
+        }
+        updateData.slug = cleanSlug;
+      }
+    }
     if (title && typeof title === "string") updateData.title = title.trim();
     if (sku && typeof sku === "string") updateData.sku = sku.trim().toUpperCase();
     if (description !== undefined) updateData.description = typeof description === "string" ? description.trim() : "";
@@ -277,7 +357,10 @@ async function handleUpdateProduct(req: NextRequest) {
     if (workType !== undefined) updateData.workType = typeof workType === "string" ? workType.trim() : "";
     if (pieceCount !== undefined) updateData.pieceCount = parseInt(String(pieceCount), 10) || 3;
     if (weight !== undefined) updateData.weight = parseFloat(String(weight)) || 1.0;
-    if (basePrice !== undefined) updateData.basePrice = parseFloat(String(basePrice));
+    if (basePrice !== undefined) {
+      const parsedEditPrice = String(basePrice).trim() === "" ? 0 : parseFloat(String(basePrice));
+      updateData.basePrice = Number.isFinite(parsedEditPrice) && parsedEditPrice >= 0 ? parsedEditPrice : 0;
+    }
     if (comparePrice !== undefined) updateData.comparePrice = comparePrice ? parseFloat(String(comparePrice)) : null;
     if (salePrice !== undefined) updateData.salePrice = salePrice ? parseFloat(String(salePrice)) : null;
     if (costPrice !== undefined) updateData.costPrice = costPrice ? parseFloat(String(costPrice)) : 0;
@@ -285,9 +368,27 @@ async function handleUpdateProduct(req: NextRequest) {
     if (subcategoryId !== undefined) updateData.subcategoryId = subcategoryId || null;
     if (collectionId !== undefined) updateData.collectionId = collectionId || null;
     if (barcode !== undefined) updateData.barcode = barcode ? String(barcode).trim() : null;
-    if (videoUrl !== undefined) updateData.videoUrl = videoUrl ? String(videoUrl).trim() : null;
+    if (runwayReelUrl !== undefined || videoUrl !== undefined) {
+      const v = runwayReelUrl !== undefined ? runwayReelUrl : videoUrl;
+      const cleanV = v ? String(v).trim() : null;
+      updateData.videoUrl = cleanV;
+      updateData.runwayReelUrl = cleanV;
+    }
     if (packageIncludes !== undefined) updateData.packageIncludes = packageIncludes ? String(packageIncludes).trim() : null;
     if (careInstructions !== undefined) updateData.careInstructions = careInstructions ? String(careInstructions).trim() : null;
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle ? String(metaTitle).trim() : null;
+    if (metaDesc !== undefined) updateData.metaDesc = metaDesc ? String(metaDesc).trim() : null;
+    if (searchTags !== undefined) {
+      updateData.searchTags = Array.isArray(searchTags) ? searchTags.join(", ") : (searchTags ? String(searchTags).trim() : null);
+    }
+    if (dimensions !== undefined) updateData.dimensions = dimensions ? String(dimensions).trim() : null;
+    if (lowStockThreshold !== undefined) updateData.lowStockThreshold = parseInt(String(lowStockThreshold), 10) || 5;
+    if (status !== undefined) updateData.status = String(status).trim().toUpperCase() || "ACTIVE";
+    if (isLimitedEdition !== undefined) updateData.isLimitedEdition = Boolean(isLimitedEdition);
+    if (modelSpecs !== undefined) updateData.modelSpecs = modelSpecs ? String(modelSpecs).trim() : null;
+    if (crossSellIds !== undefined) {
+      updateData.crossSellIds = Array.isArray(crossSellIds) ? crossSellIds.join(", ") : (crossSellIds ? String(crossSellIds).trim() : null);
+    }
     if (inStock !== undefined) updateData.inStock = Boolean(inStock);
     if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
     if (isBestSeller !== undefined) updateData.isBestSeller = Boolean(isBestSeller);

@@ -86,12 +86,20 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               </h2>
 
               <div className="mt-2 flex items-baseline gap-3">
-                <span className="font-serif font-bold text-xl text-brand-900">
-                  Rs. {effectivePrice.toLocaleString()}
-                </span>
-                {product.comparePrice && product.comparePrice > effectivePrice && (
-                  <span className="text-sm text-sand-400 line-through">
-                    Rs. {product.comparePrice.toLocaleString()}
+                {effectivePrice > 0 ? (
+                  <>
+                    <span className="font-serif font-bold text-xl text-brand-900">
+                      Rs. {effectivePrice.toLocaleString()}
+                    </span>
+                    {product.comparePrice && product.comparePrice > effectivePrice && (
+                      <span className="text-sm text-sand-400 line-through">
+                        Rs. {product.comparePrice.toLocaleString()}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="font-serif font-semibold text-sm text-gold-700 uppercase tracking-wider">
+                    Price on Request
                   </span>
                 )}
               </div>

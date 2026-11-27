@@ -191,24 +191,33 @@ export default function ProductCard({
             </button>
           )}
 
-          <button
-            onClick={handleQuickAdd}
-            className={`flex-1 py-1.5 px-3 rounded-full text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all ${
-              justAdded
-                ? "bg-[#2D6A4F] text-white"
-                : "bg-[#171717] text-white hover:bg-black"
-            }`}
-          >
-            {justAdded ? (
-              <>
-                <Check className="w-3.5 h-3.5" /> Added
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-3.5 h-3.5" /> + Add
-              </>
-            )}
-          </button>
+          {effectivePrice > 0 ? (
+            <button
+              onClick={handleQuickAdd}
+              className={`flex-1 py-1.5 px-3 rounded-full text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all ${
+                justAdded
+                  ? "bg-[#2D6A4F] text-white"
+                  : "bg-[#171717] text-white hover:bg-black"
+              }`}
+            >
+              {justAdded ? (
+                <>
+                  <Check className="w-3.5 h-3.5" /> Added
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" /> + Add
+                </>
+              )}
+            </button>
+          ) : (
+            <Link
+              href={`/product/${slug}`}
+              className="flex-1 py-1.5 px-3 bg-[#171717] text-white hover:bg-black rounded-full text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all"
+            >
+              View Details
+            </Link>
+          )}
         </div>
       </div>
 
@@ -226,37 +235,54 @@ export default function ProductCard({
 
           {/* Pricing */}
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-serif font-bold text-base text-[#171717]">
-              Rs. {effectivePrice.toLocaleString()}
-            </span>
-            {hasDiscount && (
+            {effectivePrice > 0 ? (
               <>
-                <span className="text-xs text-[#9B9289] line-through">
-                  Rs. {comparePrice.toLocaleString()}
+                <span className="font-serif font-bold text-base text-[#171717]">
+                  Rs. {effectivePrice.toLocaleString()}
                 </span>
-                <span className="text-[10px] font-bold text-[#9B3D3D] bg-[#FEF2F2] px-1.5 py-0.5 rounded">
-                  -{discountPercent}%
-                </span>
+                {hasDiscount && (
+                  <>
+                    <span className="text-xs text-[#9B9289] line-through">
+                      Rs. {comparePrice.toLocaleString()}
+                    </span>
+                    <span className="text-[10px] font-bold text-[#9B3D3D] bg-[#FEF2F2] px-1.5 py-0.5 rounded">
+                      -{discountPercent}%
+                    </span>
+                  </>
+                )}
               </>
+            ) : (
+              <span className="font-serif font-semibold text-xs text-[#7A6652] uppercase tracking-wider">
+                Price on Request
+              </span>
             )}
           </div>
         </div>
       </div>
 
       {/* Mobile Quick Add Button (Tactile Animated Touch) */}
-      <button
-        onClick={handleQuickAdd}
-        className={`sm:hidden w-full py-2.5 text-xs font-bold rounded-b-xl flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-95 cursor-pointer ${
-          justAdded ? "bg-[#2D6A4F] text-white shadow-inner" : "bg-[#171717] hover:bg-black text-white"
-        }`}
-      >
-        {justAdded ? (
-          <Check className="w-4 h-4 animate-bounce" />
-        ) : (
-          <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
-        )}
-        <span>{justAdded ? "Added" : "Quick Add"}</span>
-      </button>
+      {effectivePrice > 0 ? (
+        <button
+          onClick={handleQuickAdd}
+          className={`sm:hidden w-full py-2.5 text-xs font-bold rounded-b-xl flex items-center justify-center gap-1.5 transition-all duration-150 active:scale-95 cursor-pointer ${
+            justAdded ? "bg-[#2D6A4F] text-white shadow-inner" : "bg-[#171717] hover:bg-black text-white"
+          }`}
+        >
+          {justAdded ? (
+            <Check className="w-4 h-4 animate-bounce" />
+          ) : (
+            <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
+          )}
+          <span>{justAdded ? "Added" : "Quick Add"}</span>
+        </button>
+      ) : (
+        <Link
+          href={`/product/${slug}`}
+          className="sm:hidden w-full py-2.5 text-xs font-bold rounded-b-xl flex items-center justify-center gap-1.5 bg-[#7A6652] hover:bg-[#5E4E3E] text-white transition-all"
+        >
+          <span>Inquire / View</span>
+        </Link>
+      )}
     </div>
   );
 }

@@ -28,6 +28,7 @@ import {
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
 import UniversalVideoPlayer from "@/components/common/UniversalVideoPlayer";
+import FloatingRunwayReel from "./FloatingRunwayReel";
 
 interface ProductDetailClientProps {
   product: any;
@@ -409,18 +410,26 @@ export default function ProductDetailClient({
 
           {/* Price Area */}
           <div className="p-4 rounded-xl bg-white border border-[#E7E1D8] shadow-sm flex items-baseline gap-3">
-            <span className="font-serif text-3xl font-bold text-[#171717]">
-              Rs. {effectivePrice.toLocaleString()}
-            </span>
-            {product.comparePrice && product.comparePrice > effectivePrice && (
+            {effectivePrice > 0 ? (
               <>
-                <span className="text-sm text-[#9B9289] line-through">
-                  Rs. {product.comparePrice.toLocaleString()}
+                <span className="font-serif text-3xl font-bold text-[#171717]">
+                  Rs. {effectivePrice.toLocaleString()}
                 </span>
-                <span className="text-xs font-bold text-[#9B3D3D] bg-[#FEF2F2] px-2 py-0.5 rounded">
-                  {Math.round(((product.comparePrice - effectivePrice) / product.comparePrice) * 100)}% OFF
-                </span>
+                {product.comparePrice && product.comparePrice > effectivePrice && (
+                  <>
+                    <span className="text-sm text-[#9B9289] line-through">
+                      Rs. {product.comparePrice.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold text-[#9B3D3D] bg-[#FEF2F2] px-2 py-0.5 rounded">
+                      {Math.round(((product.comparePrice - effectivePrice) / product.comparePrice) * 100)}% OFF
+                    </span>
+                  </>
+                )}
               </>
+            ) : (
+              <span className="font-serif text-xl font-bold text-[#7A6652] uppercase tracking-wider">
+                Price on Request
+              </span>
             )}
             <span className="ml-auto text-xs text-[#1A6B3C] font-semibold flex items-center gap-1">
               <Check className="w-4 h-4" /> In Stock (Unstitched)
@@ -483,24 +492,26 @@ export default function ProductDetailClient({
                 </button>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                className={`btn-shimmer flex-1 py-4 px-6 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all duration-200 active:scale-95 cursor-pointer ${
-                  added
-                    ? "bg-[#1A6B3C] text-white shadow-[#1A6B3C]/30"
-                    : "bg-[#171717] hover:bg-black text-white hover:scale-[1.01]"
-                }`}
-              >
-                {added ? (
-                  <>
-                    <Check className="w-5 h-5 animate-bounce" /> Added to Bag
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" /> Add to Bag
-                  </>
-                )}
-              </button>
+              {effectivePrice > 0 && (
+                <button
+                  onClick={handleAddToCart}
+                  className={`btn-shimmer flex-1 py-4 px-6 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all duration-200 active:scale-95 cursor-pointer ${
+                    added
+                      ? "bg-[#1A6B3C] text-white shadow-[#1A6B3C]/30"
+                      : "bg-[#171717] hover:bg-black text-white hover:scale-[1.01]"
+                  }`}
+                >
+                  {added ? (
+                    <>
+                      <Check className="w-5 h-5 animate-bounce" /> Added to Bag
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" /> Add to Bag
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Direct Order via WhatsApp (Animated Shimmer & Pulse Glow) */}
@@ -929,6 +940,15 @@ export default function ProductDetailClient({
           <span>WhatsApp</span>
         </a>
       </div>
+
+      {/* Floating Runway Reel Video Preview (Conditionally Rendered Above Sticky Bar) */}
+      {(product.runwayReelUrl || product.videoUrl) && (
+        <FloatingRunwayReel
+          videoUrl={product.runwayReelUrl || product.videoUrl}
+          productTitle={product.title}
+          thumbnailUrl={currentImage?.url || product.images?.[0]?.url}
+        />
+      )}
     </div>
   );
 }
