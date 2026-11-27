@@ -902,8 +902,107 @@ export default function AdminProductsClientView({
         </div>
       </div>
 
-      {/* Catalog Table */}
-      <div className="bg-white rounded-2xl border border-sand-200 shadow-sm overflow-hidden">
+      {/* Catalog Mobile Cards + Desktop Table */}
+      <div className="space-y-3 md:hidden">
+        {productList.map((p) => {
+          const totalStock = p.variants?.reduce((sum: number, v: any) => sum + v.stockQuantity, 0) || 0;
+          return (
+            <div
+              key={p.id}
+              className="bg-white rounded-2xl border border-sand-200 p-3.5 shadow-sm space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                <div className="relative w-16 h-20 rounded-xl bg-sand-100 overflow-hidden shrink-0 border border-sand-200">
+                  <Image
+                    src={p.images?.[0]?.url || "/assets/reel-2.jpg"}
+                    alt={p.title}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-serif font-bold text-sm text-brand-950 line-clamp-2 leading-snug">
+                      {p.title}
+                    </p>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold shrink-0 ${
+                      p.inStock !== false ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"
+                    }`}>
+                      {p.inStock !== false ? "Active" : "Out of Stock"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap text-[11px] text-brand-600">
+                    <span className="font-mono font-semibold text-brand-800 bg-sand-100 px-1.5 py-0.5 rounded">
+                      {p.sku}
+                    </span>
+                    <span>•</span>
+                    <span>{p.fabric}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                    <span className="text-[10px] font-semibold text-brand-800 bg-sand-100 px-2 py-0.5 rounded border border-sand-200">
+                      {p.category?.name || "Uncategorized"}
+                    </span>
+                    {p.subcategory && (
+                      <span className="text-[10px] font-semibold text-brand-700 bg-sand-50 px-2 py-0.5 rounded border border-sand-200">
+                        {p.subcategory.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-sand-100 text-xs">
+                <div>
+                  {p.basePrice && p.basePrice > 0 ? (
+                    <span className="font-serif font-bold text-base text-brand-950">
+                      Rs. {p.basePrice.toLocaleString()}
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                      Price Not Set
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                    totalStock > 10 ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                  }`}>
+                    {totalStock} units
+                  </span>
+                  <span className="text-[11px] text-brand-500">
+                    {p.images?.length || 1} photo{p.images?.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEditModal(p)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-brand-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-gold-400" />
+                  <span>Edit Product</span>
+                </button>
+                <Link
+                  href={`/product/${p.slug}`}
+                  target="_blank"
+                  className="w-full py-2.5 px-3 rounded-xl bg-sand-100 hover:bg-sand-200 text-brand-900 text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                >
+                  <span>View Live &rarr;</span>
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Catalog Table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-sand-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead className="bg-sand-50 text-brand-800 uppercase">
@@ -1030,8 +1129,8 @@ export default function AdminProductsClientView({
       {/* ============================================================= */}
       {isEditModalOpen && editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="fixed inset-0 bg-brand-950/70 backdrop-blur-sm" onClick={() => !isSavingEdit && setIsEditModalOpen(false)} />
-          <div className="relative w-full max-w-4xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
+          <div className="fixed inset-0 bg-brand-950/70" onClick={() => !isSavingEdit && setIsEditModalOpen(false)} />
+          <div className="relative w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-sand-200 pb-4">
               <div>
@@ -1519,7 +1618,88 @@ export default function AdminProductsClientView({
                   </button>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Mobile Variant Cards */}
+                <div className="space-y-3 md:hidden">
+                  {editVariants.map((v, idx) => (
+                    <div key={idx} className="p-3 bg-white rounded-xl border border-sand-200 space-y-2.5">
+                      <div className="flex items-center justify-between border-b border-sand-100 pb-2">
+                        <span className="text-[11px] font-bold text-brand-900">Variant #{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEditVariant(idx)}
+                          className="p-1.5 text-maroon-600 hover:bg-maroon-50 rounded-md transition-colors cursor-pointer"
+                          title="Delete variant"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Size</label>
+                          <input
+                            type="text"
+                            value={v.size || ""}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "size", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg font-semibold text-brand-950 text-xs"
+                            placeholder="e.g. S, M, L"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Color</label>
+                          <input
+                            type="text"
+                            value={v.color || ""}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "color", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg text-brand-950 text-xs"
+                            placeholder="e.g. Emerald"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Stitching</label>
+                          <select
+                            value={v.stitchedType || "Unstitched"}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "stitchedType", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg text-brand-950 text-xs font-medium bg-white"
+                          >
+                            <option value="Unstitched">Unstitched</option>
+                            <option value="Stitched">Stitched</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Stock Units</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={v.stockQuantity ?? 0}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "stockQuantity", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg font-mono font-bold text-brand-950 text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Variant SKU</label>
+                          <input
+                            type="text"
+                            value={v.sku || ""}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "sku", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg font-mono text-[11px] text-brand-900 uppercase"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-brand-600 mb-0.5">Price Adjust (+PKR)</label>
+                          <input
+                            type="number"
+                            value={v.priceAdjustment ?? 0}
+                            onChange={(e) => handleUpdateEditVariantField(idx, "priceAdjustment", e.target.value)}
+                            className="w-full p-2 border border-sand-300 rounded-lg font-mono text-brand-950 text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Variant Table */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-xs text-left">
                     <thead className="bg-sand-100/80 text-brand-900 font-bold uppercase text-[10px]">
                       <tr>
@@ -1848,8 +2028,8 @@ export default function AdminProductsClientView({
       {/* ============================================================= */}
       {isCollectionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="fixed inset-0 bg-brand-950/70 backdrop-blur-sm" onClick={() => !isSavingCollection && setIsCollectionModalOpen(false)} />
-          <div className="relative w-full max-w-4xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
+          <div className="fixed inset-0 bg-brand-950/70" onClick={() => !isSavingCollection && setIsCollectionModalOpen(false)} />
+          <div className="relative w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-sand-200 pb-4">
               <div>
@@ -2146,8 +2326,8 @@ export default function AdminProductsClientView({
       {/* ============================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="fixed inset-0 bg-brand-950/70 backdrop-blur-sm" onClick={() => !isSubmitting && setIsModalOpen(false)} />
-          <div className="relative w-full max-w-4xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
+          <div className="fixed inset-0 bg-brand-950/70" onClick={() => !isSubmitting && setIsModalOpen(false)} />
+          <div className="relative w-full max-w-4xl bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto space-y-6 animate-fadeIn border border-sand-200">
             <div className="flex items-center justify-between border-b border-sand-200 pb-4">
               <div>
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-widest">Catalog Engine</span>
