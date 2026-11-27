@@ -104,6 +104,16 @@ export default function AdminProductsClientView({
   const [isSale, setIsSale] = useState(false);
   const [isPreOrder, setIsPreOrder] = useState(false);
   const [preOrderDate, setPreOrderDate] = useState("");
+  const [slug, setSlug] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDesc, setMetaDesc] = useState("");
+  const [searchTags, setSearchTags] = useState("");
+  const [dimensions, setDimensions] = useState("");
+  const [lowStockThreshold, setLowStockThreshold] = useState("5");
+  const [status, setStatus] = useState("ACTIVE");
+  const [isLimitedEdition, setIsLimitedEdition] = useState(false);
+  const [modelSpecs, setModelSpecs] = useState("");
+  const [crossSellIds, setCrossSellIds] = useState("");
 
   const [images, setImages] = useState<string[]>([]);
   const [uploadingPC, setUploadingPC] = useState(false);
@@ -146,6 +156,16 @@ export default function AdminProductsClientView({
   const [editIsSale, setEditIsSale] = useState(false);
   const [editIsPreOrder, setEditIsPreOrder] = useState(false);
   const [editPreOrderDate, setEditPreOrderDate] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [editMetaTitle, setEditMetaTitle] = useState("");
+  const [editMetaDesc, setEditMetaDesc] = useState("");
+  const [editSearchTags, setEditSearchTags] = useState("");
+  const [editDimensions, setEditDimensions] = useState("");
+  const [editLowStockThreshold, setEditLowStockThreshold] = useState("5");
+  const [editStatus, setEditStatus] = useState("ACTIVE");
+  const [editIsLimitedEdition, setEditIsLimitedEdition] = useState(false);
+  const [editModelSpecs, setEditModelSpecs] = useState("");
+  const [editCrossSellIds, setEditCrossSellIds] = useState("");
 
   // Multi-Angle Image Gallery state for edit
   const [editImages, setEditImages] = useState<string[]>([]);
@@ -160,6 +180,7 @@ export default function AdminProductsClientView({
   // 3. COLLECTION MANAGEMENT MODAL STATE
   // -------------------------------------------------------------
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
   const [editingCollection, setEditingCollection] = useState<any | null>(null);
   const [colName, setColName] = useState("");
   const [colSlug, setColSlug] = useState("");
@@ -321,6 +342,7 @@ export default function AdminProductsClientView({
           sku,
           barcode: barcode || null,
           videoUrl: videoUrl || null,
+          runwayReelUrl: videoUrl || null,
           fabric,
           workType,
           pieceCount,
@@ -343,6 +365,16 @@ export default function AdminProductsClientView({
           isSale,
           isPreOrder,
           preOrderDate: isPreOrder ? preOrderDate : null,
+          slug: slug.trim() || undefined,
+          metaTitle: metaTitle.trim() || null,
+          metaDesc: metaDesc.trim() || null,
+          searchTags: searchTags.trim() || null,
+          dimensions: dimensions.trim() || null,
+          lowStockThreshold: parseInt(lowStockThreshold || "5", 10),
+          status,
+          isLimitedEdition,
+          modelSpecs: modelSpecs.trim() || null,
+          crossSellIds: crossSellIds.trim() || null,
         }),
       });
 
@@ -368,6 +400,16 @@ export default function AdminProductsClientView({
       setCostPrice("");
       setDescription("");
       setPackageIncludes("");
+      setSlug("");
+      setMetaTitle("");
+      setMetaDesc("");
+      setSearchTags("");
+      setDimensions("");
+      setLowStockThreshold("5");
+      setStatus("ACTIVE");
+      setIsLimitedEdition(false);
+      setModelSpecs("");
+      setCrossSellIds("");
       setImages([]);
       router.refresh();
     } catch (err: any) {
@@ -408,6 +450,16 @@ export default function AdminProductsClientView({
     setEditIsSale(Boolean(p.isSale));
     setEditIsPreOrder(Boolean(p.isPreOrder));
     setEditPreOrderDate(p.preOrderDate || "");
+    setEditSlug(p.slug || "");
+    setEditMetaTitle(p.metaTitle || "");
+    setEditMetaDesc(p.metaDesc || "");
+    setEditSearchTags(p.searchTags || "");
+    setEditDimensions(p.dimensions || "");
+    setEditLowStockThreshold(String(p.lowStockThreshold ?? 5));
+    setEditStatus(p.status || "ACTIVE");
+    setEditIsLimitedEdition(Boolean(p.isLimitedEdition));
+    setEditModelSpecs(p.modelSpecs || "");
+    setEditCrossSellIds(p.crossSellIds || "");
 
     // Populate images array
     const existingImgs = (p.images || []).map((img: any) => img.url).filter(Boolean);
@@ -608,6 +660,7 @@ export default function AdminProductsClientView({
         collectionId: editCollectionId || null,
         barcode: editBarcode || null,
         videoUrl: editVideoUrl || null,
+        runwayReelUrl: editVideoUrl || null,
         packageIncludes: editPackageIncludes || null,
         careInstructions: editCareInstructions || null,
         inStock: editInStock,
@@ -617,6 +670,16 @@ export default function AdminProductsClientView({
         isSale: editIsSale,
         isPreOrder: editIsPreOrder,
         preOrderDate: editIsPreOrder ? editPreOrderDate : null,
+        slug: editSlug.trim() || undefined,
+        metaTitle: editMetaTitle.trim() || null,
+        metaDesc: editMetaDesc.trim() || null,
+        searchTags: editSearchTags.trim() || null,
+        dimensions: editDimensions.trim() || null,
+        lowStockThreshold: parseInt(editLowStockThreshold || "5", 10),
+        status: editStatus,
+        isLimitedEdition: editIsLimitedEdition,
+        modelSpecs: editModelSpecs.trim() || null,
+        crossSellIds: editCrossSellIds.trim() || null,
         images: filteredImages,
         variants: editVariants,
       };
@@ -653,6 +716,7 @@ export default function AdminProductsClientView({
   // COLLECTION MANAGEMENT HANDLERS
   // -------------------------------------------------------------
   const handleOpenCollectionManager = () => {
+    setIsCreatingCollection(false);
     setEditingCollection(null);
     setColName("");
     setColSlug("");
@@ -664,6 +728,7 @@ export default function AdminProductsClientView({
   };
 
   const handleEditCollection = (col: any) => {
+    setIsCreatingCollection(false);
     setEditingCollection(col);
     setColName(col.name);
     setColSlug(col.slug || "");
@@ -770,6 +835,7 @@ export default function AdminProductsClientView({
         toast.success("New collection created! 🎉");
       }
 
+      setIsCreatingCollection(false);
       setEditingCollection(null);
       setColName("");
       setColSlug("");
@@ -1067,6 +1133,32 @@ export default function AdminProductsClientView({
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">URL Slug (SEO Path)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. mahnoor-velvet-3pc"
+                      value={editSlug}
+                      onChange={(e) => setEditSlug(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono text-xs text-brand-950"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Product Status</label>
+                    <select
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950"
+                    >
+                      <option value="ACTIVE">Active (Live in Store)</option>
+                      <option value="DRAFT">Draft (Admin Only)</option>
+                      <option value="ARCHIVED">Archived (Delisted)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Fabric & Workmanship */}
@@ -1112,7 +1204,7 @@ export default function AdminProductsClientView({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div>
                     <label className="block font-bold text-brand-900 mb-1">Parcel Weight (KG)</label>
                     <input
@@ -1121,6 +1213,29 @@ export default function AdminProductsClientView({
                       min="0.1"
                       value={editWeight}
                       onChange={(e) => setEditWeight(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono font-bold text-brand-950"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Dimensions (L x W x H)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 35 x 25 x 4 cm"
+                      value={editDimensions}
+                      onChange={(e) => setEditDimensions(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono text-brand-950 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Low Stock Alert Threshold</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="5"
+                      value={editLowStockThreshold}
+                      onChange={(e) => setEditLowStockThreshold(e.target.value)}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono font-bold text-brand-950"
                     />
                   </div>
@@ -1136,6 +1251,17 @@ export default function AdminProductsClientView({
                       <option value="false">Out of Stock (Disabled)</option>
                     </select>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">Model Specifications (Height & Wearing Size)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Model is 5'9 and wearing size Small (S)"
+                    value={editModelSpecs}
+                    onChange={(e) => setEditModelSpecs(e.target.value)}
+                    className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950"
+                  />
                 </div>
               </div>
 
@@ -1591,6 +1717,16 @@ export default function AdminProductsClientView({
                     />
                     <span className="font-semibold text-brand-900">Sale Special</span>
                   </label>
+
+                  <label className="flex items-center gap-2 p-3 rounded-xl border border-sand-200 bg-sand-50/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editIsLimitedEdition}
+                      onChange={(e) => setEditIsLimitedEdition(e.target.checked)}
+                      className="rounded text-gold-600 focus:ring-gold-500"
+                    />
+                    <span className="font-semibold text-brand-900">Limited Edition</span>
+                  </label>
                 </div>
 
                 {/* Pre-Order Option */}
@@ -1617,6 +1753,63 @@ export default function AdminProductsClientView({
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Cross-Sells */}
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">
+                    Cross-Sell Products (Matching Dupattas, Trousers, or Accessories)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. TT-SLK-01, TT-SHW-04, TT-VLV-02 (SKUs or Product IDs)"
+                    value={editCrossSellIds}
+                    onChange={(e) => setEditCrossSellIds(e.target.value)}
+                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white font-mono text-xs"
+                  />
+                  <p className="text-[10px] text-brand-500 mt-0.5">Comma-separated list of product SKUs or IDs to recommend on this product page.</p>
+                </div>
+              </div>
+
+              {/* SEO & Search Discovery */}
+              <div className="space-y-4 pt-2">
+                <h4 className="font-serif font-bold text-sm text-brand-950 border-b border-sand-100 pb-1 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-gold-600" /> SEO & Search Engine Discovery
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Meta Title (Search Engines)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Mahnoor Velvet Embroidered 3-Piece | Tauheed Textile"
+                      value={editMetaTitle}
+                      onChange={(e) => setEditMetaTitle(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Search Keywords / Internal Search Tags</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. velvet, winter, embroidered, wedding, bridal, unstitched"
+                      value={editSearchTags}
+                      onChange={(e) => setEditSearchTags(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-mono text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">Meta Description (SEO Snippet)</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Concise, compelling description shown on Google search results (150-160 characters recommended)..."
+                    value={editMetaDesc}
+                    onChange={(e) => setEditMetaDesc(e.target.value)}
+                    className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 text-xs"
+                  />
                 </div>
               </div>
 
@@ -1683,17 +1876,18 @@ export default function AdminProductsClientView({
             </div>
 
             {/* If currently editing a collection (or creating new one) */}
-            {editingCollection !== null || colName ? (
+            {editingCollection !== null || isCreatingCollection ? (
               <form onSubmit={handleSaveCollection} className="space-y-5 text-xs">
                 <div className="p-4 bg-sand-50 rounded-2xl border border-sand-200 space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-serif font-bold text-sm text-brand-950">
                       {editingCollection ? "Update Collection Details" : "New Collection Details"}
                     </h4>
-                    {editingCollection && (
+                    {(editingCollection || isCreatingCollection) && (
                       <button
                         type="button"
                         onClick={() => {
+                          setIsCreatingCollection(false);
                           setEditingCollection(null);
                           setColName("");
                           setColSlug("");
@@ -1797,6 +1991,9 @@ export default function AdminProductsClientView({
                           placeholder="Search products by title/SKU..."
                           value={colSearchQuery}
                           onChange={(e) => setColSearchQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") e.preventDefault();
+                          }}
                           className="w-full pl-8 pr-3 py-1.5 border border-sand-300 rounded-lg text-xs bg-white"
                         />
                       </div>
@@ -1855,6 +2052,7 @@ export default function AdminProductsClientView({
                   <button
                     type="button"
                     onClick={() => {
+                      setIsCreatingCollection(false);
                       setEditingCollection(null);
                       setColName("");
                     }}
@@ -1880,8 +2078,9 @@ export default function AdminProductsClientView({
                   <button
                     type="button"
                     onClick={() => {
+                      setIsCreatingCollection(true);
                       setEditingCollection(null);
-                      setColName("New Luxury Collection");
+                      setColName("");
                       setColSlug("");
                       setColDesc("");
                       setColBanner("/assets/cat-lawn-summer.jpg");
@@ -2088,6 +2287,32 @@ export default function AdminProductsClientView({
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Custom URL Slug (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. mahnoor-velvet-3pc (auto-generated if left empty)"
+                      value={slug}
+                      onChange={(e) => setSlug(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Catalog Status</label>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950"
+                    >
+                      <option value="ACTIVE">Active (Live in Store)</option>
+                      <option value="DRAFT">Draft (Admin Only)</option>
+                      <option value="ARCHIVED">Archived (Delisted)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Fabric & Workmanship */}
@@ -2136,7 +2361,7 @@ export default function AdminProductsClientView({
 
                   <div>
                     <label className="block font-bold text-brand-900 mb-1">
-                      Parcel Weight (KG) <span className="text-[10px] text-brand-500">(Auto-calculates Delivery)</span>
+                      Parcel Weight (KG) <span className="text-[10px] text-brand-500">(Auto Delivery)</span>
                     </label>
                     <input
                       type="number"
@@ -2148,6 +2373,40 @@ export default function AdminProductsClientView({
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-bold text-brand-950 font-mono"
                     />
                   </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Dimensions (L x W x H)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 35 x 25 x 4 cm"
+                      value={dimensions}
+                      onChange={(e) => setDimensions(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono text-brand-950 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Low Stock Threshold</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="5"
+                      value={lowStockThreshold}
+                      onChange={(e) => setLowStockThreshold(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 font-mono font-bold text-brand-950"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">Model Specifications (Height & Wearing Size)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Model is 5'9 and wearing size Small (S)"
+                    value={modelSpecs}
+                    onChange={(e) => setModelSpecs(e.target.value)}
+                    className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950"
+                  />
                 </div>
               </div>
 
@@ -2397,6 +2656,16 @@ export default function AdminProductsClientView({
                     />
                     <span className="font-semibold text-brand-900">Sale Special</span>
                   </label>
+
+                  <label className="flex items-center gap-2 p-3 rounded-xl border border-sand-200 bg-sand-50/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isLimitedEdition}
+                      onChange={(e) => setIsLimitedEdition(e.target.checked)}
+                      className="rounded text-gold-600 focus:ring-gold-500"
+                    />
+                    <span className="font-semibold text-brand-900">Limited Edition</span>
+                  </label>
                 </div>
 
                 {/* Pre-Order Option */}
@@ -2423,6 +2692,63 @@ export default function AdminProductsClientView({
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Cross-Sells */}
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">
+                    Cross-Sell Products (Matching Dupattas, Trousers, or Accessories)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. TT-SLK-01, TT-SHW-04, TT-VLV-02 (SKUs or Product IDs)"
+                    value={crossSellIds}
+                    onChange={(e) => setCrossSellIds(e.target.value)}
+                    className="w-full p-2.5 border border-sand-300 rounded-lg bg-white font-mono text-xs"
+                  />
+                  <p className="text-[10px] text-brand-500 mt-0.5">Comma-separated list of product SKUs or IDs to recommend on this product page.</p>
+                </div>
+              </div>
+
+              {/* SEO & Search Discovery */}
+              <div className="space-y-4 pt-2">
+                <h4 className="font-serif font-bold text-sm text-brand-950 border-b border-sand-100 pb-1 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-gold-600" /> SEO & Search Engine Discovery
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Meta Title (Search Engines)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Mahnoor Velvet Embroidered 3-Piece | Tauheed Textile"
+                      value={metaTitle}
+                      onChange={(e) => setMetaTitle(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-brand-900 mb-1">Search Keywords / Internal Search Tags</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. velvet, winter, embroidered, wedding, bridal, unstitched"
+                      value={searchTags}
+                      onChange={(e) => setSearchTags(e.target.value)}
+                      className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-mono text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-brand-900 mb-1">Meta Description (SEO Snippet)</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Concise, compelling description shown on Google search results (150-160 characters recommended)..."
+                    value={metaDesc}
+                    onChange={(e) => setMetaDesc(e.target.value)}
+                    className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 text-xs"
+                  />
                 </div>
               </div>
 
