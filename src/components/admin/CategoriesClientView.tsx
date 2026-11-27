@@ -12,12 +12,8 @@ import {
   ChevronRight, 
   ChevronDown, 
   X, 
-  Check, 
-  ShoppingBag,
   ExternalLink,
-  Upload,
-  Camera,
-  Sparkles
+  Upload
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -40,17 +36,6 @@ interface CategoryItem {
   };
 }
 
-const CURATED_CATEGORY_PRESETS = [
-  { label: "Summer Lawn", url: "/assets/cat-lawn-summer.jpg" },
-  { label: "Chiffon Formal", url: "/assets/cat-chiffon-formal.jpg" },
-  { label: "Pret Ready to Wear", url: "/assets/cat-pret-readytowear.jpg" },
-  { label: "Wedding Luxury", url: "/assets/cat-wedding-luxury.jpg" },
-  { label: "Nafasat Chiffon", url: "/assets/prod-nafasat.jpg" },
-  { label: "Armani Schiffli", url: "/assets/prod-armani.jpg" },
-  { label: "Bridal Barat", url: "/assets/prod-bridal.jpg" },
-  { label: "Velvet Silk", url: "/assets/prod-velvet.jpg" },
-];
-
 export default function CategoriesClientView({
   initialCategories = [],
 }: {
@@ -63,12 +48,9 @@ export default function CategoriesClientView({
   const [showCatModal, setShowCatModal] = useState(false);
   const [editingCat, setEditingCat] = useState<CategoryItem | null>(null);
   const [catName, setCatName] = useState("");
-  const [catSlug, setCatSlug] = useState("");
-  const [catDesc, setCatDesc] = useState("");
   const [catImage, setCatImage] = useState("");
   const [savingCat, setSavingCat] = useState(false);
   const [uploadingCatImg, setUploadingCatImg] = useState(false);
-  const [aiFitMode, setAiFitMode] = useState<"cover" | "contain" | "vignette">("cover");
 
   const handleUploadCatImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,8 +81,14 @@ export default function CategoriesClientView({
   const [targetParentCatId, setTargetParentCatId] = useState<string>("");
   const [editingSub, setEditingSub] = useState<SubcategoryItem | null>(null);
   const [subName, setSubName] = useState("");
-  const [subSlug, setSubSlug] = useState("");
   const [savingSub, setSavingSub] = useState(false);
+
+  const toSlug = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
 
   const toggleExpand = (id: string) => {
     setExpandedCats((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -110,8 +98,6 @@ export default function CategoriesClientView({
   const handleOpenNewCat = () => {
     setEditingCat(null);
     setCatName("");
-    setCatSlug("");
-    setCatDesc("");
     setCatImage("/assets/banners/banner-lawn.jpg");
     setShowCatModal(true);
   };
@@ -120,8 +106,6 @@ export default function CategoriesClientView({
   const handleOpenEditCat = (cat: CategoryItem) => {
     setEditingCat(cat);
     setCatName(cat.name);
-    setCatSlug(cat.slug);
-    setCatDesc(cat.description || "");
     setCatImage(cat.image || "/assets/banners/banner-lawn.jpg");
     setShowCatModal(true);
   };
@@ -131,18 +115,17 @@ export default function CategoriesClientView({
     e.preventDefault();
     if (!catName.trim()) return;
     setSavingCat(true);
+    const autoSlug = toSlug(catName);
 
     try {
       if (editingCat) {
-        // Edit
         const res = await fetch("/api/categories", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id: editingCat.id,
-            name: catName,
-            slug: catSlug,
-            description: catDesc,
+            name: catName.trim(),
+            slug: editingCat.slug || autoSlug,
             image: catImage,
           }),
         });
@@ -151,7 +134,7 @@ export default function CategoriesClientView({
           setCategories((prev) =>
             prev.map((c) =>
               c.id === editingCat.id
-                ? { ...c, name: catName, slug: catSlug || c.slug, description: catDesc, image: catImage }
+                ? { ...c, name: catName.trim(), image: catImage }
                 : c
             )
           );
@@ -161,14 +144,12 @@ export default function CategoriesClientView({
           toast.error(data.error || "Failed to update category");
         }
       } else {
-        // Create
         const res = await fetch("/api/categories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: catName,
-            slug: catSlug,
-            description: catDesc,
+            name: catName.trim(),
+            slug: autoSlug,
             image: catImage,
           }),
         });
@@ -207,7 +188,6 @@ export default function CategoriesClientView({
     setTargetParentCatId(parentId);
     setEditingSub(null);
     setSubName("");
-    setSubSlug("");
     setShowSubModal(true);
   };
 
@@ -216,7 +196,6 @@ export default function CategoriesClientView({
     setTargetParentCatId(parentId);
     setEditingSub(sub);
     setSubName(sub.name);
-    setSubSlug(sub.slug);
     setShowSubModal(true);
   };
 
@@ -225,6 +204,7 @@ export default function CategoriesClientView({
     e.preventDefault();
     if (!subName.trim() || !targetParentCatId) return;
     setSavingSub(true);
+    const autoSlug = toSlug(subName);
 
     try {
       if (editingSub) {
@@ -234,8 +214,8 @@ export default function CategoriesClientView({
           body: JSON.stringify({
             type: "subcategory",
             id: editingSub.id,
-            name: subName,
-            slug: subSlug,
+            name: subName.trim(),
+            slug: editingSub.slug || autoSlug,
           }),
         });
         const data = await res.json();
@@ -246,7 +226,7 @@ export default function CategoriesClientView({
               return {
                 ...c,
                 subcategories: c.subcategories.map((s) =>
-                  s.id === editingSub.id ? { ...s, name: subName, slug: subSlug || s.slug } : s
+                  s.id === editingSub.id ? { ...s, name: subName.trim() } : s
                 ),
               };
             })
@@ -263,8 +243,8 @@ export default function CategoriesClientView({
           body: JSON.stringify({
             type: "subcategory",
             categoryId: targetParentCatId,
-            name: subName,
-            slug: subSlug,
+            name: subName.trim(),
+            slug: autoSlug,
           }),
         });
         const data = await res.json();
@@ -375,15 +355,10 @@ export default function CategoriesClientView({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-serif font-bold text-sm sm:text-base text-brand-950 truncate">
-                        {cat.name}
-                      </h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sand-100 text-brand-600 border border-sand-200 truncate max-w-[140px] sm:max-w-none">
-                        /{cat.slug}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2.5 text-[11px] sm:text-xs text-brand-500 mt-0.5">
+                    <h3 className="font-serif font-bold text-base text-brand-950 leading-snug">
+                      {cat.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-brand-500 mt-0.5">
                       <span>{subCount} Subcategories</span>
                       <span>•</span>
                       <span>{prodCount} Dresses</span>
@@ -392,15 +367,25 @@ export default function CategoriesClientView({
                 </div>
 
                 {/* Category Actions */}
-                <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 border-t sm:border-t-0 border-sand-100 pt-2 sm:pt-0">
+                <div className="flex items-center flex-wrap justify-end gap-2 shrink-0 border-t sm:border-t-0 border-sand-100 pt-2.5 sm:pt-0">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditCat(cat)}
+                    className="px-3 py-1.5 rounded-lg bg-brand-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Edit category"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-gold-400" />
+                    <span>Edit</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => handleOpenAddSub(cat.id)}
-                    className="px-2.5 py-1.5 rounded-lg bg-sand-100 hover:bg-sand-200 text-brand-800 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-sand-100 hover:bg-sand-200 text-brand-900 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
                     title="Add subcategory to this collection"
                   >
                     <Plus className="w-3.5 h-3.5 text-gold-700" />
-                    <span>Add Sub</span>
+                    <span>+ Sub</span>
                   </button>
 
                   <Link
@@ -414,20 +399,12 @@ export default function CategoriesClientView({
 
                   <button
                     type="button"
-                    onClick={() => handleOpenEditCat(cat)}
-                    className="p-2 rounded-lg text-brand-700 bg-sand-50 hover:bg-sand-200 transition-colors cursor-pointer"
-                    title="Edit category"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                    className="p-2 rounded-lg text-maroon-600 hover:bg-maroon-50 transition-colors cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg text-maroon-600 hover:bg-maroon-50 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                     title="Delete category"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
                   </button>
                 </div>
               </div>
@@ -514,44 +491,34 @@ export default function CategoriesClientView({
 
             <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-brand-900 mb-1">Category Name *</label>
+                <label className="block font-bold text-brand-900 mb-1.5">Category Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Lawn Formals, Organza Formals"
                   value={catName}
-                  onChange={(e) => {
-                    setCatName(e.target.value);
-                    if (!editingCat) {
-                      setCatSlug(
-                        e.target.value
-                          .toLowerCase()
-                          .replace(/[^a-z0-9]+/g, "-")
-                          .replace(/(^-|-$)+/g, "")
-                      );
-                    }
-                  }}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  onChange={(e) => setCatName(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-sand-300 bg-sand-50 text-brand-950 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-brand-900 mb-1">URL Slug</label>
-                <input
-                  type="text"
-                  placeholder="e.g. lawn-formals"
-                  value={catSlug}
-                  onChange={(e) => setCatSlug(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block font-bold text-brand-900 text-xs sm:text-sm">Category Cover Photo</label>
-                  <label className="cursor-pointer px-3 py-1.5 bg-brand-900 hover:bg-black text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
-                    <Upload className="w-3.5 h-3.5 text-gold-400" />
-                    <span>{uploadingCatImg ? "Uploading..." : "📱 Upload from Gallery / PC"}</span>
+              <div className="space-y-2">
+                <label className="block font-bold text-brand-900">Cover Photo</label>
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-sand-200 bg-sand-50">
+                  <div className="relative w-16 h-20 rounded-lg overflow-hidden bg-sand-200 border border-sand-300 shrink-0">
+                    {catImage ? (
+                      <Image
+                        src={catImage}
+                        alt="Category cover"
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    ) : null}
+                  </div>
+                  <label className="flex-1 cursor-pointer py-3 px-4 bg-brand-900 hover:bg-black text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+                    <Upload className="w-4 h-4 text-gold-400" />
+                    <span>{uploadingCatImg ? "Uploading..." : "Upload Photo"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -561,121 +528,20 @@ export default function CategoriesClientView({
                     />
                   </label>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Or paste image URL (e.g. /assets/banners/... or https://...)"
-                  value={catImage}
-                  onChange={(e) => setCatImage(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 font-mono text-xs focus:outline-none focus:ring-1 focus:ring-gold-500"
-                />
-
-                {/* 🎨 Curated Luxury Photo Presets */}
-                <div>
-                  <span className="text-[10px] font-bold text-brand-700 uppercase tracking-wider block mb-1.5">
-                    🎨 Curated Luxury Photo Library (1-Click Select):
-                  </span>
-                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-                    {CURATED_CATEGORY_PRESETS.map((preset, pIdx) => (
-                      <button
-                        key={pIdx}
-                        type="button"
-                        onClick={() => setCatImage(preset.url)}
-                        className={`relative aspect-[4/5] rounded-lg overflow-hidden border transition-all ${
-                          catImage === preset.url
-                            ? "border-gold-600 ring-2 ring-gold-500/50 scale-105"
-                            : "border-sand-300 hover:border-sand-500 opacity-80 hover:opacity-100"
-                        }`}
-                        title={preset.label}
-                      >
-                        <Image src={preset.url} alt={preset.label} fill className="object-cover" />
-                        <span className="absolute inset-x-0 bottom-0 bg-black/70 text-[8px] text-white font-medium truncate px-1 py-0.5 text-center">
-                          {preset.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* ✨ AI Auto-Fit / Improvise (4:5 Card Preview) */}
-                {catImage && (
-                  <div className="pt-2 p-3 bg-sand-50 border border-sand-200 rounded-xl text-center space-y-2">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-gold-600" />
-                        AI Auto-Fit Preview (Shop by Category 4:5):
-                      </span>
-                      <div className="inline-flex rounded-lg bg-sand-200 p-0.5 text-[10px] font-bold">
-                        <button
-                          type="button"
-                          onClick={() => setAiFitMode("cover")}
-                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "cover" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
-                        >
-                          Center Crop
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAiFitMode("contain")}
-                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "contain" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
-                        >
-                          Smart Fit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAiFitMode("vignette")}
-                          className={`px-2 py-0.5 rounded transition-all ${aiFitMode === "vignette" ? "bg-white text-brand-950 shadow-xs" : "text-brand-600"}`}
-                        >
-                          Vignette
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="relative aspect-[4/5] max-w-[170px] rounded-xl overflow-hidden bg-sand-200 border border-sand-300 shadow-md mx-auto">
-                      <Image
-                        src={catImage}
-                        alt="Category preview"
-                        fill
-                        className={`transition-all duration-300 ${
-                          aiFitMode === "contain"
-                            ? "object-contain bg-brand-950/20"
-                            : "object-cover"
-                        }`}
-                      />
-                      {aiFitMode === "vignette" && (
-                        <div className="absolute inset-0 bg-radial from-transparent via-black/20 to-black/70 pointer-events-none" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-3 pointer-events-none">
-                        <p className="font-serif font-bold text-white text-xs leading-tight drop-shadow">
-                          {catName || "Category Title"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <div>
-                <label className="block font-bold text-brand-900 mb-1">Description (Optional)</label>
-                <textarea
-                  rows={3}
-                  placeholder="Brief overview of this luxury collection..."
-                  value={catDesc}
-                  onChange={(e) => setCatDesc(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 focus:outline-none focus:ring-1 focus:ring-gold-500"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCatModal(false)}
-                  className="px-4 py-2 rounded-lg bg-sand-200 text-brand-900 font-bold"
+                  className="flex-1 py-3 rounded-xl bg-sand-200 text-brand-900 font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={savingCat}
-                  className="px-5 py-2 rounded-lg bg-brand-900 text-white font-bold hover:bg-brand-950"
+                  className="flex-1 py-3 rounded-xl bg-brand-900 text-white font-bold hover:bg-black cursor-pointer shadow"
                 >
                   {savingCat ? "Saving..." : editingCat ? "Update Category" : "Create Category"}
                 </button>
@@ -692,7 +558,7 @@ export default function CategoriesClientView({
           <div className="relative w-full max-w-md bg-white rounded-2xl p-4 sm:p-6 shadow-2xl z-10 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-sand-200 pb-3">
               <h3 className="font-serif font-bold text-base sm:text-lg text-brand-950">
-                {editingSub ? `Edit Subcategory` : "Add Subcategory"}
+                {editingSub ? "Edit Subcategory" : "Add Subcategory"}
               </h3>
               <button
                 type="button"
@@ -705,50 +571,29 @@ export default function CategoriesClientView({
 
             <form onSubmit={handleSaveSubcategory} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-brand-900 mb-1">Subcategory Name *</label>
+                <label className="block font-bold text-brand-900 mb-1.5">Subcategory Name *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 2 Piece, 3 Piece, Maxi, Sari, Embroidered"
+                  placeholder="e.g. Unstitched 3-Piece, Printed Lawn"
                   value={subName}
-                  onChange={(e) => {
-                    setSubName(e.target.value);
-                    if (!editingSub) {
-                      setSubSlug(
-                        e.target.value
-                          .toLowerCase()
-                          .replace(/[^a-z0-9]+/g, "-")
-                          .replace(/(^-|-$)+/g, "")
-                      );
-                    }
-                  }}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  onChange={(e) => setSubName(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-sand-300 bg-sand-50 text-brand-950 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-brand-900 mb-1">URL Slug</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 2-piece"
-                  value={subSlug}
-                  onChange={(e) => setSubSlug(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-sand-300 bg-sand-50 text-brand-950 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-gold-500"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowSubModal(false)}
-                  className="px-4 py-2 rounded-lg bg-sand-200 text-brand-900 font-bold"
+                  className="flex-1 py-3 rounded-xl bg-sand-200 text-brand-900 font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={savingSub}
-                  className="px-5 py-2 rounded-lg bg-brand-900 text-white font-bold hover:bg-brand-950"
+                  className="flex-1 py-3 rounded-xl bg-brand-900 text-white font-bold hover:bg-black cursor-pointer shadow"
                 >
                   {savingSub ? "Saving..." : editingSub ? "Update Subcategory" : "Add Subcategory"}
                 </button>
