@@ -28,6 +28,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { generateProductSeoAeo } from "@/lib/seoAeo";
 import toast from "react-hot-toast";
 import { parseVideoUrl } from "@/lib/videoUtils";
 
@@ -108,6 +109,32 @@ export default function AdminProductsClientView({
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDesc, setMetaDesc] = useState("");
   const [searchTags, setSearchTags] = useState("");
+  const [seoManuallyEdited, setSeoManuallyEdited] = useState(false);
+
+  // Auto-generate Google SEO & AEO title/description/tags whenever product name or attributes change
+  React.useEffect(() => {
+    if (!isModalOpen || seoManuallyEdited) return;
+    if (!title.trim()) {
+      setMetaTitle("");
+      setMetaDesc("");
+      setSearchTags("");
+      setSeoManuallyEdited(false);
+      return;
+    }
+    const cat = categories.find((c) => c.id === categoryId);
+    const sub = cat?.subcategories?.find((s: any) => s.id === subcategoryId);
+    const seo = generateProductSeoAeo({
+      title,
+      fabric,
+      categoryName: cat?.name,
+      subcategoryName: sub?.name,
+      pieceCount,
+      basePrice,
+    });
+    setMetaTitle(seo.metaTitle);
+    setMetaDesc(seo.metaDesc);
+    setSearchTags(seo.searchTags);
+  }, [isModalOpen, title, fabric, categoryId, subcategoryId, pieceCount, basePrice, seoManuallyEdited, categories]);
   const [dimensions, setDimensions] = useState("");
   const [lowStockThreshold, setLowStockThreshold] = useState("5");
   const [status, setStatus] = useState("ACTIVE");
@@ -418,6 +445,7 @@ export default function AdminProductsClientView({
       setMetaTitle("");
       setMetaDesc("");
       setSearchTags("");
+      setSeoManuallyEdited(false);
       setDimensions("");
       setLowStockThreshold("5");
       setStatus("ACTIVE");
@@ -2869,41 +2897,78 @@ export default function AdminProductsClientView({
 
               {/* SEO & Search Discovery */}
               <div className="space-y-4 pt-2">
-                <h4 className="font-serif font-bold text-sm text-brand-950 border-b border-sand-100 pb-1 flex items-center gap-2">
-                  <Search className="w-4 h-4 text-gold-600" /> SEO & Search Engine Discovery
-                </h4>
+                <div className="flex items-center justify-between border-b border-sand-100 pb-1">
+                  <h4 className="font-serif font-bold text-sm text-brand-950 flex items-center gap-2">
+                    <Search className="w-4 h-4 text-gold-600" /> Auto SEO &amp; AEO (Google + AI Search)
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cat = categories.find((c) => c.id === categoryId);
+                      const sub = cat?.subcategories?.find((s: any) => s.id === subcategoryId);
+                      const seo = generateProductSeoAeo({
+                        title,
+                        fabric,
+                        categoryName: cat?.name,
+                        subcategoryName: sub?.name,
+                        pieceCount,
+                        basePrice,
+                      });
+                      setSeoManuallyEdited(false);
+                      setMetaTitle(seo.metaTitle);
+                      setMetaDesc(seo.metaDesc);
+                      setSearchTags(seo.searchTags);
+                      if (!description.trim() && seo.description) {
+                        setDescription(seo.description);
+                      }
+                      toast.success("SEO & AEO title & description optimized!");
+                    }}
+                    className="text-[11px] font-bold text-gold-700 hover:text-gold-900 cursor-pointer"
+                  >
+                    ↻ Auto-Optimize SEO &amp; AEO
+                  </button>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Meta Title (Search Engines)</label>
+                    <label className="block font-bold text-brand-900 mb-1">Google Meta Title (Auto-Generated)</label>
                     <input
                       type="text"
-                      placeholder="e.g. Mahnoor Velvet Embroidered 3-Piece | Tauheed Textile"
+                      placeholder="Auto-generated when you enter Product Title..."
                       value={metaTitle}
-                      onChange={(e) => setMetaTitle(e.target.value)}
+                      onChange={(e) => {
+                        setSeoManuallyEdited(true);
+                        setMetaTitle(e.target.value);
+                      }}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-medium"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-brand-900 mb-1">Search Keywords / Internal Search Tags</label>
+                    <label className="block font-bold text-brand-900 mb-1">Search Keywords / AEO Tags</label>
                     <input
                       type="text"
-                      placeholder="e.g. velvet, winter, embroidered, wedding, bridal, unstitched"
+                      placeholder="Auto-generated keywords..."
                       value={searchTags}
-                      onChange={(e) => setSearchTags(e.target.value)}
+                      onChange={(e) => {
+                        setSeoManuallyEdited(true);
+                        setSearchTags(e.target.value);
+                      }}
                       className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 font-mono text-xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-brand-900 mb-1">Meta Description (SEO Snippet)</label>
+                  <label className="block font-bold text-brand-900 mb-1">Google Meta Description (Auto-Generated SEO/AEO Snippet)</label>
                   <textarea
                     rows={2}
-                    placeholder="Concise, compelling description shown on Google search results (150-160 characters recommended)..."
+                    placeholder="Auto-generated Google & AI answer description (150-160 characters)..."
                     value={metaDesc}
-                    onChange={(e) => setMetaDesc(e.target.value)}
+                    onChange={(e) => {
+                      setSeoManuallyEdited(true);
+                      setMetaDesc(e.target.value);
+                    }}
                     className="w-full p-3 border border-sand-300 rounded-xl bg-sand-50 text-brand-950 text-xs"
                   />
                 </div>

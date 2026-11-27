@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { internalError, jsonError } from "@/lib/http";
+import { generateProductSeoAeo } from "@/lib/seoAeo";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);
@@ -152,6 +153,22 @@ export async function POST(req: NextRequest) {
         .replace(/^-+|-+$/g, "") + `-${Math.floor(100 + Math.random() * 900)}`;
     }
 
+    // Auto-generate SEO & AEO metadata if omitted
+    const categoryRecord = categoryId
+      ? await prisma.category.findUnique({ where: { id: categoryId }, select: { name: true } })
+      : null;
+    const subcategoryRecord = subcategoryId
+      ? await prisma.subcategory.findUnique({ where: { id: subcategoryId }, select: { name: true } })
+      : null;
+    const autoSeo = generateProductSeoAeo({
+      title,
+      fabric,
+      categoryName: categoryRecord?.name,
+      subcategoryName: subcategoryRecord?.name,
+      pieceCount,
+      basePrice: safeBasePrice,
+    });
+
     const product = await prisma.product.create({
       data: {
         title,
@@ -170,12 +187,12 @@ export async function POST(req: NextRequest) {
         categoryId: categoryId || null,
         subcategoryId: subcategoryId || null,
         collectionId: collectionId || null,
-        description: description || `Premium Pakistani creation by Tauheed Textile crafted in ${fabric}.`,
+        description: (description && String(description).trim()) ? String(description).trim() : autoSeo.description,
         packageIncludes: packageIncludes || "Complete shirt fabric, pure dupatta, and dyed trouser.",
         careInstructions: careInstructions || "Dry clean recommended. Gentle hand wash in cold water.",
-        metaTitle: metaTitle ? String(metaTitle).trim() : null,
-        metaDesc: metaDesc ? String(metaDesc).trim() : null,
-        searchTags: Array.isArray(searchTags) ? searchTags.join(", ") : (searchTags ? String(searchTags).trim() : null),
+        metaTitle: (metaTitle && String(metaTitle).trim()) ? String(metaTitle).trim() : autoSeo.metaTitle,
+        metaDesc: (metaDesc && String(metaDesc).trim()) ? String(metaDesc).trim() : autoSeo.metaDesc,
+        searchTags: Array.isArray(searchTags) ? searchTags.join(", ") : ((searchTags && String(searchTags).trim()) ? String(searchTags).trim() : autoSeo.searchTags),
         dimensions: dimensions ? String(dimensions).trim() : null,
         lowStockThreshold: lowStockThreshold !== undefined ? parseInt(String(lowStockThreshold), 10) || 5 : 5,
         status: status ? String(status).trim().toUpperCase() : "ACTIVE",
